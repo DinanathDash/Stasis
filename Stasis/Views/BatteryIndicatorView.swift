@@ -3,12 +3,16 @@ import SwiftUI
 struct BatteryIndicatorView: View {
     let batteryLevel: Int
     let chargingMode: ChargingMode
+    var isLowPowerModeEnabled: Bool = false
     var showPercentage: Bool = false
     var showState: Bool = false
 
     private var fillColor: Color {
         if showState && batteryLevel <= 10 {
             return .red
+        }
+        if isLowPowerModeEnabled {
+            return .yellow
         }
         return .primary
     }
