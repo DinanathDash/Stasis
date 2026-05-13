@@ -49,6 +49,7 @@ struct StatusBarContentView: View {
         BatteryIndicatorView(
             batteryLevel: viewModel.displayPercentage,
             chargingMode: viewModel.chargingMode,
+            isLowPowerModeEnabled: viewModel.isLowPowerModeEnabled,
             showPercentage: showPercentage,
             showState: showState
         )

@@ -31,6 +31,7 @@ class MenuViewModel {
     var outputPortDetailsText: String = "None"
     var powerSource: PowerSource = .battery
     var isCharging: Bool = false
+    var isLowPowerModeEnabled: Bool = ProcessInfo.processInfo.isLowPowerModeEnabled
 
     var chargeLimitOverrideActive: Bool { chargeManager.chargeLimitOverrideActive }
     var forceDischargeActive: Bool { chargeManager.forceDischargeActive }
@@ -43,6 +44,7 @@ class MenuViewModel {
     private let timeEstimator = TimeRemainingEstimator()
     private var stableOutputPorts: [OutputPortPower] = []
     private var outputPortsHoldUntil: Date = .distantPast
+    private var powerModeObservation: Task<Void, Never>?
 
     init(batteryService: BatteryService, chargeManager: ChargeManager) {
         self.batteryService = batteryService
@@ -50,6 +52,7 @@ class MenuViewModel {
         self.bootTimestamp = SystemService.bootTimestamp()
         startObservingMetrics()
         startObservingSettings()
+        startObservingPowerMode()
     }
 
     private func startObservingMetrics() {
@@ -82,6 +85,17 @@ class MenuViewModel {
                     from: self.batteryService.metrics,
                     adapter: self.batteryService.adapterMetrics
                 )
+            }
+        }
+    }
+
+    private func startObservingPowerMode() {
+        powerModeObservation = Task { [weak self] in
+            guard let self else { return }
+            for await _ in NotificationCenter.default.notifications(
+                named: .NSProcessInfoPowerStateDidChange
+            ) {
+                self.isLowPowerModeEnabled = ProcessInfo.processInfo.isLowPowerModeEnabled
             }
         }
     }
