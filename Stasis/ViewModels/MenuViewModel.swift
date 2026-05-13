@@ -37,6 +37,7 @@ class MenuViewModel {
     private var metricsObservation: Task<Void, Never>?
     private var settingsObservation: Task<Void, Never>?
     private var uptimeTask: Task<Void, Never>?
+    private let timeEstimator = TimeRemainingEstimator()
 
     init(batteryService: BatteryService, chargeManager: ChargeManager) {
         self.batteryService = batteryService
@@ -107,8 +108,7 @@ class MenuViewModel {
             powerSourceText = "Battery & Power Adapter"
         }
 
-        let formatted = formatTimeRemaining(minutes: metrics.timeRemaining)
-        timeRemainingText = formatted.isEmpty ? "Calculating..." : formatted
+        timeRemainingText = formatTimeRemaining(minutes: metrics.timeRemaining, powerSource: derivedPowerSource, isCharging: metrics.isCharging)
 
         updateUptimeText()
 
@@ -166,10 +166,18 @@ class MenuViewModel {
             return
         }
 
-        let uptime = Date().timeIntervalSince(bootTimestamp)
-        let hours = Int(uptime) / 3600
-        let minutes = (Int(uptime) % 3600) / 60
-        uptimeText = String(format: "%02d:%02d", hours, minutes)
+        let uptime = max(0, Int(Date().timeIntervalSince(bootTimestamp)))
+        let days = uptime / 86_400
+        let hours = (uptime % 86_400) / 3_600
+        let minutes = (uptime % 3_600) / 60
+
+        if days > 0 {
+            uptimeText = "\(days)D \(hours)H \(minutes)M"
+        } else if hours > 0 {
+            uptimeText = "\(hours)H \(minutes)M"
+        } else {
+            uptimeText = "\(minutes)M"
+        }
     }
 
     private func startUptimeTimer() {
@@ -203,13 +211,22 @@ class MenuViewModel {
         NSApplication.shared.terminate(nil)
     }
 
-    private func formatTimeRemaining(minutes: Int) -> String {
-        if minutes < 0 {
-            return ""
+    private func formatTimeRemaining(minutes: Int, powerSource: PowerSource, isCharging: Bool) -> String {
+        return timeEstimator.formatTimeRemaining(
+            reportedMinutes: minutes,
+            powerSource: powerSource,
+            isCharging: isCharging,
+            adapterConnected: adapterConnected,
+            batteryPercentage: displayPercentage,
+            chargingTargetPercentage: chargingTargetPercentage
+        )
+    }
+
+    private var chargingTargetPercentage: Int {
+        if Defaults[.manageCharging] && !chargeLimitOverrideActive {
+            return Defaults[.chargeLimit]
         }
-        let hours = minutes / 60
-        let mins = minutes % 60
-        return String(format: "%02d:%02d", hours, mins)
+        return 100
     }
 
     deinit {
