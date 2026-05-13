@@ -4,6 +4,13 @@ import smc_power
 
 extension MagSafeLEDState: Defaults.Serializable {}
 
+enum OutputVisualizationMode: String, CaseIterable, Defaults.Serializable {
+    case off
+    case powerOnly
+    case batteryOnly
+    case always
+}
+
 extension Defaults.Keys {
     // General
     static let launchAtLogin = Key<Bool>("launchAtLogin", default: false)
@@ -30,6 +37,11 @@ extension Defaults.Keys {
     static let showInternalPower = Key<Bool>("showInternalPower", default: true)
     static let showExternalPower = Key<Bool>("showExternalPower", default: true)
     static let showPowerDistribution = Key<Bool>("showPowerDistribution", default: false)
+    static let showOutputPortsText = Key<Bool>("showOutputPortsText", default: true)
+    static let outputVisualizationMode = Key<OutputVisualizationMode>(
+        "outputVisualizationMode",
+        default: .always
+    )
 
     // Charging
     static let manageCharging = Key<Bool>("manageCharging", default: false)

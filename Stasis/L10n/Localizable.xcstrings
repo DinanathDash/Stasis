@@ -119,6 +119,9 @@
         }
       }
     },
+    "Always" : {
+
+    },
     "Approve Stasis in System Settings → Login Items to continue." : {
 
     },
@@ -264,6 +267,9 @@
           }
         }
       }
+    },
+    "Battery Only" : {
+
     },
     "Battery Power Metrics" : {
       "localizations" : {
@@ -1378,6 +1384,12 @@
         }
       }
     },
+    "Output Ports" : {
+
+    },
+    "Output ports text row" : {
+
+    },
     "Pause charging when the battery temperature exceeds the threshold." : {
       "localizations" : {
         "de" : {
@@ -1461,6 +1473,9 @@
           }
         }
       }
+    },
+    "Power Only" : {
+
     },
     "Power source" : {
       "localizations" : {
@@ -1609,6 +1624,9 @@
       }
     },
     "Show battery state" : {
+
+    },
+    "Show outgoing output" : {
 
     },
     "Sleep Prevention" : {
