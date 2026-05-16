@@ -34,17 +34,34 @@ final class UpdaterService: NSObject {
     static let shared = UpdaterService()
     private var isChecking = false
 
+    /// Returns `true` when the app was installed via Homebrew Cask.
+    /// Homebrew manages the update lifecycle for cask-installed apps,
+    /// so the built-in updater should be disabled entirely in this case.
+    static var isHomebrewInstall: Bool {
+        let bundlePath = Bundle.main.bundlePath
+        let homebrewPrefixes = [
+            "/opt/homebrew/Caskroom",   // Apple Silicon default
+            "/usr/local/Caskroom",       // Intel default
+            "/home/linuxbrew/.linuxbrew/Caskroom", // Linux Homebrew
+        ]
+        return homebrewPrefixes.contains { bundlePath.hasPrefix($0) }
+    }
+
     private override init() {
         super.init()
     }
 
     func startIfAvailable() {
+        // Auto-update is disabled for Homebrew installs; Homebrew manages updates.
+        guard !UpdaterService.isHomebrewInstall else { return }
         if Defaults[.automaticallyCheckForUpdates] {
             checkForUpdates(automatic: true)
         }
     }
 
     func checkForUpdates() {
+        // Manual update check is also disabled for Homebrew installs.
+        guard !UpdaterService.isHomebrewInstall else { return }
         checkForUpdates(automatic: false)
     }
 

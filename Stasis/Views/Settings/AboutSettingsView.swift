@@ -40,24 +40,47 @@ struct AboutSettingsView: View {
                 .padding(.vertical, 2)
             }
 
-            Section {
-                Toggle("Automatically check for updates", isOn: $automaticallyCheckForUpdates)
-
-                Picker("When updates are found", selection: $updateAutomationMode) {
-                    Text("Notify only").tag(UpdaterService.UpdateAutomationMode.notify)
-                    Text("Auto-download to Downloads folder").tag(UpdaterService.UpdateAutomationMode.autoDownload)
-                }
-                .disabled(!automaticallyCheckForUpdates)
-
-                Button("Check for updates now") {
-                    updaterService.checkForUpdates()
-                }
-            } header: {
-                VStack(alignment: .leading, spacing: 2) {
+            if UpdaterService.isHomebrewInstall {
+                Section {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "info.circle")
+                            .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Updates managed by Homebrew")
+                                .fontWeight(.medium)
+                            Text("Stasis was installed via Homebrew Cask. To update, run:")
+                                .foregroundStyle(.secondary)
+                            Text("brew upgrade --cask stasis")
+                                .font(.system(.callout, design: .monospaced))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
+                        }
+                    }
+                    .padding(.vertical, 2)
+                } header: {
                     Text("Updates")
-                    Text("Stasis can check and download updates to your Downloads folder.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                }
+            } else {
+                Section {
+                    Toggle("Automatically check for updates", isOn: $automaticallyCheckForUpdates)
+
+                    Picker("When updates are found", selection: $updateAutomationMode) {
+                        Text("Notify only").tag(UpdaterService.UpdateAutomationMode.notify)
+                        Text("Auto-download to Downloads folder").tag(UpdaterService.UpdateAutomationMode.autoDownload)
+                    }
+                    .disabled(!automaticallyCheckForUpdates)
+
+                    Button("Check for updates now") {
+                        updaterService.checkForUpdates()
+                    }
+                } header: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Updates")
+                        Text("Stasis can check and download updates to your Downloads folder.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }

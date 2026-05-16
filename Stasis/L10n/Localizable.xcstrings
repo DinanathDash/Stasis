@@ -370,6 +370,9 @@
     "Blinking Orange Slow" : {
 
     },
+    "brew upgrade --cask stasis" : {
+
+    },
     "Built with a focus on practical battery health and charging workflows." : {
 
     },
@@ -1706,6 +1709,9 @@
         }
       }
     },
+    "Stasis was installed via Homebrew Cask. To update, run:" : {
+
+    },
     "Status" : {
       "localizations" : {
         "de" : {
@@ -1825,6 +1831,9 @@
 
     },
     "Updates" : {
+
+    },
+    "Updates managed by Homebrew" : {
 
     },
     "Uptime" : {
