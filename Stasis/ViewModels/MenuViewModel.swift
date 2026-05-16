@@ -37,7 +37,7 @@ class MenuViewModel {
     private var metricsObservation: Task<Void, Never>?
     private var settingsObservation: Task<Void, Never>?
     private var uptimeTask: Task<Void, Never>?
-    private let timeEstimator = TimeRemainingEstimator()
+    private var timeEstimator = TimeRemainingEstimator()
 
     init(batteryService: BatteryService, chargeManager: ChargeManager) {
         self.batteryService = batteryService
@@ -108,8 +108,6 @@ class MenuViewModel {
             powerSourceText = "Battery & Power Adapter"
         }
 
-        timeRemainingText = formatTimeRemaining(minutes: metrics.timeRemaining, powerSource: derivedPowerSource, isCharging: metrics.isCharging)
-
         updateUptimeText()
 
         if derivedPowerSource == .acAdapter {
@@ -144,6 +142,8 @@ class MenuViewModel {
         isCharging = metrics.isCharging
         adapterConnected = adapter.adapterConnected
 
+        timeRemainingText = formatTimeRemaining(minutes: metrics.timeRemaining, isCharging: metrics.isCharging)
+
         cycleCountText = "\(metrics.cycleCount)"
         batteryHealthText = "\(metrics.batteryHealth)%"
     }
@@ -167,17 +167,10 @@ class MenuViewModel {
         }
 
         let uptime = max(0, Int(Date().timeIntervalSince(bootTimestamp)))
-        let days = uptime / 86_400
-        let hours = (uptime % 86_400) / 3_600
-        let minutes = (uptime % 3_600) / 60
-
-        if days > 0 {
-            uptimeText = "\(days)D \(hours)H \(minutes)M"
-        } else if hours > 0 {
-            uptimeText = "\(hours)H \(minutes)M"
-        } else {
-            uptimeText = "\(minutes)M"
-        }
+        let duration = Duration.seconds(uptime)
+        uptimeText = duration.formatted(
+            .units(allowed: [.days, .hours, .minutes], width: .abbreviated)
+        )
     }
 
     private func startUptimeTimer() {
@@ -211,15 +204,24 @@ class MenuViewModel {
         NSApplication.shared.terminate(nil)
     }
 
-    private func formatTimeRemaining(minutes: Int, powerSource: PowerSource, isCharging: Bool) -> String {
-        return timeEstimator.formatTimeRemaining(
+    private func formatTimeRemaining(minutes: Int, isCharging: Bool) -> String {
+        if adapterConnected && !isCharging {
+            return "N/A"
+        }
+
+        let estimatedMinutes = timeEstimator.estimateTimeRemaining(
             reportedMinutes: minutes,
-            powerSource: powerSource,
             isCharging: isCharging,
             adapterConnected: adapterConnected,
             batteryPercentage: displayPercentage,
             chargingTargetPercentage: chargingTargetPercentage
         )
+        guard let validMinutes = estimatedMinutes, validMinutes >= 0 else {
+            return "Calculating..."
+        }
+        let hours = validMinutes / 60
+        let mins = validMinutes % 60
+        return String(format: "%02d:%02d", hours, mins)
     }
 
     private var chargingTargetPercentage: Int {

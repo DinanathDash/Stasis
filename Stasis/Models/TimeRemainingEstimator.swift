@@ -1,69 +1,38 @@
 import Foundation
 
-@MainActor
-class TimeRemainingEstimator {
-    private var trendSample: (date: Date, percentage: Int, isCharging: Bool)?
+struct TimeRemainingEstimator {
+    private struct TrendSample {
+        let date: Date
+        let percentage: Int
+        let isCharging: Bool
+    }
 
-    func formatTimeRemaining(
+    private var trendSample: TrendSample?
+
+    mutating func estimateTimeRemaining(
         reportedMinutes: Int,
-        powerSource: PowerSource,
         isCharging: Bool,
         adapterConnected: Bool,
         batteryPercentage: Int,
         chargingTargetPercentage: Int
-    ) -> String {
-        if adapterConnected && !isCharging {
-            return "N/A"
+    ) -> Int? {
+        if batteryPercentage >= chargingTargetPercentage && isCharging {
+            return 0
         }
 
-        let adjustedReportedMinutes = adjustedReportedMinutesToTarget(
-            reportedMinutes: reportedMinutes,
-            isCharging: isCharging,
-            batteryPercentage: batteryPercentage,
-            targetPercentage: chargingTargetPercentage
-        )
+        if reportedMinutes >= 0 {
+            return reportedMinutes
+        }
 
-        let fallbackMinutes = estimateMinutesFromTrend(
+        return estimateMinutesFromTrend(
             batteryPercentage: batteryPercentage,
             isCharging: isCharging,
             adapterConnected: adapterConnected,
             targetPercentage: chargingTargetPercentage
         )
-
-        let effectiveMinutes = adjustedReportedMinutes >= 0 ? adjustedReportedMinutes : fallbackMinutes
-        guard let effectiveMinutes, effectiveMinutes >= 0 else {
-            return "Calculating..."
-        }
-
-        let hours = effectiveMinutes / 60
-        let mins = effectiveMinutes % 60
-        return String(format: "%02d:%02d", hours, mins)
     }
 
-    private func adjustedReportedMinutesToTarget(
-        reportedMinutes: Int,
-        isCharging: Bool,
-        batteryPercentage: Int,
-        targetPercentage: Int
-    ) -> Int {
-        guard reportedMinutes >= 0 else { return -1 }
-        guard isCharging else { return reportedMinutes }
-
-        if batteryPercentage >= targetPercentage {
-            return 0
-        }
-
-        if targetPercentage >= 100 || batteryPercentage >= 100 {
-            return reportedMinutes
-        }
-
-        let remainingToTarget = max(0, targetPercentage - batteryPercentage)
-        let remainingToFull = max(1, 100 - batteryPercentage)
-        let scaled = Double(reportedMinutes) * Double(remainingToTarget) / Double(remainingToFull)
-        return Int(ceil(scaled))
-    }
-
-    private func estimateMinutesFromTrend(
+    private mutating func estimateMinutesFromTrend(
         batteryPercentage: Int,
         isCharging: Bool,
         adapterConnected: Bool,
@@ -71,7 +40,7 @@ class TimeRemainingEstimator {
     ) -> Int? {
         let now = Date()
         defer {
-            trendSample = (date: now, percentage: batteryPercentage, isCharging: isCharging)
+            trendSample = TrendSample(date: now, percentage: batteryPercentage, isCharging: isCharging)
         }
 
         guard !(adapterConnected && !isCharging) else { return nil }
