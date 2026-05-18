@@ -29,7 +29,9 @@ class MenuViewModel {
     var powerSource: PowerSource = .battery
     var isCharging: Bool = false
 
-    var chargeLimitOverrideActive: Bool { chargeManager.chargeLimitOverrideActive }
+    var chargeLimitOverrideActive: Bool {
+        chargeManager.chargeLimitOverrideActive
+    }
     var forceDischargeActive: Bool { chargeManager.forceDischargeActive }
     var manageChargingEnabled: Bool { Defaults[.manageCharging] }
     var adapterConnected: Bool = false
@@ -37,7 +39,7 @@ class MenuViewModel {
     private var metricsObservation: Task<Void, Never>?
     private var settingsObservation: Task<Void, Never>?
     private var uptimeTask: Task<Void, Never>?
-    private var timeEstimator = TimeRemainingEstimator()
+    private let timeEstimator = TimeRemainingEstimator()
 
     init(batteryService: BatteryService, chargeManager: ChargeManager) {
         self.batteryService = batteryService
@@ -71,7 +73,10 @@ class MenuViewModel {
 
     private func startObservingSettings() {
         settingsObservation = Task { [weak self] in
-            for await _ in Defaults.updates([.useHardwarePercentage], initial: false) {
+            for await _ in Defaults.updates(
+                [.useHardwarePercentage],
+                initial: false
+            ) {
                 guard let self else { return }
                 self.updateFormattedValues(
                     from: self.batteryService.metrics,
@@ -89,7 +94,10 @@ class MenuViewModel {
         chargeManager.toggleForceDischarge()
     }
 
-    private func updateFormattedValues(from metrics: BatteryMetrics, adapter: AdapterMetrics) {
+    private func updateFormattedValues(
+        from metrics: BatteryMetrics,
+        adapter: AdapterMetrics
+    ) {
         let useHardware = Defaults[.useHardwarePercentage]
         let percentage =
             useHardware
@@ -97,7 +105,10 @@ class MenuViewModel {
         displayPercentage = percentage
         batteryPercentageText = "\(percentage)%"
 
-        let derivedPowerSource = derivePowerSource(battery: metrics, adapter: adapter)
+        let derivedPowerSource = derivePowerSource(
+            battery: metrics,
+            adapter: adapter
+        )
 
         switch derivedPowerSource {
         case .battery:
@@ -126,8 +137,12 @@ class MenuViewModel {
         batteryTemperatureText =
             "\(metrics.batteryTemperature.formatted(.number.precision(.fractionLength(1))))°C"
 
-        let voltageFormat = FloatingPointFormatStyle<Double>.number.precision(.fractionLength(2))
-        let currentFormat = FloatingPointFormatStyle<Double>.number.precision(.fractionLength(2))
+        let voltageFormat = FloatingPointFormatStyle<Double>.number.precision(
+            .fractionLength(2)
+        )
+        let currentFormat = FloatingPointFormatStyle<Double>.number.precision(
+            .fractionLength(2)
+        )
 
         externalInputText =
             "\(adapter.adapterVoltage.formatted(voltageFormat))V @ \(adapter.adapterCurrent.formatted(currentFormat))A"
@@ -142,13 +157,19 @@ class MenuViewModel {
         isCharging = metrics.isCharging
         adapterConnected = adapter.adapterConnected
 
-        timeRemainingText = formatTimeRemaining(minutes: metrics.timeRemaining, isCharging: metrics.isCharging)
+        timeRemainingText = formatTimeRemaining(
+            minutes: metrics.timeRemaining,
+            isCharging: metrics.isCharging
+        )
 
         cycleCountText = "\(metrics.cycleCount)"
         batteryHealthText = "\(metrics.batteryHealth)%"
     }
 
-    private func derivePowerSource(battery: BatteryMetrics, adapter: AdapterMetrics) -> PowerSource {
+    private func derivePowerSource(
+        battery: BatteryMetrics,
+        adapter: AdapterMetrics
+    ) -> PowerSource {
         guard adapter.adapterConnected else { return .battery }
 
         if adapter.adapterPower == 0 {
@@ -212,7 +233,6 @@ class MenuViewModel {
         let estimatedMinutes = timeEstimator.estimateTimeRemaining(
             reportedMinutes: minutes,
             isCharging: isCharging,
-            adapterConnected: adapterConnected,
             batteryPercentage: displayPercentage,
             chargingTargetPercentage: chargingTargetPercentage
         )
