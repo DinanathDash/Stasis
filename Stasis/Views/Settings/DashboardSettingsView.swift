@@ -54,7 +54,7 @@ struct DashboardSettingsView: View {
                 }
                 .disabled(!showPowerDistribution)
                 Toggle("Output ports text row", isOn: $showOutputPortsText)
-                    .disabled(!showPowerDistribution || outputVisualizationMode == .off)
+                    .disabled(!showPowerDistribution)
             }
         }
         .formStyle(.grouped)

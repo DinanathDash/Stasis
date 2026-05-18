@@ -17,6 +17,7 @@ class IOKitService {
         subsystem: "com.srimanachanta.stasis",
         category: "IOKitService"
     )
+    private var outputTelemetryAvailabilityLogged = false
 
     func metricsStream() -> AsyncStream<(BatteryMetrics, AdapterMetrics)> {
         AsyncStream { continuation in
@@ -132,7 +133,6 @@ class IOKitService {
 
         batteryMetrics.externalConnected =
             getPropertyValue(batteryService, key: "ExternalConnected") ?? false
-        batteryMetrics.systemInputPower = getSystemInputPowerWatts()
         batteryMetrics.outputPorts = getOutputPortPowers()
         batteryMetrics.outputPower = batteryMetrics.outputPorts.reduce(0) { $0 + $1.powerWatts }
 
@@ -270,32 +270,11 @@ class IOKitService {
         return (currentCapacity, maxCapacity, designCapacity)
     }
 
-    private func getSystemInputPowerWatts() -> Double {
-        guard
-            let telemetry: [String: Any] = getPropertyValue(
-                batteryService,
-                key: "PowerTelemetryData"
-            )
-        else {
-            return 0
-        }
-
-        if let systemPowerMilliwatts = telemetry["SystemPowerIn"] as? NSNumber {
-            return max(0, systemPowerMilliwatts.doubleValue / 1000.0)
-        }
-
-        if let systemLoadMilliwatts = telemetry["SystemLoad"] as? NSNumber {
-            return max(0, systemLoadMilliwatts.doubleValue / 1000.0)
-        }
-
-        return 0
-    }
-
-    private func getOutputPowerWatts() -> Double {
-        getOutputPortPowers().reduce(0) { $0 + $1.powerWatts }
-    }
-
     private func getOutputPortPowers() -> [OutputPortPower] {
+        guard supportsOutputTelemetry() else {
+            return []
+        }
+
         guard
             let powerOutDetails: [[String: Any]] = getPropertyValue(
                 batteryService,
@@ -326,6 +305,40 @@ class IOKitService {
             return OutputPortPower(portIndex: portIndex, powerWatts: watts)
         }
         .sorted { $0.portIndex < $1.portIndex }
+    }
+
+    private func supportsOutputTelemetry() -> Bool {
+        let osMajor = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
+        guard osMajor >= 26 else {
+            if !outputTelemetryAvailabilityLogged {
+                logger.info("Outgoing output telemetry disabled: requires macOS 26+")
+                outputTelemetryAvailabilityLogged = true
+            }
+            return false
+        }
+
+        let hasTelemetryData: [String: Any]? = getPropertyValue(
+            batteryService,
+            key: "PowerTelemetryData"
+        )
+        let hasPowerOutDetails: [[String: Any]]? = getPropertyValue(
+            batteryService,
+            key: "PowerOutDetails"
+        )
+        let supported = (hasTelemetryData != nil) && (hasPowerOutDetails != nil)
+
+        if !outputTelemetryAvailabilityLogged {
+            if supported {
+                logger.info("Outgoing output telemetry enabled")
+            } else {
+                logger.info(
+                    "Outgoing output telemetry disabled: PowerTelemetryData/PowerOutDetails unavailable"
+                )
+            }
+            outputTelemetryAvailabilityLogged = true
+        }
+
+        return supported
     }
 
     private func startRefreshLoop() {

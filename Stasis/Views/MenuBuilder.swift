@@ -158,19 +158,7 @@ class MenuBuilder {
     }
 
     private var shouldShowOutputPortsTextRow: Bool {
-        guard Defaults[.showOutputPortsText] else {
-            return false
-        }
-        switch Defaults[.outputVisualizationMode] {
-        case .off:
-            return false
-        case .powerOnly:
-            return viewModel.adapterConnected
-        case .batteryOnly:
-            return !viewModel.adapterConnected
-        case .always:
-            return true
-        }
+        Defaults[.showOutputPortsText]
     }
 
     private func buildHardwareSection() -> [NSMenuItem] {

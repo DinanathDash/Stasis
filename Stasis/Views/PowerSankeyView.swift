@@ -175,6 +175,7 @@ struct PowerSankeyView: View {
     private var rightNodes: some View {
         VStack(spacing: 0) {
             let hasTwoOutputs = outputPortPowers.count >= 2
+            let hasAnyOutput = outputPower > 0
             switch powerSource {
             case .acAdapter:
                 if batteryPower > 0 {
@@ -196,8 +197,6 @@ struct PowerSankeyView: View {
                             value: nil,
                             isLeftSide: false
                         )
-                    } else {
-                        Spacer(minLength: Layout.spacerHeight)
                     }
                 } else {
                     NodeView(
@@ -231,12 +230,13 @@ struct PowerSankeyView: View {
                 .frame(height: Layout.largeNodeHeight)
             case .battery:
                 NodeView(icon: "laptopcomputer", value: nil, isLeftSide: false)
-                if outputPower > 0 {
+                if hasAnyOutput {
+                    Spacer(minLength: Layout.spacerHeight)
                     if hasTwoOutputs {
                         NodeView(icon: "iphone", value: nil, isLeftSide: false)
+                        Spacer(minLength: Layout.spacerHeight)
                         NodeView(icon: "display", value: nil, isLeftSide: false)
                     } else {
-                        Spacer(minLength: Layout.spacerHeight)
                         NodeView(icon: "iphone", value: nil, isLeftSide: false)
                     }
                 }
