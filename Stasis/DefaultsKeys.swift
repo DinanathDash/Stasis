@@ -11,13 +11,21 @@ enum OutputVisualizationMode: String, CaseIterable, Defaults.Serializable {
     case always
 }
 
+enum PercentageDisplayLocation: String, Defaults.Serializable, CaseIterable, Identifiable {
+    case hidden
+    case nextToIcon
+    case insideIcon
+
+    var id: String { rawValue }
+}
+
 extension Defaults.Keys {
     // General
     static let launchAtLogin = Key<Bool>("launchAtLogin", default: false)
 
     // Status Icon
-    static let showBatteryPercentageInStatusIcon = Key<Bool>(
-        "showBatteryPercentageInStatusIcon", default: false)
+    static let batteryPercentageDisplayLocation = Key<PercentageDisplayLocation>(
+        "batteryPercentageDisplayLocation", default: .nextToIcon)
     static let showBatteryStateInStatusIcon = Key<Bool>(
         "showBatteryStateInStatusIcon", default: true)
 
