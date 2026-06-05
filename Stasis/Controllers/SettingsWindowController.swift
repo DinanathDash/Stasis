@@ -6,11 +6,8 @@ import smc_power
 class SettingsWindowController {
     private var window: NSWindow?
     private let capabilities: DeviceCapabilities
-    private let updaterService: UpdaterService
-
-    init(capabilities: DeviceCapabilities, updaterService: UpdaterService) {
+    init(capabilities: DeviceCapabilities) {
         self.capabilities = capabilities
-        self.updaterService = updaterService
     }
 
     func showSettings() {
@@ -21,8 +18,7 @@ class SettingsWindowController {
         }
 
         let settingsView = SettingsView(
-            capabilities: capabilities,
-            updaterService: updaterService
+            capabilities: capabilities
         )
         let hostingController = NSHostingController(rootView: settingsView)
 

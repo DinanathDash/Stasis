@@ -106,6 +106,16 @@ jobs:
           echo "sha256=$(shasum -a 256 Stasis.dmg | awk '{print $1}')" >> $GITHUB_ENV
           echo "version=${{ steps.tag_version.outputs.new_version }}" >> $GITHUB_ENV
 
+      - name: Generate Sparkle Appcast
+        run: |
+          curl -L -o sparkle.zip https://github.com/sparkle-project/Sparkle/releases/download/2.6.2/Sparkle-for-Swift-Package-Manager.zip
+          unzip -q sparkle.zip -d sparkle_tools
+          mkdir appcast_gen
+          cp Stasis.dmg appcast_gen/
+          cp appcast.xml appcast_gen/
+          echo "${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}" | ./sparkle_tools/bin/generate_appcast --ed-key-file - --download-url-prefix "https://github.com/DinanathDash/Stasis/releases/download/${{ steps.tag_version.outputs.new_tag }}/" appcast_gen
+          cp appcast_gen/appcast.xml .
+
       - name: Update Homebrew Cask and Commit
         run: |
           # Replace version in stasis.rb
@@ -113,10 +123,11 @@ jobs:
           # Replace sha256 in stasis.rb
           sed -i '' 's/sha256 ".*"/sha256 "'${{ env.sha256 }}'"/' Casks/stasis.rb
           
-          # Commit the updated ruby file and pbxproj to the repository
+          # Commit the updated ruby file, pbxproj, and appcast.xml to the repository
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Casks/stasis.rb
           git add stasis.xcodeproj/project.pbxproj
-          git commit -m "chore: bump version to v${{ env.version }} and update Homebrew Cask [skip ci]"
+          git add appcast.xml
+          git commit -m "chore: bump version to v${{ env.version }}, update Homebrew Cask, and update appcast [skip ci]"
           git push origin main

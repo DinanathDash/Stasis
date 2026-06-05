@@ -40,11 +40,8 @@ struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
 
     private let capabilities: DeviceCapabilities
-    private let updaterService: UpdaterService
-
-    init(capabilities: DeviceCapabilities, updaterService: UpdaterService) {
+    init(capabilities: DeviceCapabilities) {
         self.capabilities = capabilities
-        self.updaterService = updaterService
     }
 
     var body: some View {
@@ -71,7 +68,7 @@ struct SettingsView: View {
                 case .advanced:
                     AdvancedSettingsView()
                 case .about:
-                    AboutSettingsView(updaterService: updaterService)
+                    AboutSettingsView()
                 }
             }
             .navigationTitle(selectedTab.title)
@@ -87,7 +84,6 @@ struct SettingsView: View {
             adapterControl: true,
             hasMagSafe: true,
             magsafeLEDControl: true
-        ),
-        updaterService: UpdaterService.shared
+        )
     )
 }

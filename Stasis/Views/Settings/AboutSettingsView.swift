@@ -3,15 +3,9 @@ import SwiftUI
 
 struct AboutSettingsView: View {
     @Environment(\.openURL) private var openURL
-    @Default(.automaticallyCheckForUpdates) var automaticallyCheckForUpdates
-    @Default(.updateCheckInterval) var updateCheckInterval
-    @Default(.updateAutomationMode) var updateAutomationMode
-    @State private var showResetSuccessAlert = false
+    @ObservedObject private var updaterManager = UpdaterManager.shared
 
-    private let updaterService: UpdaterService
-
-    init(updaterService: UpdaterService) {
-        self.updaterService = updaterService
+    init() {
     }
 
     var body: some View {
@@ -101,55 +95,45 @@ struct AboutSettingsView: View {
             }
 
             Section {
-                Toggle(
-                    "Automatically check for updates",
-                    isOn: $automaticallyCheckForUpdates
-                )
+                Toggle(isOn: Binding(
+                    get: { updaterManager.automaticallyChecksForUpdates },
+                    set: { updaterManager.automaticallyChecksForUpdates = $0 }
+                )) {
+                    Text("Automatically check for updates")
+                }
 
-                Picker("Check frequency", selection: $updateCheckInterval) {
-                    Text("At start").tag(
-                        UpdaterService.UpdateCheckInterval.atStart
-                    )
-                    Divider()
-                    Text("Once per day").tag(
-                        UpdaterService.UpdateCheckInterval.daily
-                    )
-                    Text("Once per week").tag(
-                        UpdaterService.UpdateCheckInterval.weekly
-                    )
-                    Text("Once per month").tag(
-                        UpdaterService.UpdateCheckInterval.monthly
-                    )
+                Picker("Check frequency", selection: Binding(
+                    get: { updaterManager.updateCheckInterval },
+                    set: { updaterManager.updateCheckInterval = $0 }
+                )) {
+                    Text("Daily").tag(TimeInterval(86400))
+                    Text("Weekly").tag(TimeInterval(604800))
+                    Text("Monthly").tag(TimeInterval(2592000))
                 }
-                .disabled(!automaticallyCheckForUpdates)
-                .onChange(of: updateCheckInterval) { _, _ in
-                    updaterService.startIfAvailable()
-                }
+                .disabled(!updaterManager.automaticallyChecksForUpdates)
 
                 Picker(
                     "When updates are found",
-                    selection: $updateAutomationMode
+                    selection: Binding(
+                        get: { updaterManager.automaticallyDownloadsUpdates },
+                        set: { updaterManager.automaticallyDownloadsUpdates = $0 }
+                    )
                 ) {
-                    Text("Notify only").tag(
-                        UpdaterService.UpdateAutomationMode.notify
-                    )
-                    Text("Auto-download to Downloads folder").tag(
-                        UpdaterService.UpdateAutomationMode.autoDownload
-                    )
+                    Text("Notify only").tag(false)
+                    Text("Auto-download").tag(true)
                 }
-                .disabled(!automaticallyCheckForUpdates)
+                .disabled(!updaterManager.automaticallyChecksForUpdates)
 
                 Button("Check for updates now") {
-                    updaterService.checkForUpdates()
+                    updaterManager.checkForUpdates()
                 }
+                .disabled(!updaterManager.canCheckForUpdates)
             } header: {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Updates")
-                    Text(
-                        "Stasis can check and download updates to your Downloads folder."
-                    )
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    Text("Stasis uses Sparkle to handle automatic updates.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
             }
 
@@ -199,9 +183,7 @@ struct AboutSettingsView: View {
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 0)
-        .onChange(of: automaticallyCheckForUpdates) { _, _ in
-            updaterService.startIfAvailable()
-        }
+
     }
 
     private var versionText: String? {
@@ -249,5 +231,5 @@ extension NSAlert {
 }
 
 #Preview {
-    AboutSettingsView(updaterService: UpdaterService.shared)
+    AboutSettingsView()
 }

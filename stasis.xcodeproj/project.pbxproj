@@ -14,7 +14,8 @@
 		A68B3E292F19ABCB00F115E4 /* helper.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = A68B3E1E2F19ABCB00F115E4 /* helper.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A6AE19892F480D41003B09FA /* smc_power.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A66D62CE2F44067C00B996E7 /* smc_power.framework */; };
 		A6AE198A2F480D41003B09FA /* smc_power.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A66D62CE2F44067C00B996E7 /* smc_power.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A6E6D7322F3A00000069CF9F /* charging-helper in Copy Helper Tools */ = {isa = PBXBuildFile; fileRef = A6E6D71E2F39DD350069CF9F /* charging-helper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A6E6D7322F3A00000069CF9F /* com.dinanathdash.stasis.charging-helper in Copy Helper Tools */ = {isa = PBXBuildFile; fileRef = A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		E848EAF049F1CF475276533E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = F195F982B58740F53BD3914B /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,7 +85,7 @@
 			dstPath = Contents/Library/LaunchServices;
 			dstSubfolderSpec = 1;
 			files = (
-				A6E6D7322F3A00000069CF9F /* charging-helper in Copy Helper Tools */,
+				A6E6D7322F3A00000069CF9F /* com.dinanathdash.stasis.charging-helper in Copy Helper Tools */,
 			);
 			name = "Copy Helper Tools";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -96,7 +97,7 @@
 		A67470412FA4F4EA00925FF2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A68B3E0C2F19AB4B00F115E4 /* stasis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = stasis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A68B3E1E2F19ABCB00F115E4 /* helper.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = helper.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
-		A6E6D71E2F39DD350069CF9F /* charging-helper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "charging-helper"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "com.dinanathdash.stasis.charging-helper"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -119,11 +120,15 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A66D62CF2F44067C00B996E7 /* SMCPower */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = SMCPower;
 			sourceTree = "<group>";
 		};
 		A68B3E0E2F19AB4B00F115E4 /* Stasis */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = Stasis;
 			sourceTree = "<group>";
 		};
@@ -160,6 +165,7 @@
 			files = (
 				A6AE19892F480D41003B09FA /* smc_power.framework in Frameworks */,
 				A6638F812F1C0FD60047FA8E /* Defaults in Frameworks */,
+				E848EAF049F1CF475276533E /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,7 +206,7 @@
 			children = (
 				A68B3E0C2F19AB4B00F115E4 /* stasis.app */,
 				A68B3E1E2F19ABCB00F115E4 /* helper.xpc */,
-				A6E6D71E2F39DD350069CF9F /* charging-helper */,
+				A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */,
 				A66D62CE2F44067C00B996E7 /* smc_power.framework */,
 			);
 			name = Products;
@@ -275,6 +281,7 @@
 			name = stasis;
 			packageProductDependencies = (
 				A6638F802F1C0FD60047FA8E /* Defaults */,
+				F195F982B58740F53BD3914B /* Sparkle */,
 			);
 			productName = stasis;
 			productReference = A68B3E0C2F19AB4B00F115E4 /* stasis.app */;
@@ -297,8 +304,6 @@
 				A68B3E1F2F19ABCB00F115E4 /* Helper */,
 			);
 			name = helper;
-			packageProductDependencies = (
-			);
 			productName = helper;
 			productReference = A68B3E1E2F19ABCB00F115E4 /* helper.xpc */;
 			productType = "com.apple.product-type.xpc-service";
@@ -319,10 +324,8 @@
 				A6E6D71F2F39DD350069CF9F /* ChargingHelper */,
 			);
 			name = "charging-helper";
-			packageProductDependencies = (
-			);
 			productName = "charging-helper";
-			productReference = A6E6D71E2F39DD350069CF9F /* charging-helper */;
+			productReference = A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -364,6 +367,7 @@
 			packageReferences = (
 				A6638F7F2F1C0FD60047FA8E /* XCRemoteSwiftPackageReference "Defaults" */,
 				A6ECE4EC2F39E247007F3EDF /* XCRemoteSwiftPackageReference "SMCKit" */,
+				04050E4B9EEE0749157F347A /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A68B3E0D2F19AB4B00F115E4 /* Products */;
@@ -723,6 +727,9 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_SUEnableInstallerLauncherService = YES;
+				INFOPLIST_KEY_SUFeedURL = "https://raw.githubusercontent.com/DinanathDash/Stasis/main/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "q259SeFUiuniAFmoW4fv4BwGZvmZHQ1P2g/15790bss=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -761,6 +768,9 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_SUEnableInstallerLauncherService = YES;
+				INFOPLIST_KEY_SUFeedURL = "https://raw.githubusercontent.com/DinanathDash/Stasis/main/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "q259SeFUiuniAFmoW4fv4BwGZvmZHQ1P2g/15790bss=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -875,6 +885,7 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChargingHelper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.8;
 				OTHER_CODE_SIGN_FLAGS = "-o library-validation,runtime";
@@ -885,7 +896,7 @@
 					"$(SRCROOT)/ChargingHelper/launchd.plist",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dinanathdash.stasis.charging-helper";
-				PRODUCT_NAME = "com.dinanathdash.stasis.charging-helper"; INFOPLIST_FILE = "ChargingHelper/Info.plist";
+				PRODUCT_NAME = "com.dinanathdash.stasis.charging-helper";
 				SKIP_INSTALL = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
@@ -905,6 +916,7 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChargingHelper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.8;
 				OTHER_CODE_SIGN_FLAGS = "-o library-validation,runtime";
@@ -915,7 +927,7 @@
 					"$(SRCROOT)/ChargingHelper/launchd.plist",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dinanathdash.stasis.charging-helper";
-				PRODUCT_NAME = "com.dinanathdash.stasis.charging-helper"; INFOPLIST_FILE = "ChargingHelper/Info.plist";
+				PRODUCT_NAME = "com.dinanathdash.stasis.charging-helper";
 				SKIP_INSTALL = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
@@ -974,6 +986,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		04050E4B9EEE0749157F347A /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		A6638F7F2F1C0FD60047FA8E /* XCRemoteSwiftPackageReference "Defaults" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
@@ -1002,6 +1022,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A6ECE4EC2F39E247007F3EDF /* XCRemoteSwiftPackageReference "SMCKit" */;
 			productName = SMCKit;
+		};
+		F195F982B58740F53BD3914B /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04050E4B9EEE0749157F347A /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

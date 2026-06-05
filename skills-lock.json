@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "macos-auto-update": {
+      "source": "fayazara/macos-app-skills",
+      "sourceType": "github",
+      "skillPath": "auto-update/SKILL.md",
+      "computedHash": "704f045635049dcb82380210ec0d337ebce28f41ee9ba28d6211ae3c1c46b190"
+    },
+    "macos-build": {
+      "source": "fayazara/macos-app-skills",
+      "sourceType": "github",
+      "skillPath": "build/SKILL.md",
+      "computedHash": "de7a069d100ebb3453269f0d4871401021f3d6eb46bd3dfc1668460bbab0f0bc"
+    },
+    "macos-notch-ui": {
+      "source": "fayazara/macos-app-skills",
+      "sourceType": "github",
+      "skillPath": "notch-ui/SKILL.md",
+      "computedHash": "e39093236fbccf2957182c117af013129000985205a3bf65c39eb42a7606afd4"
+    },
+    "macos-patterns": {
+      "source": "fayazara/macos-app-skills",
+      "sourceType": "github",
+      "skillPath": "macos-patterns/SKILL.md",
+      "computedHash": "ae976dcae49d6a40b131b75104ad58491d9cc076a68c6175f6daba60a266acaf"
+    },
+    "macos-release": {
+      "source": "fayazara/macos-app-skills",
+      "sourceType": "github",
+      "skillPath": "release/SKILL.md",
+      "computedHash": "b313d525a5b732d02b889ec3772594d5edbc327ddb7471827df3d9abf7e5a0f9"
+    },
+    "macos-settings-ui": {
+      "source": "fayazara/macos-app-skills",
+      "sourceType": "github",
+      "skillPath": "settings-ui/SKILL.md",
+      "computedHash": "31d1a4f1d86375291fded0015e93f48e725d24ce72573028eb72902d70aad250"
+    }
+  }
+}
