@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		06F980D52C3CA823CFE253D7 /* ToggleTopUpIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F345B1AEF42CA935A018CC0 /* ToggleTopUpIntent.swift */; };
+		2536C146A0F597799CB2EA12 /* StasisWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E745C06FFDDB3C2921608841 /* StasisWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		284218D2AA2D0B85FB96F044 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0108D8B15E447D46671D426F /* Cocoa.framework */; };
+		2C816407495870DDD186633F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21A79EE1AC5AA13B90F7AA0A /* Foundation.framework */; };
+		541A7F2C7A4B6D796D15389D /* StasisWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB628545B8B9D748ABB0577 /* StasisWidgetsBundle.swift */; };
+		5E9C1D938347D78227B1ECC4 /* ToggleSailingModeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99D2FA2F464CB390128FA52 /* ToggleSailingModeIntent.swift */; };
+		89DAF1C7280F554AA14B728F /* GetBatteryStatusIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B388511F3D9F789874C0EB07 /* GetBatteryStatusIntent.swift */; };
+		8E4273446317CF0024F87CEE /* DefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C285BD3E05BD94A263FB87C8 /* DefaultsKeys.swift */; };
+		95CD1EEDF8472ED3EFB46373 /* BatteryMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B34494C8924E9E33E69FC9BF /* BatteryMetrics.swift */; };
+		9798846635F9B724C0D55FAD /* PercentageFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FE5AA906A0FC7642140A2D9 /* PercentageFormatter.swift */; };
+		979FAF28D04193F679A98304 /* StasisWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037CBDD1E7C2450509B7B0DD /* StasisWidgetProvider.swift */; };
+		A3D1BFAC11E3F5C15E65B614 /* BatteryStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7921FDF3ED9D1AA7BDEAD0F /* BatteryStatusWidget.swift */; };
 		A6638F812F1C0FD60047FA8E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = A6638F802F1C0FD60047FA8E /* Defaults */; };
 		A66D62D92F44069300B996E7 /* smc_power.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A66D62CE2F44067C00B996E7 /* smc_power.framework */; };
 		A66D62DD2F44069900B996E7 /* smc_power.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A66D62CE2F44067C00B996E7 /* smc_power.framework */; };
@@ -15,7 +27,21 @@
 		A6AE19892F480D41003B09FA /* smc_power.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A66D62CE2F44067C00B996E7 /* smc_power.framework */; };
 		A6AE198A2F480D41003B09FA /* smc_power.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A66D62CE2F44067C00B996E7 /* smc_power.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A6E6D7322F3A00000069CF9F /* com.dinanathdash.stasis.charging-helper in Copy Helper Tools */ = {isa = PBXBuildFile; fileRef = A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A753C600B37DBF37173AB536 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B70DF00D0A4512323410473 /* WidgetKit.framework */; };
+		B05B37B3A2BA5FE5671EC149 /* ChargingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA8AAD624458CB3FED76B4E /* ChargingMode.swift */; };
+		B1450E221FD6458750534835 /* PowerSankeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94772A5BDA18243CADB1C57 /* PowerSankeyView.swift */; };
+		B383FAFDBFA3E5C820E07925 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED8922E693EE3566EC460042 /* AppKit.framework */; };
+		B91212E66C4C701D009F04F7 /* AppDelegateStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC6C5DCE555E5672BBBBD21 /* AppDelegateStub.swift */; };
+		C8EC10B032835FCE373F09C0 /* PowerSankeyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB6C94A68EA753EBFCFAFA6 /* PowerSankeyWidget.swift */; };
+		CA1E46B7B443A391CEADDC3F /* SetChargeLimitIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB17D917042FD18D94EDF6E6 /* SetChargeLimitIntent.swift */; };
+		D2544446301B7E5F002CFCBE /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = A6638F802F1C0FD60047FA8E /* Defaults */; };
+		D8605D2B2A7CDEB3C20F4736 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4076A738FB5EF065316FFB54 /* AppIntents.framework */; };
+		DC38B2D45D5321C4D6226B6B /* PowerValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3649CD880BA38818012E8D08 /* PowerValueFormatter.swift */; };
+		E51E5389E375FC1F6E7184A4 /* BatteryIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A5FEA7ACD9C697176636C /* BatteryIndicatorView.swift */; };
 		E848EAF049F1CF475276533E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = F195F982B58740F53BD3914B /* Sparkle */; };
+		EBC6CDA09066E29463BC8155 /* PowerSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C940BAF946D438A68EB4AE8 /* PowerSource.swift */; };
+		FABB180C892DF932BA7AF195 /* WidgetStatusData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4090E1F7AB451C1D2A435FA /* WidgetStatusData.swift */; };
+		FDF6C939ABC24BBF6C04CF73 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FE7636E2BC9BA719E2DB36E /* SwiftUI.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +80,13 @@
 			remoteGlobalIDString = A6E6D71D2F39DD350069CF9F;
 			remoteInfo = "charging-helper";
 		};
+		FEE579C580616A77DCE78823 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A68B3E042F19AB4B00F115E4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 470E04E865F208042D6ED0DC;
+			remoteInfo = StasisWidgets;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -90,14 +123,54 @@
 			name = "Copy Helper Tools";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F757C228143A379F4B09BEAE /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2536C146A0F597799CB2EA12 /* StasisWidgets.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0108D8B15E447D46671D426F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		037CBDD1E7C2450509B7B0DD /* StasisWidgetProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StasisWidgetProvider.swift; path = StasisWidgets/StasisWidgetProvider.swift; sourceTree = "<group>"; };
+		0F345B1AEF42CA935A018CC0 /* ToggleTopUpIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ToggleTopUpIntent.swift; path = Stasis/Intents/ToggleTopUpIntent.swift; sourceTree = "<group>"; };
+		1FB628545B8B9D748ABB0577 /* StasisWidgetsBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StasisWidgetsBundle.swift; path = StasisWidgets/StasisWidgetsBundle.swift; sourceTree = "<group>"; };
+		21A79EE1AC5AA13B90F7AA0A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		3649CD880BA38818012E8D08 /* PowerValueFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PowerValueFormatter.swift; path = Stasis/Models/PowerValueFormatter.swift; sourceTree = "<group>"; };
+		4076A738FB5EF065316FFB54 /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/AppIntents.framework; sourceTree = DEVELOPER_DIR; };
+		42067C73F0CFFE5662DD1B01 /* StasisWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StasisWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B8A5FEA7ACD9C697176636C /* BatteryIndicatorView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BatteryIndicatorView.swift; path = Stasis/Views/BatteryIndicatorView.swift; sourceTree = "<group>"; };
+		6B70DF00D0A4512323410473 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/WidgetKit.framework; sourceTree = DEVELOPER_DIR; };
+		6C940BAF946D438A68EB4AE8 /* PowerSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PowerSource.swift; path = Stasis/Models/PowerSource.swift; sourceTree = "<group>"; };
+		7FE7636E2BC9BA719E2DB36E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/SwiftUI.framework; sourceTree = DEVELOPER_DIR; };
+		8AA8AAD624458CB3FED76B4E /* ChargingMode.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChargingMode.swift; path = Stasis/Models/ChargingMode.swift; sourceTree = "<group>"; };
+		8BB6C94A68EA753EBFCFAFA6 /* PowerSankeyWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PowerSankeyWidget.swift; path = StasisWidgets/PowerSankeyWidget.swift; sourceTree = "<group>"; };
+		8FE5AA906A0FC7642140A2D9 /* PercentageFormatter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PercentageFormatter.swift; path = Stasis/Models/PercentageFormatter.swift; sourceTree = "<group>"; };
 		A66D62CE2F44067C00B996E7 /* smc_power.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = smc_power.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A67470412FA4F4EA00925FF2 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A68B3E0C2F19AB4B00F115E4 /* Stasis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stasis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A68B3E1E2F19ABCB00F115E4 /* helper.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = helper.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "com.dinanathdash.stasis.charging-helper"; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABC6C5DCE555E5672BBBBD21 /* AppDelegateStub.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppDelegateStub.swift; path = StasisWidgets/AppDelegateStub.swift; sourceTree = "<group>"; };
+		B0D3722E10FE862C56FF700D /* StasisWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StasisWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B34494C8924E9E33E69FC9BF /* BatteryMetrics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BatteryMetrics.swift; path = Stasis/Models/BatteryMetrics.swift; sourceTree = "<group>"; };
+		B388511F3D9F789874C0EB07 /* GetBatteryStatusIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GetBatteryStatusIntent.swift; path = Stasis/Intents/GetBatteryStatusIntent.swift; sourceTree = "<group>"; };
+		C285BD3E05BD94A263FB87C8 /* DefaultsKeys.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DefaultsKeys.swift; path = Stasis/DefaultsKeys.swift; sourceTree = "<group>"; };
+		D94772A5BDA18243CADB1C57 /* PowerSankeyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PowerSankeyView.swift; path = Stasis/Views/PowerSankeyView.swift; sourceTree = "<group>"; };
+		DE1F0B17AD11866924DCAE59 /* StasisWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StasisWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E745C06FFDDB3C2921608841 /* StasisWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StasisWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7921FDF3ED9D1AA7BDEAD0F /* BatteryStatusWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BatteryStatusWidget.swift; path = StasisWidgets/BatteryStatusWidget.swift; sourceTree = "<group>"; };
+		EB17D917042FD18D94EDF6E6 /* SetChargeLimitIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SetChargeLimitIntent.swift; path = Stasis/Intents/SetChargeLimitIntent.swift; sourceTree = "<group>"; };
+		ED8922E693EE3566EC460042 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/AppKit.framework; sourceTree = DEVELOPER_DIR; };
+		F4090E1F7AB451C1D2A435FA /* WidgetStatusData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetStatusData.swift; path = Stasis/Models/WidgetStatusData.swift; sourceTree = "<group>"; };
+		F99D2FA2F464CB390128FA52 /* ToggleSailingModeIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ToggleSailingModeIntent.swift; path = Stasis/Intents/ToggleSailingModeIntent.swift; sourceTree = "<group>"; };
+		F9C22A9F82B7CF20C671525F /* StasisWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StasisWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -157,6 +230,20 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		044CA7030F6731EA9E7D8DD8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D2544446301B7E5F002CFCBE /* Defaults in Frameworks */,
+				284218D2AA2D0B85FB96F044 /* Cocoa.framework in Frameworks */,
+				A753C600B37DBF37173AB536 /* WidgetKit.framework in Frameworks */,
+				FDF6C939ABC24BBF6C04CF73 /* SwiftUI.framework in Frameworks */,
+				D8605D2B2A7CDEB3C20F4736 /* AppIntents.framework in Frameworks */,
+				B383FAFDBFA3E5C820E07925 /* AppKit.framework in Frameworks */,
+				2C816407495870DDD186633F /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A66D62CB2F44067C00B996E7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -194,6 +281,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7238AB8D8D411E05B4CC693D /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				0108D8B15E447D46671D426F /* Cocoa.framework */,
+				6B70DF00D0A4512323410473 /* WidgetKit.framework */,
+				7FE7636E2BC9BA719E2DB36E /* SwiftUI.framework */,
+				4076A738FB5EF065316FFB54 /* AppIntents.framework */,
+				ED8922E693EE3566EC460042 /* AppKit.framework */,
+				21A79EE1AC5AA13B90F7AA0A /* Foundation.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
 		A68B3E032F19AB4B00F115E4 = {
 			isa = PBXGroup;
 			children = (
@@ -204,6 +304,24 @@
 				A66D62CF2F44067C00B996E7 /* SMCPower */,
 				A68B3E532F1A942600F115E4 /* Frameworks */,
 				A68B3E0D2F19AB4B00F115E4 /* Products */,
+				1FB628545B8B9D748ABB0577 /* StasisWidgetsBundle.swift */,
+				037CBDD1E7C2450509B7B0DD /* StasisWidgetProvider.swift */,
+				E7921FDF3ED9D1AA7BDEAD0F /* BatteryStatusWidget.swift */,
+				8BB6C94A68EA753EBFCFAFA6 /* PowerSankeyWidget.swift */,
+				ABC6C5DCE555E5672BBBBD21 /* AppDelegateStub.swift */,
+				F4090E1F7AB451C1D2A435FA /* WidgetStatusData.swift */,
+				8FE5AA906A0FC7642140A2D9 /* PercentageFormatter.swift */,
+				6C940BAF946D438A68EB4AE8 /* PowerSource.swift */,
+				B34494C8924E9E33E69FC9BF /* BatteryMetrics.swift */,
+				8AA8AAD624458CB3FED76B4E /* ChargingMode.swift */,
+				3649CD880BA38818012E8D08 /* PowerValueFormatter.swift */,
+				D94772A5BDA18243CADB1C57 /* PowerSankeyView.swift */,
+				4B8A5FEA7ACD9C697176636C /* BatteryIndicatorView.swift */,
+				C285BD3E05BD94A263FB87C8 /* DefaultsKeys.swift */,
+				0F345B1AEF42CA935A018CC0 /* ToggleTopUpIntent.swift */,
+				F99D2FA2F464CB390128FA52 /* ToggleSailingModeIntent.swift */,
+				EB17D917042FD18D94EDF6E6 /* SetChargeLimitIntent.swift */,
+				B388511F3D9F789874C0EB07 /* GetBatteryStatusIntent.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -214,6 +332,11 @@
 				A68B3E1E2F19ABCB00F115E4 /* helper.xpc */,
 				A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */,
 				A66D62CE2F44067C00B996E7 /* smc_power.framework */,
+				DE1F0B17AD11866924DCAE59 /* StasisWidgets.appex */,
+				B0D3722E10FE862C56FF700D /* StasisWidgets.appex */,
+				F9C22A9F82B7CF20C671525F /* StasisWidgets.appex */,
+				42067C73F0CFFE5662DD1B01 /* StasisWidgets.appex */,
+				E745C06FFDDB3C2921608841 /* StasisWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -221,6 +344,7 @@
 		A68B3E532F1A942600F115E4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7238AB8D8D411E05B4CC693D /* OS X */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -238,6 +362,26 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		470E04E865F208042D6ED0DC /* StasisWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 95DB1DB70F717EF2DA8A40D1 /* Build configuration list for PBXNativeTarget "StasisWidgets" */;
+			buildPhases = (
+				4F6810DC0A819424BB28002F /* Sources */,
+				044CA7030F6731EA9E7D8DD8 /* Frameworks */,
+				0719B51D0D9BE3677854F39A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StasisWidgets;
+			packageProductDependencies = (
+				A6638F802F1C0FD60047FA8E /* Defaults */,
+			);
+			productName = StasisWidgets;
+			productReference = E745C06FFDDB3C2921608841 /* StasisWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		A66D62CD2F44067C00B996E7 /* smc-power */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A66D62D62F44067C00B996E7 /* Build configuration list for PBXNativeTarget "smc-power" */;
@@ -273,6 +417,7 @@
 				A6E6D7332F3A00000069CF9F /* Copy Helper Tools */,
 				A6E6D7342F3A00000069CF9F /* Copy LaunchDaemon Plist */,
 				A6AE198D2F480D41003B09FA /* Embed Frameworks */,
+				F757C228143A379F4B09BEAE /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
@@ -280,6 +425,7 @@
 				A68B3E282F19ABCB00F115E4 /* PBXTargetDependency */,
 				A6E6D7312F3A00000069CF9F /* PBXTargetDependency */,
 				A6AE198C2F480D41003B09FA /* PBXTargetDependency */,
+				8B68ECE317E987E78C94F2D5 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A68B3E0E2F19AB4B00F115E4 /* Stasis */,
@@ -398,11 +544,19 @@
 				A68B3E1D2F19ABCB00F115E4 /* helper */,
 				A6E6D71D2F39DD350069CF9F /* charging-helper */,
 				A66D62CD2F44067C00B996E7 /* smc-power */,
+				470E04E865F208042D6ED0DC /* StasisWidgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		0719B51D0D9BE3677854F39A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A66D62CC2F44067C00B996E7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -446,6 +600,31 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4F6810DC0A819424BB28002F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				541A7F2C7A4B6D796D15389D /* StasisWidgetsBundle.swift in Sources */,
+				979FAF28D04193F679A98304 /* StasisWidgetProvider.swift in Sources */,
+				A3D1BFAC11E3F5C15E65B614 /* BatteryStatusWidget.swift in Sources */,
+				C8EC10B032835FCE373F09C0 /* PowerSankeyWidget.swift in Sources */,
+				B91212E66C4C701D009F04F7 /* AppDelegateStub.swift in Sources */,
+				FABB180C892DF932BA7AF195 /* WidgetStatusData.swift in Sources */,
+				9798846635F9B724C0D55FAD /* PercentageFormatter.swift in Sources */,
+				EBC6CDA09066E29463BC8155 /* PowerSource.swift in Sources */,
+				95CD1EEDF8472ED3EFB46373 /* BatteryMetrics.swift in Sources */,
+				B05B37B3A2BA5FE5671EC149 /* ChargingMode.swift in Sources */,
+				DC38B2D45D5321C4D6226B6B /* PowerValueFormatter.swift in Sources */,
+				B1450E221FD6458750534835 /* PowerSankeyView.swift in Sources */,
+				E51E5389E375FC1F6E7184A4 /* BatteryIndicatorView.swift in Sources */,
+				8E4273446317CF0024F87CEE /* DefaultsKeys.swift in Sources */,
+				06F980D52C3CA823CFE253D7 /* ToggleTopUpIntent.swift in Sources */,
+				5E9C1D938347D78227B1ECC4 /* ToggleSailingModeIntent.swift in Sources */,
+				CA1E46B7B443A391CEADDC3F /* SetChargeLimitIntent.swift in Sources */,
+				89DAF1C7280F554AA14B728F /* GetBatteryStatusIntent.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A66D62CA2F44067C00B996E7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -477,6 +656,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		8B68ECE317E987E78C94F2D5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = StasisWidgets;
+			target = 470E04E865F208042D6ED0DC /* StasisWidgets */;
+			targetProxy = FEE579C580616A77DCE78823 /* PBXContainerItemProxy */;
+		};
 		A66D62DC2F44069300B996E7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A66D62CD2F44067C00B996E7 /* smc-power */;
@@ -505,6 +690,64 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		01D0C24A4EF172576474E267 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = StasisWidgets/StasisWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 58;
+				DEVELOPMENT_TEAM = 52WCJ39DLM;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = StasisWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.13.1;
+				OTHER_SWIFT_FLAGS = "$(inherited) -DWIDGET_EXTENSION";
+				PRODUCT_BUNDLE_IDENTIFIER = com.dinanathdash.stasis.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		576C772161C238565FD48E7E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = StasisWidgets/StasisWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 58;
+				DEVELOPMENT_TEAM = 52WCJ39DLM;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = StasisWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.13.1;
+				OTHER_SWIFT_FLAGS = "$(inherited) -DWIDGET_EXTENSION";
+				PRODUCT_BUNDLE_IDENTIFIER = com.dinanathdash.stasis.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		A66D62D72F44067C00B996E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -954,6 +1197,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		95DB1DB70F717EF2DA8A40D1 /* Build configuration list for PBXNativeTarget "StasisWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				576C772161C238565FD48E7E /* Release */,
+				01D0C24A4EF172576474E267 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A66D62D62F44067C00B996E7 /* Build configuration list for PBXNativeTarget "smc-power" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

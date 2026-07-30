@@ -392,6 +392,22 @@ class MenuViewModel {
         }()
 
         batteryHealthText = healthToShow.formattedPercentage
+
+        WidgetDataManager.shared.update(
+            percentage: displayPercentage,
+            chargingMode: chargingMode,
+            isTopUpActive: chargeToLimitActive,
+            batteryWatts: batteryPower,
+            adapterWatts: adapterPower,
+            systemWatts: systemPower,
+            batteryHealth: healthToShow,
+            batteryTemperature: safeMetrics.batteryTemperature,
+            cycleCount: metrics.cycleCount,
+            timeRemainingMinutes: safeMetrics.timeRemaining,
+            outputPortPowers: outputPortPowers.map { $0.powerWatts },
+            outputIcons: outputIcons,
+            hasMultiPort: hasMultiPort
+        )
     }
 
     private func derivePowerSource(

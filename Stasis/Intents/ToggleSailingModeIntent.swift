@@ -16,15 +16,14 @@ struct ToggleSailingModeIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
-        guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady() else {
-            throw CustomIntentError.stasisNotReady
-        }
-
         let targetState = enable ?? !Defaults[.sailingMode]
         Defaults[.sailingMode] = targetState
         Defaults[.manageCharging] = true
-        chargeManager.forceSyncSettings()
+
+        if let appDelegate = AppDelegate.shared,
+           let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady() {
+            chargeManager.forceSyncSettings()
+        }
 
         let message = targetState ? "Sailing Mode enabled." : "Sailing Mode disabled."
         return .result(value: message, dialog: "\(message)")

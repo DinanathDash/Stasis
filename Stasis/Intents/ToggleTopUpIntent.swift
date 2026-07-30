@@ -16,17 +16,23 @@ struct ToggleTopUpIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
-        guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady() else {
-            throw CustomIntentError.stasisNotReady
+        if let appDelegate = AppDelegate.shared,
+           let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady() {
+            let targetState = enable ?? !chargeManager.chargeLimitOverrideActive
+            if chargeManager.chargeLimitOverrideActive != targetState {
+                chargeManager.toggleChargeLimitOverride()
+            }
+            let message = targetState ? "Top-up to \(100.formattedPercentage) started." : "Top-up to \(100.formattedPercentage) cancelled. Standard limit resumed."
+            return .result(value: message, dialog: "\(message)")
+        } else {
+            DistributedNotificationCenter.default().postNotificationName(
+                NSNotification.Name("com.dinanathdash.stasis.toggleTopUp"),
+                object: nil,
+                userInfo: nil,
+                deliverImmediately: true
+            )
+            let message = "Toggled Top-Up in Stasis."
+            return .result(value: message, dialog: "\(message)")
         }
-
-        let targetState = enable ?? !chargeManager.chargeLimitOverrideActive
-        if chargeManager.chargeLimitOverrideActive != targetState {
-            chargeManager.toggleChargeLimitOverride()
-        }
-
-        let message = targetState ? "Top-up to \(100.formattedPercentage) started." : "Top-up to \(100.formattedPercentage) cancelled. Standard limit resumed."
-        return .result(value: message, dialog: "\(message)")
     }
 }

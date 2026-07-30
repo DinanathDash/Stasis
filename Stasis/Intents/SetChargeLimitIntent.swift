@@ -14,17 +14,24 @@ struct SetChargeLimitIntent: AppIntent {
     )
     var limit: Int
 
+    init() {
+        self.limit = 80
+    }
+
+    init(limit: Int) {
+        self.limit = limit
+    }
+
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
-        guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady() else {
-            throw CustomIntentError.stasisNotReady
-        }
-
         let clampedLimit = min(max(limit, 50), 100)
         Defaults[.chargeLimit] = clampedLimit
         Defaults[.manageCharging] = true
-        chargeManager.forceSyncSettings()
+
+        if let appDelegate = AppDelegate.shared,
+           let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady() {
+            chargeManager.forceSyncSettings()
+        }
 
         let message: String
         if limit < 50 {

@@ -1,7 +1,19 @@
 import Defaults
 import Foundation
 import SwiftUI
+
+#if !WIDGET_EXTENSION
 import smc_power
+#else
+public enum MagSafeLEDState: UInt8, Codable, Sendable {
+    case off = 0
+    case green = 1
+    case orange = 2
+    case blinkOrangeSlow = 3
+    case blinkOrangeFast = 4
+    case reset = 255
+}
+#endif
 
 extension MagSafeLEDState: Defaults.Serializable {}
 

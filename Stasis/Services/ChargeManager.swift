@@ -47,6 +47,17 @@ class ChargeManager {
                 self.syncSettingsToDaemon()
             }
         }
+
+        DistributedNotificationCenter.default().addObserver(
+            forName: NSNotification.Name("com.dinanathdash.stasis.toggleTopUp"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            Task { @MainActor in
+                self.toggleChargeLimitOverride()
+            }
+        }
     }
 
     func forceSyncSettings() {
