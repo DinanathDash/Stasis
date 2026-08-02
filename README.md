@@ -1,5 +1,7 @@
 # Stasis
 
+> ***This project is a fork of [srimanachanta/Stasis](https://github.com/srimanachanta/Stasis).***
+
 **A smarter battery icon for your MacBook.** Monitor power metrics, manage charge limits, automate power profiles, and extend your battery's lifespan — all from the menu bar.
 
 Stasis gives you real-time insight into your MacBook's power system and lets you control charging behavior directly, without relying on macOS's opaque "Optimized Battery Charging."

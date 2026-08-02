@@ -133,7 +133,7 @@ struct ShortcutsHelpView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
 
-                    Text("open \"stasis://charge-limit?value=80\"")
+                    Text(verbatim: "open \"stasis://charge-limit?value=80\"")
                         .font(.system(.footnote, design: .monospaced))
                         .padding(8)
                         .background(Color(NSColor.textBackgroundColor))
