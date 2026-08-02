@@ -3,8 +3,8 @@ import SwiftUI
 
 struct ShortcutItem: Identifiable {
     let id = UUID()
-    let title: LocalizedStringKey
-    let description: LocalizedStringKey
+    let title: LocalizedStringResource
+    let description: LocalizedStringResource
     let urlString: String
     let exampleCLI: String
 }
@@ -162,8 +162,13 @@ struct ShortcutsHelpView: View {
                                     Button {
                                         copyToClipboard(item.urlString)
                                     } label: {
-                                        Label(copiedURL == item.urlString ? "Copied" : "Copy URL", systemImage: copiedURL == item.urlString ? "checkmark" : "doc.on.doc")
-                                            .font(.caption)
+                                        if copiedURL == item.urlString {
+                                            Label("Copied", systemImage: "checkmark")
+                                                .font(.caption)
+                                        } else {
+                                            Label("Copy URL", systemImage: "doc.on.doc")
+                                                .font(.caption)
+                                        }
                                     }
                                     .buttonStyle(.bordered)
 
@@ -216,7 +221,7 @@ struct ShortcutsHelpView: View {
 
 private struct StepView: View {
     let step: Int
-    let text: LocalizedStringKey
+    let text: LocalizedStringResource
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
