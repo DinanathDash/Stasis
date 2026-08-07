@@ -49,10 +49,18 @@ struct PowerSankeyView: View {
         .padding(.vertical, 6)
     }
 
+    private func flowLabel(for power: Double, leftY: CGFloat, rightY: CGFloat, width: CGFloat, midX: CGFloat) -> some View {
+        let angle = atan2(2 * (rightY - leftY), width)
+        return PowerLabel(power: power)
+            .rotationEffect(.radians(angle))
+            .position(x: midX, y: (leftY + rightY) / 2)
+    }
+
     @ViewBuilder
     private var flowsAndLabels: some View {
         let hasAnyOutput = outputPower > 0
         let hasTwoOutputs = outputPortPowers.count >= 2
+        
         switch powerSource {
         case .acAdapter:
             if batteryPower > 0 {
@@ -63,11 +71,39 @@ struct PowerSankeyView: View {
                         drawSplitSankeyFlow(context: context, size: size)
                     }
                 }
-                VStack(spacing: outputPower > 0 ? 22 : Layout.powerLabelSpacing) {
-                    PowerLabel(power: batteryPower)
-                    PowerLabel(power: systemPower)
+                GeometryReader { geo in
+                    let w = geo.size.width - 2 * (Layout.nodeWidth + Layout.gap)
+                    let midX = geo.size.width / 2
+                    let H = geo.size.height
+                    let LH = Layout.largeNodeHeight
+                    let gap = Layout.spacerHeight
+                    
                     if outputPower > 0 {
-                        PowerLabel(power: outputPower)
+                        let leftTop = (H / 2) - (LH / 2)
+                        let left1 = leftTop + LH / 6
+                        let left2 = leftTop + LH / 2
+                        let left3 = leftTop + 5 * LH / 6
+                        
+                        let totalGap = gap * 2
+                        let segH = (H - totalGap) / 3
+                        let right1 = segH / 2
+                        let right2 = segH + gap + segH / 2
+                        let right3 = (2 * segH) + (2 * gap) + segH / 2
+                        
+                        flowLabel(for: batteryPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                        flowLabel(for: systemPower, leftY: left2, rightY: right2, width: w, midX: midX)
+                        flowLabel(for: outputPower, leftY: left3, rightY: right3, width: w, midX: midX)
+                    } else {
+                        let leftTop = (H / 2) - (LH / 2)
+                        let left1 = leftTop + LH / 4
+                        let left2 = leftTop + 3 * LH / 4
+                        
+                        let smallH = (H - gap) / 2
+                        let right1 = smallH / 2
+                        let right2 = H - smallH / 2
+                        
+                        flowLabel(for: batteryPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                        flowLabel(for: systemPower, leftY: left2, rightY: right2, width: w, midX: midX)
                     }
                 }
             } else {
@@ -80,19 +116,42 @@ struct PowerSankeyView: View {
                         drawSimpleFlow(context: context, size: size)
                     }
                 }
-                if outputPortPowers.count >= 2 {
-                    VStack(spacing: 22) {
-                        PowerLabel(power: systemPower)
-                        PowerLabel(power: outputPortPowers[0])
-                        PowerLabel(power: outputPortPowers[1])
+                GeometryReader { geo in
+                    let w = geo.size.width - 2 * (Layout.nodeWidth + Layout.gap)
+                    let midX = geo.size.width / 2
+                    let H = geo.size.height
+                    let LH = Layout.largeNodeHeight
+                    let gap = Layout.spacerHeight
+                    
+                    if outputPortPowers.count >= 2 {
+                        let leftTop = (H / 2) - (LH / 2)
+                        let left1 = leftTop + LH / 6
+                        let left2 = leftTop + LH / 2
+                        let left3 = leftTop + 5 * LH / 6
+                        
+                        let totalGap = gap * 2
+                        let segH = (H - totalGap) / 3
+                        let right1 = segH / 2
+                        let right2 = segH + gap + segH / 2
+                        let right3 = (2 * segH) + (2 * gap) + segH / 2
+                        
+                        flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                        flowLabel(for: outputPortPowers[0], leftY: left2, rightY: right2, width: w, midX: midX)
+                        flowLabel(for: outputPortPowers[1], leftY: left3, rightY: right3, width: w, midX: midX)
+                    } else if outputPower > 0 {
+                        let leftTop = (H / 2) - (LH / 2)
+                        let left1 = leftTop + LH / 4
+                        let left2 = leftTop + 3 * LH / 4
+                        
+                        let smallH = (H - gap) / 2
+                        let right1 = smallH / 2
+                        let right2 = H - smallH / 2
+                        
+                        flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                        flowLabel(for: outputPower, leftY: left2, rightY: right2, width: w, midX: midX)
+                    } else {
+                        flowLabel(for: adapterPower, leftY: H / 2, rightY: H / 2, width: w, midX: midX)
                     }
-                } else if outputPower > 0 {
-                    VStack(spacing: Layout.powerLabelSpacing) {
-                        PowerLabel(power: systemPower)
-                        PowerLabel(power: outputPower)
-                    }
-                } else {
-                    PowerLabel(power: adapterPower)
                 }
             }
 
@@ -100,9 +159,22 @@ struct PowerSankeyView: View {
             Canvas { context, size in
                 drawMergeSankeyFlow(context: context, size: size)
             }
-            VStack(spacing: Layout.powerLabelSpacing) {
-                PowerLabel(power: batteryPower)
-                PowerLabel(power: adapterPower)
+            GeometryReader { geo in
+                let w = geo.size.width - 2 * (Layout.nodeWidth + Layout.gap)
+                let midX = geo.size.width / 2
+                let H = geo.size.height
+                let LH = Layout.largeNodeHeight
+                let gap = Layout.spacerHeight
+                
+                let smallH = (H - gap) / 2
+                let left1 = smallH / 2
+                let left2 = H - smallH / 2
+                
+                let right1 = (H / 2) - (LH / 4)
+                let right2 = (H / 2) + (LH / 4)
+                
+                flowLabel(for: batteryPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                flowLabel(for: adapterPower, leftY: left2, rightY: right2, width: w, midX: midX)
             }
 
         case .battery:
@@ -125,69 +197,80 @@ struct PowerSankeyView: View {
                     }
                 }
             }
-            if adapterConnected {
-                GeometryReader { geo in
-                    let nodeHeight = (geo.size.height - Layout.spacerHeight) / 2
-                    let midX = geo.size.width / 2
-                    
+            GeometryReader { geo in
+                let w = geo.size.width - 2 * (Layout.nodeWidth + Layout.gap)
+                let midX = geo.size.width / 2
+                let H = geo.size.height
+                let LH = Layout.largeNodeHeight
+                let gap = Layout.spacerHeight
+                
+                if adapterConnected {
+                    let nodeH = (H - gap) / 2
                     if hasTwoOutputs {
-                        // TopHalfToTripleSplit
-                        let totalGap = Layout.spacerHeight * 2
-                        let segmentHeight = (geo.size.height - totalGap) / 3
+                        let totalGap = gap * 2
+                        let segH = (H - totalGap) / 3
                         
-                        // Tube 1: Left [0, nodeHeight/3] -> Right [0, segmentHeight]
-                        let t1LeftY = nodeHeight / 6
-                        let t1RightY = segmentHeight / 2
-                        PowerLabel(power: systemPower).position(x: midX, y: (t1LeftY + t1RightY) / 2)
+                        let left1 = nodeH / 6
+                        let right1 = segH / 2
                         
-                        // Tube 2: Left [nodeHeight/3, 2*nodeHeight/3] -> Right [segmentHeight + gap, 2*segmentHeight + gap]
-                        let t2LeftY = nodeHeight / 2
-                        let t2RightY = segmentHeight + Layout.spacerHeight + (segmentHeight / 2)
-                        PowerLabel(power: outputPortPowers[0]).position(x: midX, y: (t2LeftY + t2RightY) / 2)
+                        let left2 = nodeH / 2
+                        let right2 = segH + gap + (segH / 2)
                         
-                        // Tube 3: Left [2*nodeHeight/3, nodeHeight] -> Right [2*segmentHeight + 2*gap, height]
-                        let t3LeftY = 5 * nodeHeight / 6
-                        let t3RightY = (2 * segmentHeight) + (2 * Layout.spacerHeight) + (segmentHeight / 2)
-                        PowerLabel(power: outputPortPowers[1]).position(x: midX, y: (t3LeftY + t3RightY) / 2)
+                        let left3 = 5 * nodeH / 6
+                        let right3 = (2 * segH) + (2 * gap) + (segH / 2)
                         
+                        flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                        flowLabel(for: outputPortPowers[0], leftY: left2, rightY: right2, width: w, midX: midX)
+                        flowLabel(for: outputPortPowers[1], leftY: left3, rightY: right3, width: w, midX: midX)
                     } else if hasAnyOutput {
-                        // TopHalfToSplit
-                        // Tube 1: Left [0, nodeHeight/2] -> Right [0, nodeHeight]
-                        let t1LeftY = nodeHeight / 4
-                        let t1RightY = nodeHeight / 2
-                        PowerLabel(power: systemPower).position(x: midX, y: (t1LeftY + t1RightY) / 2)
+                        let left1 = nodeH / 4
+                        let right1 = nodeH / 2
                         
-                        // Tube 2: Left [nodeHeight/2, nodeHeight] -> Right [height - nodeHeight, height]
-                        let t2LeftY = 3 * nodeHeight / 4
-                        let t2RightY = geo.size.height - (nodeHeight / 2)
-                        PowerLabel(power: outputPower).position(x: midX, y: (t2LeftY + t2RightY) / 2)
+                        let left2 = 3 * nodeH / 4
+                        let right2 = H - (nodeH / 2)
                         
+                        flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                        flowLabel(for: outputPower, leftY: left2, rightY: right2, width: w, midX: midX)
                     } else {
-                        // TopHalfToCenteredSimple
-                        let leftY = nodeHeight / 2
-                        let rightY = geo.size.height / 2
-                        PowerLabel(power: systemPower).position(x: midX, y: (leftY + rightY) / 2)
+                        let left1 = nodeH / 2
+                        let right1 = H / 2
+                        flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
                     }
                     
                     // Adapter Label (0W)
                     PowerLabel(power: 0)
                         .opacity(0.3)
-                        .position(x: midX, y: geo.size.height - (nodeHeight / 2))
-                }
-            } else {
-                if hasTwoOutputs {
-                    VStack(spacing: 22) {
-                        PowerLabel(power: systemPower)
-                        PowerLabel(power: outputPortPowers[0])
-                        PowerLabel(power: outputPortPowers[1])
-                    }
-                } else if hasAnyOutput {
-                    VStack(spacing: Layout.powerLabelSpacing) {
-                        PowerLabel(power: systemPower)
-                        PowerLabel(power: outputPower)
-                    }
+                        .position(x: midX, y: H - (nodeH / 2))
                 } else {
-                    PowerLabel(power: systemPower)
+                    if hasTwoOutputs {
+                        let leftTop = (H / 2) - (LH / 2)
+                        let left1 = leftTop + LH / 6
+                        let left2 = leftTop + LH / 2
+                        let left3 = leftTop + 5 * LH / 6
+                        
+                        let totalGap = gap * 2
+                        let segH = (H - totalGap) / 3
+                        let right1 = segH / 2
+                        let right2 = segH + gap + segH / 2
+                        let right3 = (2 * segH) + (2 * gap) + segH / 2
+                        
+                        flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                        flowLabel(for: outputPortPowers[0], leftY: left2, rightY: right2, width: w, midX: midX)
+                        flowLabel(for: outputPortPowers[1], leftY: left3, rightY: right3, width: w, midX: midX)
+                    } else if hasAnyOutput {
+                        let leftTop = (H / 2) - (LH / 2)
+                        let left1 = leftTop + LH / 4
+                        let left2 = leftTop + 3 * LH / 4
+                        
+                        let smallH = (H - gap) / 2
+                        let right1 = smallH / 2
+                        let right2 = H - smallH / 2
+                        
+                        flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
+                        flowLabel(for: outputPower, leftY: left2, rightY: right2, width: w, midX: midX)
+                    } else {
+                        flowLabel(for: systemPower, leftY: H / 2, rightY: H / 2, width: w, midX: midX)
+                    }
                 }
             }
         }

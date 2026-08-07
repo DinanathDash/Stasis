@@ -12,6 +12,7 @@ class StatusBarManager {
         statusItem = NSStatusBar.system.statusItem(
             withLength: NSStatusItem.variableLength
         )
+        statusItem.autosaveName = "StasisBatteryStatusItem"
         setupPersistentHostingView()
     }
 
