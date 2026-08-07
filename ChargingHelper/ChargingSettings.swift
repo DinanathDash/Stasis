@@ -122,7 +122,7 @@ enum ChargingSettings {
             }
         }
 
-        defaults.synchronize()
-        logger.info("Settings updated via XPC")
+        _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
+        logger.info("Settings updated via XPC (CFPreferencesAppSynchronize)")
     }
 }
