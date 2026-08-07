@@ -157,6 +157,7 @@ enum GlobalSleep {
         
         self.setSleepDisabledIOPMValue(value: value as CFBoolean)
         UserDefaults.standard.removeObject(forKey: self.previousSleepDisabledKey)
+        _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
     }
 
     static func forceRestore() {
@@ -180,6 +181,7 @@ enum GlobalSleep {
         let sleepDisable = self.getSleepDisabledIOPMValue()
         self.previousDisabled = sleepDisable
         UserDefaults.standard.setValue(sleepDisable, forKey: self.previousSleepDisabledKey)
+        _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
 
         guard !sleepDisable else { return }
         self.setSleepDisabledIOPMValue(value: kCFBooleanTrue)
@@ -206,5 +208,6 @@ enum GlobalSleep {
         }
         self.setSleepDisabledIOPMValue(value: kCFBooleanFalse)
         UserDefaults.standard.removeObject(forKey: self.previousSleepDisabledKey)
+        _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
     }
 }

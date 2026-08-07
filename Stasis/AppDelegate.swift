@@ -140,7 +140,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             significantEnergyService: significantEnergyService
         )
         settingsWindowController = SettingsWindowController(
-            capabilities: batteryService.deviceCapabilities
+            capabilities: batteryService.deviceCapabilities,
+            chargeManager: chargeManager
         )
         menuBuilder = MenuBuilder(
             viewModel: viewModel,

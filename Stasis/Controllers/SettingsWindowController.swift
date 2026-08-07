@@ -2,40 +2,21 @@ import AppKit
 import SwiftUI
 import smc_power
 
-@MainActor
-enum AppActivationPolicy {
-    private static var count = 0
-
-    static func enter() {
-        count += 1
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
-    }
-
-    static func leave() {
-        count = max(0, count - 1)
-        guard count == 0 else { return }
-        Task { @MainActor in
-            NSApp.setActivationPolicy(.accessory)
-        }
-    }
-}
 
 @MainActor
 class SettingsWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
     private let capabilities: DeviceCapabilities
-    init(capabilities: DeviceCapabilities) {
+    private let chargeManager: ChargeManager
+    
+    init(capabilities: DeviceCapabilities, chargeManager: ChargeManager) {
         self.capabilities = capabilities
+        self.chargeManager = chargeManager
     }
 
     func showSettings() {
         // Window positioning is now handled by .center()
         if let existingWindow = window {
-            let wasVisible = existingWindow.isVisible
-            if !wasVisible {
-                AppActivationPolicy.enter()
-            }
             existingWindow.center()
             existingWindow.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -45,6 +26,7 @@ class SettingsWindowController: NSObject, NSWindowDelegate {
         let settingsView = SettingsView(
             capabilities: capabilities
         )
+        .environment(chargeManager)
 
         let hostingController = NSHostingController(rootView: settingsView)
 
@@ -66,14 +48,10 @@ class SettingsWindowController: NSObject, NSWindowDelegate {
         window = newWindow
         newWindow.setFrameAutosaveName("SettingsWindow")
         
-        AppActivationPolicy.enter()
         newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
 
         self.window = newWindow
     }
     
-    func windowWillClose(_ notification: Notification) {
-        AppActivationPolicy.leave()
-    }
 }
