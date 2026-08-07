@@ -64,7 +64,6 @@ final class UpdaterManager: NSObject, ObservableObject {
         #if DEBUG
         return
         #else
-        NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
         controller.checkForUpdates(nil)
         #endif

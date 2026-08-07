@@ -54,6 +54,11 @@ class ChargeManager {
     }
 
     private func syncSettingsToDaemon() {
+        guard ChargingHelperManager.shared.isInstalled else {
+            logger.info("Skipping sync: helper is not installed")
+            return
+        }
+
         let settings: [String: NSObject & Sendable] = [
             "manageCharging": Defaults[.manageCharging] as NSNumber,
             "chargeLimit": Defaults[.chargeLimit] as NSNumber,
@@ -69,7 +74,7 @@ class ChargeManager {
         ]
 
         Task {
-            let maxRetries = 5
+            let maxRetries = 20
             for attempt in 1...maxRetries {
                 do {
                     try await batteryService.setSettings(settings: settings)

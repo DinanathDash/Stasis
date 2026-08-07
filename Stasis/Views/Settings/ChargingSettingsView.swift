@@ -24,6 +24,7 @@ struct ChargingSettingsView: View {
     @Default(.calibrationStatus) var calibrationStatus
     @Default(.lastCalibrationDate) var lastCalibrationDate
 
+    @Environment(ChargeManager.self) private var chargeManager
     @State private var helperManager = ChargingHelperManager.shared
 
     private let capabilities: DeviceCapabilities
@@ -379,6 +380,9 @@ struct ChargingSettingsView: View {
             if enabled {
                 if !helperManager.isInstalled {
                     try helperManager.install()
+                    if helperManager.helperStatus == .installed {
+                        chargeManager.forceSyncSettings()
+                    }
                 }
                 if helperManager.helperStatus == .installed {
                     manageCharging = true
@@ -411,6 +415,9 @@ struct ChargingSettingsView: View {
         if helperManager.helperStatus == .installed {
             do {
                 try helperManager.install()
+                if helperManager.helperStatus == .installed {
+                    chargeManager.forceSyncSettings()
+                }
             } catch {
                 logger.error(
                     "Failed to install helper after approval: \(error)"

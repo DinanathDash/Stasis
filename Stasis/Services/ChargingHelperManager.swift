@@ -73,7 +73,7 @@ class ChargingHelperManager {
         helperStatus = .notInstalled
         
         // Force the UI toggle off since the helper is gone
-        UserDefaults.standard.set(false, forKey: "isChargingManagementEnabled")
+        UserDefaults.standard.set(false, forKey: "manageCharging")
         UserDefaults.standard.synchronize()
     }
 
