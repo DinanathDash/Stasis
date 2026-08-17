@@ -6,7 +6,7 @@ import SwiftUI
 
 @MainActor
 class NotchHUDManager {
-    private let window: NotchWindow
+    private var windows: [NotchWindow] = []
     private let viewModel: MenuViewModel
     private var observationTask: Task<Void, Never>?
     private var hideTask: Task<Void, Never>?
@@ -23,12 +23,6 @@ class NotchHUDManager {
 
     init(viewModel: MenuViewModel) {
         self.viewModel = viewModel
-        self.window = NotchWindow()
-        // Override default shadow padding/height for our custom view
-        self.window.contentHeight = 36
-        self.window.shadowPadding = 0 // Tighter padding for a cleaner look
-        self.window.hasShadow = false // Fix grayish color blending
-
         startObserving()
     }
 
@@ -224,16 +218,11 @@ class NotchHUDManager {
                 targetScreens.append(mainScreen)
             }
         } else {
-            // Show on main screen or all screens. For simplicity, just use main screen if all displays
-            if let mainScreen = NSScreen.main {
-                targetScreens.append(mainScreen)
-            }
+            // Show on all screens
+            targetScreens = NSScreen.screens
         }
 
-        guard let targetScreen = targetScreens.first else { return }
-        let isPill = !NotchWindow.hasNotch(screen: targetScreen)
-
-        let wasVisible = window.isVisible
+        let wasVisible = !windows.isEmpty && windows.first?.isVisible == true
         
         // Ensure state starts collapsed if window is not visible
         if !wasVisible {
@@ -250,17 +239,62 @@ class NotchHUDManager {
         state.chargingMode = viewModel.chargingMode
         state.isLowPowerModeEnabled = viewModel.isLowPowerModeEnabled
         
-        // Ensure the window is shown with the view bound to our state
-        if window.contentView == nil || !wasVisible {
-            let contentView = ChargingNotchView(state: state)
-            if !isPill {
-                window.contentHeight = targetScreen.safeAreaInsets.top
-                window.showNotch(on: targetScreen, content: contentView)
-            } else {
-                window.contentHeight = 36
-                window.showPill(on: targetScreen, content: contentView)
-            }
+        // Match windows count to targetScreens
+        while windows.count < targetScreens.count {
+            let window = NotchWindow()
+            window.contentHeight = 36
+            window.shadowPadding = 0
+            window.hasShadow = false
+            windows.append(window)
+        }
+        while windows.count > targetScreens.count {
+            let window = windows.removeLast()
+            window.orderOut(nil)
+        }
+        
+        // Ensure the windows are shown with the view bound to our state
+        for (index, targetScreen) in targetScreens.enumerated() {
+            let window = windows[index]
             
+            if window.contentView == nil || !wasVisible {
+                var calculatedNotchWidth: CGFloat = 180.0
+                if #available(macOS 12.0, *) {
+                    if let leftArea = targetScreen.auxiliaryTopLeftArea,
+                       let rightArea = targetScreen.auxiliaryTopRightArea,
+                       leftArea.width > 0, rightArea.width > 0 {
+                        let gap = rightArea.minX - leftArea.maxX
+                        if gap > 0 {
+                            calculatedNotchWidth = gap
+                        }
+                    } else {
+                        // Responsive fallback
+                        let scale = targetScreen.frame.width / 1470.0
+                        calculatedNotchWidth = 180.0 * max(0.8, min(scale, 1.5))
+                    }
+                } else {
+                    let scale = targetScreen.frame.width / 1470.0
+                    calculatedNotchWidth = 180.0 * max(0.8, min(scale, 1.5))
+                }
+
+                let contentView = ChargingNotchView(state: state, notchWidth: calculatedNotchWidth)
+                let safeAreaTop = targetScreen.safeAreaInsets.top
+                let menuBarHeight = targetScreen.frame.maxY - targetScreen.visibleFrame.maxY
+                
+                let notchHeight: CGFloat
+                if safeAreaTop > 0 {
+                    notchHeight = safeAreaTop
+                } else if menuBarHeight > 0 {
+                    notchHeight = menuBarHeight
+                } else {
+                    notchHeight = 32 // Fallback if menu bar is hidden
+                }
+                
+                window.contentHeight = notchHeight
+                window.showNotch(on: targetScreen, content: contentView)
+            }
+        }
+        
+        if !wasVisible {
             // Trigger animation on next runloop tick so view is in hierarchy
             Task { @MainActor in
                 try? await Task.sleep(for: .milliseconds(50))
@@ -282,10 +316,12 @@ class NotchHUDManager {
             // Trigger SwiftUI collapse animation
             state.isVisible = false
             
-            // Wait for spring animation to finish then close window
+            // Wait for spring animation to finish then close windows
             try? await Task.sleep(for: .milliseconds(400))
             guard !Task.isCancelled else { return }
-            window.orderOut(nil)
+            for window in self.windows {
+                window.orderOut(nil)
+            }
         }
     }
 }

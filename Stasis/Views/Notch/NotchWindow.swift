@@ -61,7 +61,7 @@ class NotchWindow: NSPanel {
         TopWindowElevator.shared.elevate(window: self)
     }
 
-    /// Show as a floating pill at the bottom of the screen (fallback for non-notch Macs).
+    /// Show as a floating pill at the top of the screen (fallback for non-notch Macs).
     func showPill<Content: View>(on screen: NSScreen, content: Content) {
         level = .floating
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
@@ -71,7 +71,8 @@ class NotchWindow: NSPanel {
         let totalHeight = contentHeight + shadowPadding
         
         let x = screen.frame.origin.x
-        let y = screen.visibleFrame.minY + 30
+        // Position below the menu bar
+        let y = screen.visibleFrame.maxY - totalHeight - 10
         setFrame(CGRect(x: x, y: y, width: totalWidth, height: totalHeight), display: false)
 
         let hosting = NSHostingView(rootView:
