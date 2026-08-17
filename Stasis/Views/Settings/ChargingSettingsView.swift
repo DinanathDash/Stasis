@@ -11,6 +11,7 @@ struct ChargingSettingsView: View {
     @Default(.sailingModeLimit) var sailingModeLimit
     @Default(.automaticDischarge) var automaticDischarge
     @Default(.disableSleepUntilChargeLimit) var disableSleepUntilChargeLimit
+    @Default(.disableSleepWhileDischarging) var disableSleepWhileDischarging
     @Default(.enableHeatProtectionMode) var enableHeatProtectionMode
     @Default(.heatProtectionLimit) var heatProtectionLimit
     @Default(.manageMagSafeLED) var manageMagSafeLED
@@ -156,11 +157,15 @@ struct ChargingSettingsView: View {
                         "Disable sleep until charge limit",
                         isOn: $disableSleepUntilChargeLimit
                     )
+                    Toggle(
+                        "Disable sleep while discharging",
+                        isOn: $disableSleepWhileDischarging
+                    )
                 } header: {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Sleep Prevention")
                         Text(
-                            "Prevent your Mac from sleeping while charging towards the charge limit. Sleep is re-enabled once the limit is reached or the adapter is disconnected."
+                            "Prevent your Mac from sleeping while charging or discharging. This enables Clamshell Mode while discharging."
                         )
                         .font(.subheadline)
                         .foregroundStyle(.secondary)

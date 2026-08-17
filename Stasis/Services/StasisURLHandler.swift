@@ -158,6 +158,14 @@ final class StasisURLHandler: NSObject, UNUserNotificationCenterDelegate {
             let message = enable ? String(localized: "Heat Protection Mode enabled.") : String(localized: "Heat Protection Mode disabled.")
             showNotification(title: String(localized: "Stasis Heat Protection"), message: message)
 
+        case "sleep-while-discharging", "toggle-sleep-while-discharging":
+            let enable = getBoolParam(key: "enable", defaultValue: Defaults[.disableSleepWhileDischarging])
+            Defaults[.disableSleepWhileDischarging] = enable
+            Defaults[.manageCharging] = true
+            chargeManager.forceSyncSettings()
+            let message = enable ? String(localized: "Sleep while discharging disabled.") : String(localized: "Sleep while discharging enabled.")
+            showNotification(title: String(localized: "Stasis Sleep Prevention"), message: message)
+
         case "heat-protection-limit", "set-heat-protection-limit", "heat-limit":
             let targetValue = getIntParam(key: "value", fallback: Defaults[.heatProtectionLimit])
             let clamped = min(max(targetValue, 30), 50)

@@ -250,6 +250,7 @@ extension Defaults.Keys {
     static let showBatteryMode = Key<Bool>("showBatteryMode", default: true)
     static let showInternalPower = Key<Bool>("showInternalPower", default: true)
     static let showExternalPower = Key<Bool>("showExternalPower", default: true)
+    static let showSessionEnergy = Key<Bool>("showSessionEnergy", default: false)
     static let showPowerDistribution = Key<Bool>(
         "showPowerDistribution",
         default: true
@@ -286,6 +287,10 @@ extension Defaults.Keys {
     )
     static let disableSleepUntilChargeLimit = Key<Bool>(
         "disableSleepUntilChargeLimit",
+        default: false
+    )
+    static let disableSleepWhileDischarging = Key<Bool>(
+        "disableSleepWhileDischarging",
         default: false
     )
 

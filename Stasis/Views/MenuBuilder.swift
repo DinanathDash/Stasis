@@ -158,6 +158,14 @@ class MenuBuilder {
                 )
             )
         }
+        if Defaults[.showSessionEnergy] && viewModel.shouldShowSessionEnergy {
+            items.append(
+                createInfoItem(
+                    label: String(localized: "Session Energy"),
+                    keyPath: \.sessionEnergyText
+                )
+            )
+        }
 
         return items
     }
