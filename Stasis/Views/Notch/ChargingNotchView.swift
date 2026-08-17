@@ -32,11 +32,7 @@ class NotchHUDState {
         return 16 + 60 + 16 // battery is around 60 wide
     }
 
-    var dynamicWidth: CGFloat {
-        if !isVisible { return 180 }
-        return leftContentWidth + 180 + rightContentWidth
-    }
-    
+    // Math to keep the gap perfectly centered on screen despite an asymmetrical shape
     var correctionOffset: CGFloat {
         if !isVisible { return 0 }
         // Math to keep the 180 gap perfectly centered on screen despite an asymmetrical shape
@@ -46,6 +42,12 @@ class NotchHUDState {
 
 struct ChargingNotchView: View {
     var state: NotchHUDState
+    var notchWidth: CGFloat = 180
+
+    var dynamicWidth: CGFloat {
+        if !state.isVisible { return notchWidth }
+        return state.leftContentWidth + notchWidth + state.rightContentWidth
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -61,7 +63,7 @@ struct ChargingNotchView: View {
 
             // CENTER: The physical notch width
             Spacer()
-                .frame(width: 180) 
+                .frame(width: notchWidth) 
 
             // RIGHT SIDE: Battery
             BatteryIndicatorView(
@@ -79,7 +81,7 @@ struct ChargingNotchView: View {
             .clipped()
         }
         // Use dynamically calculated asymmetric width that perfectly wraps content
-        .frame(width: state.dynamicWidth)
+        .frame(width: dynamicWidth)
         .frame(maxHeight: .infinity)
         // Background and clip shape MUST be applied BEFORE offset so they perfectly wrap the asymmetric content
         .background(NotchShape().fill(.black))
