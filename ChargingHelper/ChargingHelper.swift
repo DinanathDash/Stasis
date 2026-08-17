@@ -27,6 +27,7 @@ final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendabl
     func setSettings(settings: [String: NSObject & Sendable], reply: @escaping @Sendable (Bool, String?) -> Void) {
         Task { @MainActor in
             ChargingSettings.setSettings(settings: settings)
+            ChargingPowerState.syncSleepState()
             ChargingPowerEvents.settingsChanged()
             reply(true, nil)
         }

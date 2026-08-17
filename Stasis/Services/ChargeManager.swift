@@ -38,7 +38,7 @@ class ChargeManager {
                     .manageCharging, .sailingMode, .automaticDischarge,
                     .enableHeatProtectionMode, .manageMagSafeLED,
                     .chargeLimit, .sailingModeLimit, .heatProtectionLimit,
-                    .disableSleepUntilChargeLimit, .chargingOnHoldMagSafeLEDState,
+                    .disableSleepUntilChargeLimit, .disableSleepWhileDischarging, .chargingOnHoldMagSafeLEDState,
                     .heatProtectionMagSafeLEDState
                 ],
                 initial: true
@@ -68,6 +68,7 @@ class ChargeManager {
             "enableHeatProtectionMode": Defaults[.enableHeatProtectionMode] as NSNumber,
             "heatProtectionLimit": Defaults[.heatProtectionLimit] as NSNumber,
             "disableSleepUntilChargeLimit": Defaults[.disableSleepUntilChargeLimit] as NSNumber,
+            "disableSleepWhileDischarging": Defaults[.disableSleepWhileDischarging] as NSNumber,
             "manageMagSafeLED": Defaults[.manageMagSafeLED] as NSNumber,
             "chargingOnHoldMagSafeLEDState": Defaults[.chargingOnHoldMagSafeLEDState].rawValue as NSNumber,
             "heatProtectionMagSafeLEDState": Defaults[.heatProtectionMagSafeLEDState].rawValue as NSNumber

@@ -25,6 +25,8 @@ class MenuViewModel {
     var internalInputText: String = "0V @ 0A"
     var cycleCountText: String = "0"
     var batteryHealthText: String = 100.formattedPercentage
+    var sessionEnergyText: String = "0.00 Wh"
+    var shouldShowSessionEnergy: Bool = false
 
     var displayPercentage: Int = 0
     var chargingMode: ChargingMode = .discharging
@@ -64,6 +66,9 @@ class MenuViewModel {
     private var lastAdapterConnected: Bool = false
     private var isChargingHoldUntil: Date = .distantPast
     private var stableIsCharging: Bool = false
+    private var lastEnergyCalculationTime: Date?
+    private var sessionEnergyAccumulatedWh: Double = 0
+    private var disconnectTime: Date?
 
     init(
         batteryService: BatteryService,
@@ -282,6 +287,35 @@ class MenuViewModel {
 
         internalInputText =
             "\(safeMetrics.batteryVoltage.formatted(voltageFormat))V @ \(safeMetrics.batteryCurrent.formatted(currentFormat))A (\(abs(safeMetrics.batteryPower).formatted(powerFormat))W)"
+            
+        if !physicallyPluggedIn {
+            if disconnectTime == nil {
+                disconnectTime = now
+            }
+            if let dTime = disconnectTime, now.timeIntervalSince(dTime) > 120.0 {
+                // Buffer time of 2 minutes expired
+                sessionEnergyAccumulatedWh = 0
+            }
+            lastEnergyCalculationTime = nil
+        } else {
+            disconnectTime = nil
+            if let lastTime = lastEnergyCalculationTime {
+                let elapsedHours = now.timeIntervalSince(lastTime) / 3600.0
+                let power = adapter.adapterPower
+                if power > 0 {
+                    sessionEnergyAccumulatedWh += power * elapsedHours
+                }
+            }
+            lastEnergyCalculationTime = now
+        }
+        
+        let showTwoDecimalPlaces = Defaults[.showTwoDecimalPowerValues]
+        let formattedEnergy = PowerValueFormatter.string(
+            from: sessionEnergyAccumulatedWh,
+            showTwoDecimalPlaces: showTwoDecimalPlaces
+        )
+        sessionEnergyText = "\(formattedEnergy) Wh"
+        shouldShowSessionEnergy = sessionEnergyAccumulatedWh > 0 || physicallyPluggedIn
 
         batteryPower = safeMetrics.batteryPower
         adapterPower = adapter.adapterPower

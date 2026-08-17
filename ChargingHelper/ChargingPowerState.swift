@@ -10,6 +10,7 @@ enum ChargingPowerState {
     
     private static var battery: SMCBattery?
     private static var adapter: SMCAdapter?
+    private static var sleepDisabledByStasis = false
 
     private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingPowerState")
 
@@ -39,6 +40,23 @@ enum ChargingPowerState {
         return self.powerDisabled
     }
 
+    static func syncSleepState() {
+        let shouldDisableForCharging = !self.chargingDisabled && ChargingSettings.disableSleepUntilChargeLimit
+        let shouldDisableForDischarging = self.powerDisabled && ChargingSettings.disableSleepWhileDischarging
+
+        if shouldDisableForCharging || shouldDisableForDischarging {
+            if !sleepDisabledByStasis {
+                GlobalSleep.disable()
+                sleepDisabledByStasis = true
+            }
+        } else {
+            if sleepDisabledByStasis {
+                GlobalSleep.restore()
+                sleepDisabledByStasis = false
+            }
+        }
+    }
+
     static func disableCharging(force: Bool = false) -> (Bool, String?) {
         guard force || !self.chargingDisabled else { return (true, nil) }
         guard let battery = self.battery else { return (false, "Battery is nil") }
@@ -49,7 +67,7 @@ enum ChargingPowerState {
             self.chargingDisabled = true
             logger.debug("SMC set charging inhibited to true")
             
-            GlobalSleep.restore()
+            syncSleepState()
             let (percent, _) = IOKitHelper.getPercentRemaining()
             syncMagSafeState(percent: percent)
             return (true, nil)
@@ -69,9 +87,7 @@ enum ChargingPowerState {
             self.chargingDisabled = false
             logger.debug("SMC set charging inhibited to false")
             
-            if ChargingSettings.disableSleepUntilChargeLimit {
-                GlobalSleep.disable()
-            }
+            syncSleepState()
             let (percent, _) = IOKitHelper.getPercentRemaining()
             syncMagSafeState(percent: percent)
             return (true, nil)
@@ -90,6 +106,7 @@ enum ChargingPowerState {
             try battery.setForceDischarging(true)
             self.powerDisabled = true
             logger.debug("SMC set force discharging to true")
+            syncSleepState()
             return (true, nil)
         } catch {
             logger.error("Failed to disable power adapter: \(error.localizedDescription)")
@@ -106,6 +123,13 @@ enum ChargingPowerState {
             try battery.setForceDischarging(false)
             self.powerDisabled = false
             logger.debug("SMC set force discharging to false")
+            
+            if self.chargingDisabled {
+                try? battery.setChargingInhibited(true)
+                logger.debug("SMC re-asserted charging inhibited to true after disabling power adapter")
+            }
+            
+            syncSleepState()
             return (true, nil)
         } catch {
             logger.error("Failed to enable power adapter: \(error.localizedDescription)")
@@ -149,6 +173,7 @@ enum GlobalSleep {
     private static let previousSleepDisabledKey = "PreviousSleepDisabled"
     private static var disabledCounter: UInt8 = 0
     private static var previousDisabled = false
+    private static var sleepAssertion: IOPMAssertionID = 0
 
     static func restoreOnStart() {
         guard let value = UserDefaults.standard.object(forKey: self.previousSleepDisabledKey) as? Bool else {
@@ -183,6 +208,15 @@ enum GlobalSleep {
         UserDefaults.standard.setValue(sleepDisable, forKey: self.previousSleepDisabledKey)
         _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
 
+        // Create an explicit assertion to prevent system sleep (helps with clamshell mode transition)
+        let reasonForActivity = "Stasis preventing sleep for charging/discharging" as CFString
+        _ = IOPMAssertionCreateWithName(
+            kIOPMAssertionTypePreventSystemSleep as CFString,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            reasonForActivity,
+            &sleepAssertion
+        )
+
         guard !sleepDisable else { return }
         self.setSleepDisabledIOPMValue(value: kCFBooleanTrue)
     }
@@ -202,10 +236,16 @@ enum GlobalSleep {
     }
 
     private static func restorePrevious() {
+        if sleepAssertion != 0 {
+            IOPMAssertionRelease(sleepAssertion)
+            sleepAssertion = 0
+        }
+
         guard !self.previousDisabled else {
             self.previousDisabled = false
             return
         }
+        
         self.setSleepDisabledIOPMValue(value: kCFBooleanFalse)
         UserDefaults.standard.removeObject(forKey: self.previousSleepDisabledKey)
         _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)

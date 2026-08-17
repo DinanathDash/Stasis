@@ -16,6 +16,11 @@ enum ChargingSettings {
         set { defaults.set(newValue, forKey: "disableSleepUntilChargeLimit") }
     }
 
+    static var disableSleepWhileDischarging: Bool {
+        get { defaults.bool(forKey: "disableSleepWhileDischarging") }
+        set { defaults.set(newValue, forKey: "disableSleepWhileDischarging") }
+    }
+
     static var chargeLimit: UInt8 {
         get {
             let val = defaults.integer(forKey: "chargeLimit")
@@ -86,6 +91,7 @@ enum ChargingSettings {
             "enableHeatProtectionMode": enableHeatProtectionMode as NSNumber,
             "heatProtectionLimit": heatProtectionLimit as NSNumber,
             "disableSleepUntilChargeLimit": disableSleepUntilChargeLimit as NSNumber,
+            "disableSleepWhileDischarging": disableSleepWhileDischarging as NSNumber,
             "manageMagSafeLED": manageMagSafeLED as NSNumber,
             "chargingOnHoldMagSafeLEDState": chargingOnHoldMagSafeLEDState as NSNumber,
             "heatProtectionMagSafeLEDState": heatProtectionMagSafeLEDState as NSNumber
@@ -111,6 +117,8 @@ enum ChargingSettings {
                 heatProtectionLimit = value as? Int ?? heatProtectionLimit
             case "disableSleepUntilChargeLimit":
                 disableSleepUntilChargeLimit = value as? Bool ?? disableSleepUntilChargeLimit
+            case "disableSleepWhileDischarging":
+                disableSleepWhileDischarging = value as? Bool ?? disableSleepWhileDischarging
             case "manageMagSafeLED":
                 manageMagSafeLED = value as? Bool ?? manageMagSafeLED
             case "chargingOnHoldMagSafeLEDState":

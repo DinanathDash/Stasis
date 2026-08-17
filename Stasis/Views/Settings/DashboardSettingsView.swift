@@ -11,6 +11,7 @@ struct DashboardSettingsView: View {
     @Default(.showBatteryHealth) var showBatteryHealth
     @Default(.showInternalPower) var showInternalPower
     @Default(.showExternalPower) var showExternalPower
+    @Default(.showSessionEnergy) var showSessionEnergy
     @Default(.showPowerDistribution) var showPowerDistribution
     @Default(.showTwoDecimalPowerValues) var showTwoDecimalPowerValues
     @Default(.showOutputPortsText) var showOutputPortsText
@@ -44,6 +45,7 @@ struct DashboardSettingsView: View {
             Section("Power") {
                 Toggle("Battery Power Metrics", isOn: $showInternalPower)
                 Toggle("Adapter Power Metrics", isOn: $showExternalPower)
+                Toggle("Session Energy", isOn: $showSessionEnergy)
             }
 
             Section("Energy Impact") {
