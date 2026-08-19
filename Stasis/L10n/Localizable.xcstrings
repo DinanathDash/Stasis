@@ -5744,103 +5744,103 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schnell blinkendes Orange"
+            "value": "Orange schnell blinkend"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Naranja intermitente rápido"
+            "value": "Naranja parpadeo rápido"
           }
         },
         "es-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "Naranja intermitente rápido"
+            "value": "Naranja parpadeo rápido"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "オレンジ色で速く点滅"
+            "value": "オレンジ点滅（速い）"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "橙色快速闪烁"
+            "value": "橙色快闪"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "橘色快速閃爍"
+            "value": "橙色快閃"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Быстро мигает оранжевым"
+            "value": "Оранжевый (быстрое мигание)"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Knippert snel oranje"
+            "value": "Oranje knipperen snel"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Turuncu Hızla Yanıp Sönüyor"
+            "value": "Turuncu hızlı yanıp sönme"
           }
         },
         "sl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hitro utripa oranžno"
+            "value": "Oranžna hitro utripanje"
           }
         },
         "sk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rýchlo bliká oranžovo"
+            "value": "Oranžová rýchle blikanie"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Màu cam nhấp nháy nhanh"
+            "value": "Cam nhấp nháy nhanh"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "주황색으로 빠르게 깜박임"
+            "value": "주황색 빠르게 깜박임"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orange clignotant rapide"
+            "value": "Clignotement orange rapide"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Arancione lampeggiante velocemente"
+            "value": "Lampeggio arancione veloce"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Laranja intermitente rápido"
+            "value": "Laranja a piscar rápido"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Laranja intermitente rápido"
+            "value": "Laranja piscando rápido"
           }
         }
       }
@@ -5850,103 +5850,103 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Langsam blinkendes Orange"
+            "value": "Orange langsam blinkend"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Naranja intermitente lento"
+            "value": "Naranja parpadeo lento"
           }
         },
         "es-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "Naranja intermitente lento"
+            "value": "Naranja parpadeo lento"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "オレンジ色でゆっくり点滅"
+            "value": "オレンジ点滅（遅い）"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "橙色缓慢闪烁"
+            "value": "橙色慢闪"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "橘色緩慢閃爍"
+            "value": "橙色慢閃"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Медленно мигает оранжевым"
+            "value": "Оранжевый (медленное мигание)"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Knipperend oranje langzaam"
+            "value": "Oranje knipperen langzaam"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yavaş Yanıp Sönen Turuncu"
+            "value": "Turuncu yavaş yanıp sönme"
           }
         },
         "sl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Utripa oranžno počasi"
+            "value": "Oranžna počasno utripanje"
           }
         },
         "sk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Blikajúca oranžová pomaly"
+            "value": "Oranžová pomalé blikanie"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Màu cam nhấp nháy chậm"
+            "value": "Cam nhấp nháy chậm"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "주황색으로 느리게 깜박임"
+            "value": "주황색 느리게 깜박임"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orange clignotant lent"
+            "value": "Clignotement orange lent"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Arancione lampeggiante lento"
+            "value": "Lampeggio arancione lento"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Laranja intermitente lento"
+            "value": "Laranja a piscar lento"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Laranja intermitente lento"
+            "value": "Laranja piscando lento"
           }
         }
       }
@@ -19185,13 +19185,13 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "verde"
+            "value": "Verde"
           }
         },
         "es-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "verde"
+            "value": "Verde"
           }
         },
         "ja": {
@@ -19233,7 +19233,7 @@
         "sl": {
           "stringUnit": {
             "state": "translated",
-            "value": "zelena"
+            "value": "Zelena"
           }
         },
         "sk": {
@@ -19245,7 +19245,7 @@
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "màu xanh lá cây"
+            "value": "Xanh lá"
           }
         },
         "ko": {
@@ -21309,19 +21309,19 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "LED bei Hitzeschutz"
+            "value": "LED während Hitzeschutz"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "LED durante protección contra calor"
+            "value": "LED durante protección térmica"
           }
         },
         "es-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "LED durante protección contra calor"
+            "value": "LED durante protección térmica"
           }
         },
         "ja": {
@@ -21333,19 +21333,19 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "高温保护时的指示灯"
+            "value": "热保护期间的 LED"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "熱保護期間 LED"
+            "value": "熱保護期間的 LED"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Светодиод во время термозащиты"
+            "value": "LED при тепловой защите"
           }
         },
         "nl": {
@@ -21375,7 +21375,7 @@
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "LED trong quá trình bảo vệ nhiệt"
+            "value": "LED khi bảo vệ nhiệt"
           }
         },
         "ko": {
@@ -21393,19 +21393,334 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "LED durante la protezione dal calore"
+            "value": "LED durante la protezione termica"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "LED durante proteção térmica"
+            "value": "LED durante a proteção térmica"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "LED durante proteção térmica"
+            "value": "LED durante a proteção térmica"
+          }
+        }
+      }
+    },
+    "LED when paused or limit reached": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED wenn pausiert oder Limit erreicht"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED cuando está pausado o al límite"
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED cuando está pausado o al límite"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED en pause ou limite atteinte"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一時停止または上限到達時のLED"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일시 정지 또는 제한 도달 시 LED"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED gepauzeerd of limiet bereikt"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED pausado ou limite atingido"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED pausado ou limite atingido"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED при паузе или достижении лимита"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED pri pozastavení alebo dosiahnutí limitu"
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED ob premoru ali doseženi omejitvi"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duraklatıldığında veya limite ulaşıldığında LED"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED khi tạm dừng hoặc đạt giới hạn"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂停或达到限制时的 LED"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫停或達到限制時的 LED"
+          }
+        }
+      }
+    },
+    "LED while charging": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED während des Ladevorgangs"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED mientras se carga"
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED mientras se carga"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED pendant la charge"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED durante la ricarica"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充電中のLED"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "충전 중 LED"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED tijdens het opladen"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED durante o carregamento"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED durante o carregamento"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED при зарядке"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED počas nabíjania"
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED med polnjenjem"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj olurken LED"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED khi đang sạc"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充电时的 LED"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充電時的 LED"
+          }
+        }
+      }
+    },
+    "LED while discharging": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED beim Entladen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED durante la descarga"
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED durante la descarga"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED pendant la décharge"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED durante la scarica"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放電中のLED"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "방전 중 LED"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED tijdens het ontladen"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED durante a descarga"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED durante a descarga"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED при разрядке"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED počas vybíjania"
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED med praznjenjem"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deşarj olurken LED"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED khi đang xả"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放电时的 LED"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放電時的 LED"
           }
         }
       }
@@ -24387,6 +24702,113 @@
         }
       }
     },
+    "Note: The slow and fast blinking speeds may appear identical on modern Macs due to hardware limitations.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinweis: Die langsamen und schnellen Blinkgeschwindigkeiten können auf modernen Macs aufgrund von Hardwareeinschränkungen identisch erscheinen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nota: Las velocidades de parpadeo pueden parecer idénticas en Macs modernos debido a limitaciones de hardware."
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nota: Las velocidades de parpadeo pueden parecer idénticas en Macs modernos debido a limitaciones de hardware."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remarque : Les vitesses de clignotement peuvent sembler identiques sur les Macs modernes en raison des limitations matérielles."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nota: Le velocità di lampeggio potrebbero sembrare identiche sui Mac moderni a causa di limitazioni hardware."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注：ハードウェアの制限により、最新のMacでは点滅速度が同じに見える場合があります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "참고: 하드웨어 제한으로 인해 최신 Mac에서는 깜박이는 속도가 동일하게 보일 수 있습니다."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opmerking: De knippersnelheden kunnen identiek lijken op moderne Macs vanwege hardwarebeperkingen."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nota: As velocidades de piscar podem parecer idênticas em Macs modernos devido a limitações de hardware."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nota: As velocidades de piscar podem parecer idênticas em Macs modernos devido a limitações de hardware."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Примечание: Скорость мигания может казаться одинаковой на современных Mac из-за аппаратных ограничений."
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poznámka: Rýchlosti blikania sa môžu na moderných Macoch zdať rovnaké kvôli hardvérovým obmedzeniam."
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opomba: Hitrost utripanja je na sodobnih Macih zaradi strojnih omejitev morda videti enaka."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not: Yanıp sönme hızları, donanım kısıtlamaları nedeniyle modern Mac'lerde aynı görünebilir."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lưu ý: Tốc độ nhấp nháy có thể giống hệt nhau trên các máy Mac hiện đại do giới hạn phần cứng."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注意：由于硬件限制，在较新的 Mac 上闪烁速度可能看起来相同。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注意：由於硬體限制，在較新的 Mac 上閃爍速度可能看起來相同。"
+          }
+        }
+      }
+    },
     "Note: macOS intentionally retains apps in the \"App Background Activity\" list (System Settings) even after their background helper is unregistered. Once you click Uninstall, the helper is truly disabled, but macOS will keep Stasis visible in that list until the app itself is deleted from your Mac.": {
       "extractionState": "manual",
       "localizations": {
@@ -24823,13 +25245,13 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Desactivado"
+            "value": "Apagado"
           }
         },
         "es-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "Desactivado"
+            "value": "Apagado"
           }
         },
         "ja": {
@@ -24889,7 +25311,7 @@
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "끔"
+            "value": "꺼짐"
           }
         },
         "fr": {
@@ -24901,19 +25323,19 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Disattivato"
+            "value": "Spento"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Desativado"
+            "value": "Desligado"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Desativado"
+            "value": "Desligado"
           }
         }
       }
@@ -26769,7 +27191,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "橘色"
+            "value": "橙色"
           }
         },
         "ru": {
@@ -26805,13 +27227,13 @@
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "trái cam"
+            "value": "Cam"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "오렌지"
+            "value": "주황색"
           }
         },
         "fr": {
@@ -30878,6 +31300,113 @@
           "stringUnit": {
             "state": "translated",
             "value": "重設並重新啟動"
+          }
+        }
+      }
+    },
+    "Reset to System": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf System zurücksetzen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restablecer al Sistema"
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restablecer al Sistema"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réinitialiser au Système"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristina al Sistema"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムにリセット"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템으로 재설정"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset naar Systeem"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redefinir para o Sistema"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redefinir para o Sistema"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сброс к системе"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obnoviť na Systém"
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ponastavi na Sistem"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sisteme Sıfırla"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại về Hệ thống"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置为系统"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置為系統"
           }
         }
       }

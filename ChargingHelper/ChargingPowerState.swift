@@ -144,20 +144,25 @@ enum ChargingPowerState {
         guard let ledState = MagSafeLEDState(rawValue: target) else { return false }
 
         do {
-            try adapter.setMagSafeLEDState(ledState)
-            logger.info("MagSafe LED set to \(target)")
+            let currentState = try adapter.getMagSafeLEDState()
+            if currentState.rawValue != target {
+                try adapter.setMagSafeLEDState(ledState)
+                logger.info("MagSafe LED changed from \(currentState.rawValue) to \(target)")
+            }
             return true
         } catch {
-            logger.error("Failed to set MagSafe LED: \(error.localizedDescription)")
+            logger.error("Failed to manage MagSafe LED: \(error.localizedDescription)")
             return false
         }
     }
 
     static func syncMagSafeState(percent: UInt8) {
-        if self.powerDisabled || percent == 100 || self.chargingDisabled {
-            manageMagsafeLED(target: MagSafeLEDState.green.rawValue)
+        if self.powerDisabled {
+            manageMagsafeLED(target: ChargingSettings.dischargingMagSafeLEDState)
+        } else if self.chargingDisabled || percent == 100 {
+            manageMagsafeLED(target: ChargingSettings.pausedMagSafeLEDState)
         } else {
-            manageMagsafeLED(target: MagSafeLEDState.orange.rawValue)
+            manageMagsafeLED(target: ChargingSettings.chargingMagSafeLEDState)
         }
     }
 

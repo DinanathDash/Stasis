@@ -65,12 +65,28 @@ enum ChargingSettings {
         set { defaults.set(newValue, forKey: "manageMagSafeLED") }
     }
 
-    static var chargingOnHoldMagSafeLEDState: UInt8 {
+    static var chargingMagSafeLEDState: UInt8 {
         get {
-            let val = defaults.integer(forKey: "chargingOnHoldMagSafeLEDState")
+            let val = defaults.integer(forKey: "chargingMagSafeLEDState")
             return val > 0 ? UInt8(val) : 4 // 4 is Orange
         }
-        set { defaults.set(newValue, forKey: "chargingOnHoldMagSafeLEDState") }
+        set { defaults.set(newValue, forKey: "chargingMagSafeLEDState") }
+    }
+
+    static var pausedMagSafeLEDState: UInt8 {
+        get {
+            let val = defaults.integer(forKey: "pausedMagSafeLEDState")
+            return val > 0 ? UInt8(val) : 3 // 3 is Green
+        }
+        set { defaults.set(newValue, forKey: "pausedMagSafeLEDState") }
+    }
+
+    static var dischargingMagSafeLEDState: UInt8 {
+        get {
+            let val = defaults.integer(forKey: "dischargingMagSafeLEDState")
+            return val > 0 ? UInt8(val) : 3 // 3 is Green
+        }
+        set { defaults.set(newValue, forKey: "dischargingMagSafeLEDState") }
     }
 
     static var heatProtectionMagSafeLEDState: UInt8 {
@@ -93,7 +109,9 @@ enum ChargingSettings {
             "disableSleepUntilChargeLimit": disableSleepUntilChargeLimit as NSNumber,
             "disableSleepWhileDischarging": disableSleepWhileDischarging as NSNumber,
             "manageMagSafeLED": manageMagSafeLED as NSNumber,
-            "chargingOnHoldMagSafeLEDState": chargingOnHoldMagSafeLEDState as NSNumber,
+            "chargingMagSafeLEDState": chargingMagSafeLEDState as NSNumber,
+            "pausedMagSafeLEDState": pausedMagSafeLEDState as NSNumber,
+            "dischargingMagSafeLEDState": dischargingMagSafeLEDState as NSNumber,
             "heatProtectionMagSafeLEDState": heatProtectionMagSafeLEDState as NSNumber
         ]
     }
@@ -121,8 +139,12 @@ enum ChargingSettings {
                 disableSleepWhileDischarging = value as? Bool ?? disableSleepWhileDischarging
             case "manageMagSafeLED":
                 manageMagSafeLED = value as? Bool ?? manageMagSafeLED
-            case "chargingOnHoldMagSafeLEDState":
-                chargingOnHoldMagSafeLEDState = UInt8(value as? Int ?? Int(chargingOnHoldMagSafeLEDState))
+            case "chargingMagSafeLEDState":
+                chargingMagSafeLEDState = UInt8(value as? Int ?? Int(chargingMagSafeLEDState))
+            case "pausedMagSafeLEDState":
+                pausedMagSafeLEDState = UInt8(value as? Int ?? Int(pausedMagSafeLEDState))
+            case "dischargingMagSafeLEDState":
+                dischargingMagSafeLEDState = UInt8(value as? Int ?? Int(dischargingMagSafeLEDState))
             case "heatProtectionMagSafeLEDState":
                 heatProtectionMagSafeLEDState = UInt8(value as? Int ?? Int(heatProtectionMagSafeLEDState))
             default:

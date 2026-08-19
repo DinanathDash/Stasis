@@ -16,7 +16,9 @@ struct ChargingSettingsView: View {
     @Default(.heatProtectionLimit) var heatProtectionLimit
     @Default(.manageMagSafeLED) var manageMagSafeLED
     @Default(.heatProtectionMagSafeLEDState) var heatProtectionMagSafeLEDState
-    @Default(.chargingOnHoldMagSafeLEDState) var chargingOnHoldMagSafeLEDState
+    @Default(.chargingMagSafeLEDState) var chargingMagSafeLEDState
+    @Default(.pausedMagSafeLEDState) var pausedMagSafeLEDState
+    @Default(.dischargingMagSafeLEDState) var dischargingMagSafeLEDState
     
     // Calibration settings
     @Default(.enableAutomaticCalibration) var enableAutomaticCalibration
@@ -269,18 +271,46 @@ struct ChargingSettingsView: View {
                             .disabled(!capabilities.magsafeLEDControl)
 
                         if manageMagSafeLED {
+                            Picker(String(localized: "LED while charging"), selection: $chargingMagSafeLEDState) {
+                                Text(String(localized: "Reset to System")).tag(MagSafeLEDState.reset)
+                                Text(String(localized: "Off")).tag(MagSafeLEDState.off)
+                                Text(String(localized: "Green")).tag(MagSafeLEDState.green)
+                                Text(String(localized: "Orange")).tag(MagSafeLEDState.orange)
+                                Text(String(localized: "Blinking Orange Slow")).tag(MagSafeLEDState.blinkOrangeSlow)
+                                Text(String(localized: "Blinking Orange Fast")).tag(MagSafeLEDState.blinkOrangeFast)
+                            }
+                            
+                            Picker(String(localized: "LED when paused or limit reached"), selection: $pausedMagSafeLEDState) {
+                                Text(String(localized: "Reset to System")).tag(MagSafeLEDState.reset)
+                                Text(String(localized: "Off")).tag(MagSafeLEDState.off)
+                                Text(String(localized: "Green")).tag(MagSafeLEDState.green)
+                                Text(String(localized: "Orange")).tag(MagSafeLEDState.orange)
+                                Text(String(localized: "Blinking Orange Slow")).tag(MagSafeLEDState.blinkOrangeSlow)
+                                Text(String(localized: "Blinking Orange Fast")).tag(MagSafeLEDState.blinkOrangeFast)
+                            }
+                            
+                            Picker(String(localized: "LED while discharging"), selection: $dischargingMagSafeLEDState) {
+                                Text(String(localized: "Reset to System")).tag(MagSafeLEDState.reset)
+                                Text(String(localized: "Off")).tag(MagSafeLEDState.off)
+                                Text(String(localized: "Green")).tag(MagSafeLEDState.green)
+                                Text(String(localized: "Orange")).tag(MagSafeLEDState.orange)
+                                Text(String(localized: "Blinking Orange Slow")).tag(MagSafeLEDState.blinkOrangeSlow)
+                                Text(String(localized: "Blinking Orange Fast")).tag(MagSafeLEDState.blinkOrangeFast)
+                            }
+
                             if enableHeatProtectionMode {
                                 Picker(
-                                    "LED during heat protection",
+                                    String(localized: "LED during heat protection"),
                                     selection: $heatProtectionMagSafeLEDState
                                 ) {
-                                    Text("Off").tag(MagSafeLEDState.off)
-                                    Text("Green").tag(MagSafeLEDState.green)
-                                    Text("Orange").tag(MagSafeLEDState.orange)
-                                    Text("Blinking Orange Slow").tag(
+                                    Text(String(localized: "Reset to System")).tag(MagSafeLEDState.reset)
+                                    Text(String(localized: "Off")).tag(MagSafeLEDState.off)
+                                    Text(String(localized: "Green")).tag(MagSafeLEDState.green)
+                                    Text(String(localized: "Orange")).tag(MagSafeLEDState.orange)
+                                    Text(String(localized: "Blinking Orange Slow")).tag(
                                         MagSafeLEDState.blinkOrangeSlow
                                     )
-                                    Text("Blinking Orange Fast").tag(
+                                    Text(String(localized: "Blinking Orange Fast")).tag(
                                         MagSafeLEDState.blinkOrangeFast
                                     )
                                 }
@@ -292,6 +322,10 @@ struct ChargingSettingsView: View {
                         if !capabilities.magsafeLEDControl {
                             Text(
                                 "MagSafe LED control is not supported on this device."
+                            )
+                        } else if manageMagSafeLED {
+                            Text(
+                                String(localized: "Note: The slow and fast blinking speeds may appear identical on modern Macs due to hardware limitations.")
                             )
                         }
                     }

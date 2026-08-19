@@ -118,6 +118,10 @@ enum ChargingPowerEvents {
     static func evaluateState(force: Bool = false) -> (Bool, String?) {
         let (percent, _) = IOKitHelper.getPercentRemaining()
         
+        defer {
+            ChargingPowerState.syncMagSafeState(percent: percent)
+        }
+        
         // Heat Protection
         if ChargingSettings.enableHeatProtectionMode,
            let temp = IOKitHelper.getBatteryTemperature(),
