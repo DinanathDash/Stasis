@@ -5,8 +5,9 @@ import IOPMPrivate
 
 @MainActor
 enum ChargingPowerState {
-    private static var chargingDisabled = false
-    private static var powerDisabled = false
+    static private(set) var chargingDisabled = false
+    static private(set) var powerDisabled = false
+    static var heatProtectionActive = false
     
     private static var battery: SMCBattery?
     private static var adapter: SMCAdapter?
@@ -138,26 +139,40 @@ enum ChargingPowerState {
     }
 
     @discardableResult
-    static func manageMagsafeLED(target: UInt8) -> Bool {
-        guard ChargingSettings.manageMagSafeLED else { return false }
+    static func manageMagsafeLED(target: UInt8, force: Bool = false) -> Bool {
+        if !force {
+            guard ChargingSettings.manageMagSafeLED else { return false }
+        }
         guard let adapter = self.adapter, adapter.capabilities.magSafeControl else { return false }
         guard let ledState = MagSafeLEDState(rawValue: target) else { return false }
 
         do {
-            try adapter.setMagSafeLEDState(ledState)
-            logger.info("MagSafe LED set to \(target)")
+            let currentState = try adapter.getMagSafeLEDState()
+            if currentState.rawValue != target {
+                try adapter.setMagSafeLEDState(ledState)
+                logger.info("MagSafe LED changed from \(currentState.rawValue) to \(target)")
+            }
             return true
         } catch {
-            logger.error("Failed to set MagSafe LED: \(error.localizedDescription)")
+            logger.error("Failed to manage MagSafe LED: \(error.localizedDescription)")
             return false
         }
     }
 
     static func syncMagSafeState(percent: UInt8) {
-        if self.powerDisabled || percent == 100 || self.chargingDisabled {
-            manageMagsafeLED(target: MagSafeLEDState.green.rawValue)
+        if !ChargingSettings.manageMagSafeLED {
+            manageMagsafeLED(target: MagSafeLEDState.reset.rawValue, force: true)
+            return
+        }
+
+        if self.powerDisabled {
+            manageMagsafeLED(target: ChargingSettings.dischargingMagSafeLEDState)
+        } else if self.heatProtectionActive {
+            manageMagsafeLED(target: ChargingSettings.heatProtectionMagSafeLEDState)
+        } else if self.chargingDisabled || percent == 100 {
+            manageMagsafeLED(target: ChargingSettings.pausedMagSafeLEDState)
         } else {
-            manageMagsafeLED(target: MagSafeLEDState.orange.rawValue)
+            manageMagsafeLED(target: ChargingSettings.chargingMagSafeLEDState)
         }
     }
 

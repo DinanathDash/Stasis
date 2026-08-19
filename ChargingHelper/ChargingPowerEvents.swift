@@ -118,13 +118,20 @@ enum ChargingPowerEvents {
     static func evaluateState(force: Bool = false) -> (Bool, String?) {
         let (percent, _) = IOKitHelper.getPercentRemaining()
         
+        defer {
+            ChargingPowerState.syncMagSafeState(percent: percent)
+        }
+        
         // Heat Protection
         if ChargingSettings.enableHeatProtectionMode,
            let temp = IOKitHelper.getBatteryTemperature(),
            temp > Double(ChargingSettings.heatProtectionLimit) {
+            ChargingPowerState.heatProtectionActive = true
             logger.info("Heat protection engaged (Temp: \(temp)C). Disabling charging.")
             return ChargingPowerState.disableCharging(force: force)
         }
+        
+        ChargingPowerState.heatProtectionActive = false
         
         if self.chargingMode == .forceDischarge {
             _ = ChargingPowerState.disableCharging(force: force)

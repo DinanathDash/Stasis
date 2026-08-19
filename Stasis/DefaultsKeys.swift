@@ -310,9 +310,17 @@ extension Defaults.Keys {
         "heatProtectionMagSafeLEDState",
         default: MagSafeLEDState.blinkOrangeSlow
     )
-    static let chargingOnHoldMagSafeLEDState = Key<MagSafeLEDState>(
-        "chargingOnHoldMagSafeLEDState",
+    static let chargingMagSafeLEDState = Key<MagSafeLEDState>(
+        "chargingMagSafeLEDState",
         default: MagSafeLEDState.orange
+    )
+    static let pausedMagSafeLEDState = Key<MagSafeLEDState>(
+        "pausedMagSafeLEDState",
+        default: MagSafeLEDState.green
+    )
+    static let dischargingMagSafeLEDState = Key<MagSafeLEDState>(
+        "dischargingMagSafeLEDState",
+        default: MagSafeLEDState.green
     )
     // Advanced
     static let useHardwarePercentage = Key<Bool>(

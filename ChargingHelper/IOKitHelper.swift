@@ -21,12 +21,16 @@ enum IOKitHelper {
     }
 
     static func getBatteryTemperature() -> Double? {
-        guard let info = getPowerSourceInfo() as? [String: Any],
-              let tempDecikelvin = info[kIOPSTemperatureKey] as? Int,
-              tempDecikelvin > 0 else {
+        let batteryService = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"))
+        guard batteryService != 0 else { return nil }
+        defer { IOObjectRelease(batteryService) }
+        
+        let prop = IORegistryEntryCreateCFProperty(batteryService, "Temperature" as CFString, kCFAllocatorDefault, 0)
+        guard let temp100 = prop?.takeRetainedValue() as? Int else {
             return nil
         }
-        let celsius = (Double(tempDecikelvin) / 10.0) - 273.15
+        
+        let celsius = Double(temp100) / 100.0
         return (0...80).contains(celsius) ? celsius : nil
     }
 
