@@ -21508,6 +21508,12 @@
             "state": "translated",
             "value": "暫停或達到限制時的 LED"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LED in pausa o limite raggiunto"
+          }
         }
       }
     },
