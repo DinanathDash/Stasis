@@ -88,6 +88,9 @@ struct HelperManagementDialog: View {
                         title: String(localized: "Helper Status"),
                         message: String(localized: "Helper daemon successfully installed.")
                     )
+                    if let appDelegate = NSApp.delegate as? AppDelegate {
+                        appDelegate.forceSyncSettings()
+                    }
                 }
             } else {
                 try helperManager.uninstall()

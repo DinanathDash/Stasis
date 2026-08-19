@@ -5,8 +5,9 @@ import IOPMPrivate
 
 @MainActor
 enum ChargingPowerState {
-    private static var chargingDisabled = false
-    private static var powerDisabled = false
+    static private(set) var chargingDisabled = false
+    static private(set) var powerDisabled = false
+    static var heatProtectionActive = false
     
     private static var battery: SMCBattery?
     private static var adapter: SMCAdapter?
@@ -138,8 +139,10 @@ enum ChargingPowerState {
     }
 
     @discardableResult
-    static func manageMagsafeLED(target: UInt8) -> Bool {
-        guard ChargingSettings.manageMagSafeLED else { return false }
+    static func manageMagsafeLED(target: UInt8, force: Bool = false) -> Bool {
+        if !force {
+            guard ChargingSettings.manageMagSafeLED else { return false }
+        }
         guard let adapter = self.adapter, adapter.capabilities.magSafeControl else { return false }
         guard let ledState = MagSafeLEDState(rawValue: target) else { return false }
 
@@ -157,8 +160,15 @@ enum ChargingPowerState {
     }
 
     static func syncMagSafeState(percent: UInt8) {
+        if !ChargingSettings.manageMagSafeLED {
+            manageMagsafeLED(target: MagSafeLEDState.reset.rawValue, force: true)
+            return
+        }
+
         if self.powerDisabled {
             manageMagsafeLED(target: ChargingSettings.dischargingMagSafeLEDState)
+        } else if self.heatProtectionActive {
+            manageMagsafeLED(target: ChargingSettings.heatProtectionMagSafeLEDState)
         } else if self.chargingDisabled || percent == 100 {
             manageMagsafeLED(target: ChargingSettings.pausedMagSafeLEDState)
         } else {

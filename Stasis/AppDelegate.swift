@@ -56,7 +56,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Perform first‑run / version‑upgrade reset of user defaults
-        resetStasisPreferencesIfNeeded()
+        let isFirstRun = resetStasisPreferencesIfNeeded()
         // Exit the app immediately if the device doesn't have a battery
         let batteryIOService = IOServiceGetMatchingService(
             kIOMainPortDefault,
@@ -69,6 +69,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         IOObjectRelease(batteryIOService)
 
         StasisShortcutsProvider.updateAppShortcutParameters()
+
+        // Auto-update the Privileged Helper Daemon if it's already installed (e.g. after a Sparkle update)
+        // Or if it's a completely fresh installation / just wiped by the "Reset App" button.
+        if ChargingHelperManager.shared.isInstalled || isFirstRun {
+            try? ChargingHelperManager.shared.install()
+            self.forceSyncSettings()
+        }
 
         NSAppleEventManager.shared().setEventHandler(
             self,
@@ -243,7 +250,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     // MARK: - First‑run / version‑upgrade preferences reset
-    private func resetStasisPreferencesIfNeeded() {
+    private func resetStasisPreferencesIfNeeded() -> Bool {
         // Bundle identifier for the app (fallback to known identifier)
         _ = Bundle.main.bundleIdentifier ?? "com.dinanathdash.stasis"
         // Current app version
@@ -254,10 +261,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if Defaults[.firstRun] {
             Defaults[.firstRun] = false
             Defaults[.storedAppVersion] = currentVersion
+            return true
         } else if Defaults[.storedAppVersion] != currentVersion {
             // App was updated, just record the new version without wiping preferences
             Defaults[.storedAppVersion] = currentVersion
         }
+        return false
     }
 
     func menuWillOpen(_ menu: NSMenu) {
@@ -271,5 +280,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             rebuildMenu()
         }
         viewModel.menuDidClose()
+    }
+
+    func forceSyncSettings() {
+        chargeManager?.forceSyncSettings()
     }
 }
