@@ -56,6 +56,23 @@ class ChargingHelperManager {
         refreshStatus()
     }
 
+    func forceUpgrade() throws {
+        logger.info("Force upgrading charging helper daemon")
+        disconnect()
+        try? service.unregister()
+        // brief pause to allow launchd to flush the registration
+        Thread.sleep(forTimeInterval: 0.1)
+        do {
+            try service.register()
+        } catch {
+            let currentStatus = SMAppService.daemon(plistName: Self.plistName).status
+            if currentStatus != .enabled && currentStatus != .requiresApproval {
+                throw error
+            }
+        }
+        refreshStatus()
+    }
+
     func uninstall() throws {
         logger.info("Unregistering charging helper daemon")
         // Reset the SMC to its default state before uninstalling so the Mac isn't stuck at 80%

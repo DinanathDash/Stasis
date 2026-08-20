@@ -56,7 +56,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Perform first‑run / version‑upgrade reset of user defaults
-        let isFirstRun = resetStasisPreferencesIfNeeded()
+        let launchState = resetStasisPreferencesIfNeeded()
         // Exit the app immediately if the device doesn't have a battery
         let batteryIOService = IOServiceGetMatchingService(
             kIOMainPortDefault,
@@ -72,7 +72,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         // Auto-update the Privileged Helper Daemon if it's already installed (e.g. after a Sparkle update)
         // Or if it's a completely fresh installation / just wiped by the "Reset App" button.
-        if ChargingHelperManager.shared.isInstalled || isFirstRun {
+        if ChargingHelperManager.shared.isInstalled {
+            if launchState == .updated {
+                try? ChargingHelperManager.shared.forceUpgrade()
+            } else {
+                try? ChargingHelperManager.shared.install()
+            }
+            self.forceSyncSettings()
+        } else if launchState == .firstRun {
             try? ChargingHelperManager.shared.install()
             self.forceSyncSettings()
         }
@@ -249,8 +256,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         needsMenuRebuild = false
     }
 
+    enum AppLaunchState {
+        case firstRun
+        case updated
+        case unchanged
+    }
+
     // MARK: - First‑run / version‑upgrade preferences reset
-    private func resetStasisPreferencesIfNeeded() -> Bool {
+    private func resetStasisPreferencesIfNeeded() -> AppLaunchState {
         // Bundle identifier for the app (fallback to known identifier)
         _ = Bundle.main.bundleIdentifier ?? "com.dinanathdash.stasis"
         // Current app version
@@ -261,12 +274,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if Defaults[.firstRun] {
             Defaults[.firstRun] = false
             Defaults[.storedAppVersion] = currentVersion
-            return true
+            return .firstRun
         } else if Defaults[.storedAppVersion] != currentVersion {
             // App was updated, just record the new version without wiping preferences
             Defaults[.storedAppVersion] = currentVersion
+            return .updated
         }
-        return false
+        return .unchanged
     }
 
     func menuWillOpen(_ menu: NSMenu) {
