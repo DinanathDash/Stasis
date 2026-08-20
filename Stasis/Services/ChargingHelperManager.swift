@@ -16,7 +16,7 @@ class ChargingHelperManager {
     private static let machServiceName = "com.dinanathdash.stasis.charging-helper"
     private static let plistName = "com.dinanathdash.stasis.charging-helper.plist"
 
-    private let service: SMAppService
+    private var service: SMAppService
     private var connection: NSXPCConnection?
     private let logger = Logger(
         subsystem: "com.dinanathdash.stasis",
@@ -60,17 +60,33 @@ class ChargingHelperManager {
         logger.info("Force upgrading charging helper daemon")
         disconnect()
         try? service.unregister()
-        // brief pause to allow launchd to flush the registration
-        Thread.sleep(forTimeInterval: 0.1)
-        do {
-            try service.register()
-        } catch {
-            let currentStatus = SMAppService.daemon(plistName: Self.plistName).status
-            if currentStatus != .enabled && currentStatus != .requiresApproval {
-                throw error
+        
+        // IMPORTANT: backgroundtaskmanagementd (BTM) has a notorious bug on macOS 13+
+        // where it aggressively caches the code signature of the previous daemon.
+        // If we register() too quickly after unregister(), BTM will throw errSecCSReqFailed (-67028)
+        // because its cache is in a race condition.
+        // We MUST wait at least 1.0 second before registering the new one.
+        // To avoid blocking the main thread during app launch, we do this asynchronously.
+        Task {
+            do {
+                try await Task.sleep(for: .seconds(1.5))
+                
+                // Re-instantiate to clear internal SMAppService state
+                let newService = SMAppService.daemon(plistName: Self.plistName)
+                try newService.register()
+                
+                await MainActor.run {
+                    self.service = newService
+                    self.logger.info("Force upgrade register successful")
+                    self.refreshStatus()
+                }
+            } catch {
+                await MainActor.run {
+                    self.logger.error("Force upgrade register failed: \(error.localizedDescription)")
+                    self.refreshStatus()
+                }
             }
         }
-        refreshStatus()
     }
 
     func uninstall() throws {
