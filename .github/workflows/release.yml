@@ -60,7 +60,9 @@ jobs:
           cp -R $PWD/build/Stasis.xcarchive/Products/Applications/Stasis.app $PWD/build/export/Stasis.app
 
       - name: Install Tools
-        run: brew install create-dmg fileicon
+        run: |
+          brew untap aws/tap || true
+          brew install create-dmg fileicon
 
       - name: Create DMG
         run: |
@@ -95,7 +97,7 @@ jobs:
           fileicon set "../../Stasis.dmg" "Stasis.app/Contents/Resources/Stasis.icns"
 
       - name: Release to GitHub
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
