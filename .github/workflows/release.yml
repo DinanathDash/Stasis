@@ -27,6 +27,35 @@ jobs:
           default_bump: patch
           release_branches: main
 
+      - name: Extract Release Notes and Update Changelog
+        run: |
+          VERSION="${{ steps.tag_version.outputs.new_version }}"
+          DATE=$(date +'%Y-%m-%d')
+          
+          python3 -c "
+          import sys, re
+          version, date = sys.argv[1], sys.argv[2]
+          with open('CHANGELOG.md', 'r') as f: content = f.read()
+          
+          # Extract notes: from '## Unreleased' until the next '---' separator
+          match = re.search(r'## Unreleased\n(.*?)(?=\n---|##|$)', content, re.DOTALL)
+          if not match:
+              print('Error: Could not find Unreleased section.')
+              sys.exit(1)
+              
+          notes = match.group(1).strip()
+          
+          # Only output release_notes.md if there are actual notes (not the placeholder)
+          out_notes = notes if 'No unreleased changes yet' not in notes else 'No release notes provided.'
+          with open('release_notes.md', 'w') as f: f.write(out_notes)
+          
+          # Update CHANGELOG.md
+          old_section = '## Unreleased\n' + match.group(1)
+          new_section = '## Unreleased\n\n- No unreleased changes yet.\n\n---\n\n## ' + version + ' - ' + date + '\n\n' + notes + '\n'
+          content = content.replace(old_section, new_section, 1)
+          with open('CHANGELOG.md', 'w') as f: f.write(content)
+          " "$VERSION" "$DATE"
+
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
@@ -101,7 +130,7 @@ jobs:
         with:
           tag_name: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
-          generate_release_notes: true
+          body_path: release_notes.md
           files: |
             Stasis.dmg
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -119,7 +148,11 @@ jobs:
           mkdir appcast_gen
           cp Stasis.dmg appcast_gen/
           cp appcast.xml appcast_gen/
-          echo "${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}" | ./sparkle_tools/bin/generate_appcast --ed-key-file - --download-url-prefix "https://github.com/DinanathDash/Stasis/releases/download/${{ steps.tag_version.outputs.new_tag }}/" appcast_gen
+          
+          npm install -g marked
+          marked release_notes.md > appcast_gen/Stasis.html
+          
+          echo "${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}" | ./sparkle_tools/bin/generate_appcast --embed-release-notes --ed-key-file - --download-url-prefix "https://github.com/DinanathDash/Stasis/releases/download/${{ steps.tag_version.outputs.new_tag }}/" appcast_gen
           cp appcast_gen/appcast.xml .
 
       - name: Update Homebrew Cask and Commit
@@ -129,11 +162,12 @@ jobs:
           # Replace sha256 in stasis.rb
           sed -i '' 's/sha256 ".*"/sha256 "'${{ env.sha256 }}'"/' Casks/stasis.rb
           
-          # Commit the updated ruby file, pbxproj, and appcast.xml to the repository
+          # Commit the updated files to the repository
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Casks/stasis.rb
           git add stasis.xcodeproj/project.pbxproj
           git add appcast.xml
+          git add CHANGELOG.md
           git commit -m "chore: bump version to v${{ env.version }}, update Homebrew Cask, and update appcast [skip ci]"
           git push origin main
