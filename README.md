@@ -8,7 +8,7 @@ Stasis gives you real-time insight into your MacBook's power system and lets you
 
 > **Apple Silicon only.** Fully supported on all Apple Silicon MacBooks (M-series chips).
 >
-> Requires **macOS 14.8 – 26.3**.
+> Requires **macOS 14.8 – 26.6**.
 
 ![Stasis Menu Bar](assets/images/FullApp.jpg)
 

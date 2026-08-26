@@ -112,13 +112,13 @@ jobs:
           create-dmg \
             --volname "Stasis" \
             --volicon "Stasis.app/Contents/Resources/Stasis.icns" \
-            --window-pos 340 200 \
-            --window-size 600 400 \
-            --icon-size 100 \
+            --window-pos 380 250 \
+            --window-size 600 460 \
+            --icon-size 130 \
             --background "../../assets/dmg-background.png" \
-            --icon "Stasis.app" 123 210 \
+            --icon "Stasis.app" 132 200 \
             --hide-extension "Stasis.app" \
-            --app-drop-link 430 220 \
+            --app-drop-link 458 200 \
             "../../Stasis.dmg" \
             "dmg_root"
           
