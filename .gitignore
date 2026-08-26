@@ -6,7 +6,9 @@ timeline.xctimeline
 playground.xcworkspace
 
 build/
+build_local_dmg/
 .local-build/
 .claude/
 .DS_Store
 Stasis.wiki/
+Stasis_Local_Test.dmg
