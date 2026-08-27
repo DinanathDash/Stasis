@@ -19,9 +19,9 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
             return false
         }
 
-        // Construct the requirement: identifier "com.dinanathdash.Stasis"
+        // Construct the requirement: identifier "com.dinanathdash.stasis"
         var requirement: SecRequirement?
-        let reqString = "identifier \"com.dinanathdash.Stasis\"" as CFString
+        let reqString = "identifier \"com.dinanathdash.stasis\"" as CFString
         let reqStatus = SecRequirementCreateWithString(reqString, [], &requirement)
         guard reqStatus == errSecSuccess, let validReq = requirement else {
             return false
