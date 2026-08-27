@@ -1,4 +1,5 @@
 import Foundation
+import Security
 import os.log
 import smc_power
 
@@ -28,12 +29,39 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
         _ listener: NSXPCListener,
         shouldAcceptNewConnection newConnection: NSXPCConnection
     ) -> Bool {
+        // Validate the code signature of the connecting process
+        let pid = newConnection.processIdentifier
+        let attributes = [kSecGuestAttributePid: pid] as CFDictionary
+
+        var code: SecCode?
+        let status = SecCodeCopyGuestWithAttributes(nil, attributes, [], &code)
+        guard status == errSecSuccess, let validCode = code else {
+            logger.error("Failed to get SecCode for connecting process PID \(pid) (status: \(status))")
+            return false
+        }
+
+        // Construct the requirement: identifier "com.dinanathdash.Stasis"
+        var requirement: SecRequirement?
+        let reqString = "identifier \"com.dinanathdash.Stasis\"" as CFString
+        let reqStatus = SecRequirementCreateWithString(reqString, [], &requirement)
+        guard reqStatus == errSecSuccess, let validReq = requirement else {
+            logger.error("Failed to create SecRequirement")
+            return false
+        }
+
+        // Check validity against the requirement
+        let checkStatus = SecCodeCheckValidity(validCode, [], validReq)
+        guard checkStatus == errSecSuccess else {
+            logger.error("XPC connection rejected: Process does not match required code signature (status: \(checkStatus))")
+            return false
+        }
+
+        logger.info("XPC connection accepted from valid Stasis process")
+
         newConnection.exportedInterface = NSXPCInterface(
             with: (any ChargingHelperProtocol).self
         )
         newConnection.exportedObject = helper
-
-        logger.info("XPC connection accepted")
 
         newConnection.invalidationHandler = {
             logger.info("XPC connection invalidated, but daemon stays alive")

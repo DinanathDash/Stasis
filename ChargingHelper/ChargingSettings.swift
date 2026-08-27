@@ -122,17 +122,23 @@ enum ChargingSettings {
             case "manageCharging":
                 manageCharging = value as? Bool ?? manageCharging
             case "chargeLimit":
-                chargeLimit = UInt8(value as? Int ?? Int(chargeLimit))
+                if let intVal = value as? Int {
+                    chargeLimit = UInt8(clamping: max(50, min(100, intVal)))
+                }
             case "sailingMode":
                 sailingMode = value as? Bool ?? sailingMode
             case "sailingModeLimit":
-                sailingModeLimit = UInt8(value as? Int ?? Int(sailingModeLimit))
+                if let intVal = value as? Int {
+                    sailingModeLimit = UInt8(clamping: max(1, min(100, intVal)))
+                }
             case "automaticDischarge":
                 automaticDischarge = value as? Bool ?? automaticDischarge
             case "enableHeatProtectionMode":
                 enableHeatProtectionMode = value as? Bool ?? enableHeatProtectionMode
             case "heatProtectionLimit":
-                heatProtectionLimit = value as? Int ?? heatProtectionLimit
+                if let intVal = value as? Int {
+                    heatProtectionLimit = max(20, min(60, intVal))
+                }
             case "disableSleepUntilChargeLimit":
                 disableSleepUntilChargeLimit = value as? Bool ?? disableSleepUntilChargeLimit
             case "disableSleepWhileDischarging":
@@ -140,13 +146,21 @@ enum ChargingSettings {
             case "manageMagSafeLED":
                 manageMagSafeLED = value as? Bool ?? manageMagSafeLED
             case "chargingMagSafeLEDState":
-                chargingMagSafeLEDState = UInt8(value as? Int ?? Int(chargingMagSafeLEDState))
+                if let intVal = value as? Int {
+                    chargingMagSafeLEDState = UInt8(clamping: intVal)
+                }
             case "pausedMagSafeLEDState":
-                pausedMagSafeLEDState = UInt8(value as? Int ?? Int(pausedMagSafeLEDState))
+                if let intVal = value as? Int {
+                    pausedMagSafeLEDState = UInt8(clamping: intVal)
+                }
             case "dischargingMagSafeLEDState":
-                dischargingMagSafeLEDState = UInt8(value as? Int ?? Int(dischargingMagSafeLEDState))
+                if let intVal = value as? Int {
+                    dischargingMagSafeLEDState = UInt8(clamping: intVal)
+                }
             case "heatProtectionMagSafeLEDState":
-                heatProtectionMagSafeLEDState = UInt8(value as? Int ?? Int(heatProtectionMagSafeLEDState))
+                if let intVal = value as? Int {
+                    heatProtectionMagSafeLEDState = UInt8(clamping: intVal)
+                }
             default:
                 logger.warning("Unknown setting key: \(key)")
             }
