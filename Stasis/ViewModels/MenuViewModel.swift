@@ -230,7 +230,7 @@ class MenuViewModel {
                 batteryModeText = String(localized: "Calibrating (Discharging to \(15.formattedPercentage))")
             case .charging:
                 if logicallyPluggedIn {
-                    chargingMode = .charging
+                    chargingMode = safeMetrics.isCharging ? .charging : .pluggedIn
                     batteryModeText = String(localized: "Calibrating (Charging to \(100.formattedPercentage))")
                 } else {
                     chargingMode = .discharging
@@ -238,7 +238,7 @@ class MenuViewModel {
                 }
             case .resting:
                 if logicallyPluggedIn {
-                    chargingMode = .pluggedIn
+                    chargingMode = safeMetrics.isCharging ? .charging : .pluggedIn
                     batteryModeText = String(localized: "Calibrating (Resting at \(100.formattedPercentage))")
                 } else {
                     chargingMode = .discharging
