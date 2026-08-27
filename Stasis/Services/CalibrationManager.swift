@@ -113,9 +113,15 @@ class CalibrationManager {
                         Defaults[.calibrationStatus] = .charging
                         try await batteryService.enablePowerAdapter()
                         try await batteryService.chargeToFull()
+                        if Defaults[.manageMagSafeLED] {
+                            try await batteryService.manageMagsafeLED(target: Defaults[.chargingMagSafeLEDState])
+                        }
                     } else {
                         // Ensure it's discharging
                         try await batteryService.disablePowerAdapter()
+                        if Defaults[.manageMagSafeLED] {
+                            try await batteryService.manageMagsafeLED(target: Defaults[.dischargingMagSafeLEDState])
+                        }
                     }
                     batteryService.scheduleSinglePoll()
                 case .charging:
@@ -125,11 +131,17 @@ class CalibrationManager {
                         logger.info("Charging step complete. Moving to resting step.")
                         Defaults[.calibrationStatus] = .resting
                         Defaults[.calibrationStepStartTime] = Date()
-                        // Keep it topped up during rest
-                        try await batteryService.chargeToFull()
+                        // Keep it resting at 100% using adapter power
+                        try await batteryService.disableCharging()
+                        if Defaults[.manageMagSafeLED] {
+                            try await batteryService.manageMagsafeLED(target: Defaults[.pausedMagSafeLEDState])
+                        }
                     } else {
                         // Ensure it's charging
                         try await batteryService.chargeToFull()
+                        if Defaults[.manageMagSafeLED] {
+                            try await batteryService.manageMagsafeLED(target: Defaults[.chargingMagSafeLEDState])
+                        }
                     }
                     batteryService.scheduleSinglePoll()
                 case .resting:
@@ -142,8 +154,11 @@ class CalibrationManager {
                     if elapsedMinutes >= 120.0 {
                         finishCalibration()
                     } else {
-                        // Keep it resting and topped up
-                        try await batteryService.chargeToFull()
+                        // Keep it resting and use adapter power
+                        try await batteryService.disableCharging()
+                        if Defaults[.manageMagSafeLED] {
+                            try await batteryService.manageMagsafeLED(target: Defaults[.pausedMagSafeLEDState])
+                        }
                     }
                 case .idle:
                     break
