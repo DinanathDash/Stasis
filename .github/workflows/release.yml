@@ -37,8 +37,8 @@ jobs:
           version, date = sys.argv[1], sys.argv[2]
           with open('CHANGELOG.md', 'r') as f: content = f.read()
           
-          # Extract notes: from '## Unreleased' until the next '---' separator
-          match = re.search(r'## Unreleased\n(.*?)(?=\n---|##|$)', content, re.DOTALL)
+          # Extract notes: from '## Unreleased' until the next '---' separator or H2 '## '
+          match = re.search(r'## Unreleased\n(.*?)(?=\n---\n|\n## |\n##\n|$)', content, re.DOTALL)
           if not match:
               print('Error: Could not find Unreleased section.')
               sys.exit(1)

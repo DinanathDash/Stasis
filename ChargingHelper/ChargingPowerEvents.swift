@@ -139,12 +139,7 @@ enum ChargingPowerEvents {
         }
 
         if !ChargingSettings.manageCharging {
-            // Respect the one-time overrides
-            if self.chargingMode == .toLimit && percent < ChargingSettings.chargeLimit {
-                return ChargingPowerState.enableCharging(force: force)
-            } else if self.chargingMode == .toFull && percent < 100 {
-                return ChargingPowerState.enableCharging(force: force)
-            }
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
             return ChargingPowerState.enableCharging(force: force)
         }
 

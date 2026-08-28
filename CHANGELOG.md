@@ -6,13 +6,18 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
-- No unreleased changes yet.
+Fixed an issue where toggling off 'Manage charging' during a forced discharge failed to re-enable the power adapter.
+
+### Bug Fixes & Refinements
+
+- **Charging Controls:** Ensure the power adapter is properly re-enabled when turning off charge management so native macOS charging resumes immediately.
 
 ---
 
 ## 0.21.1 - 2026-08-28
 
 XPC security validation, calibration state improvements, and DMG layout updates.
+
 ### Features & Core Capabilities
 
 - **XPC Security:** Implemented code signature validation for incoming XPC connections and added input validation for charging configuration settings.
