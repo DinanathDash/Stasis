@@ -5,6 +5,21 @@
         <description>Most recent changes for Stasis.</description>
         <language>en</language>
         <item>
+            <title>0.21.2</title>
+            <pubDate>Fri, 28 Aug 2026 15:24:00 +0000</pubDate>
+            <sparkle:version>72</sparkle:version>
+            <sparkle:shortVersionString>0.21.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
+            <description><![CDATA[<p>Fixed an issue where toggling off &#39;Manage charging&#39; during a forced discharge failed to re-enable the power adapter.</p>
+<h3>Bug Fixes &amp; Refinements</h3>
+<ul>
+<li><strong>Charging Controls:</strong> Ensure the power adapter is properly re-enabled when turning off charge management so native macOS charging resumes immediately.</li>
+</ul>
+
+]]></description>
+            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.21.2/Stasis.dmg" length="4547290" type="application/octet-stream" sparkle:edSignature="bd3aQJLYoIo8KT8tBUMakBdx4VdYkl92Yfyh4P7qCfNCGppKh2oLR+u1vbDZBrIZRBOSTle7aAHVW0sOHST0Bg=="/>
+        </item>
+        <item>
             <title>0.21.1</title>
             <pubDate>Fri, 28 Aug 2026 14:54:21 +0000</pubDate>
             <sparkle:version>71</sparkle:version>
@@ -22,14 +37,6 @@
             <sparkle:shortVersionString>0.20.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.20.2/Stasis.dmg" length="2979847" type="application/octet-stream" sparkle:edSignature="Bkfcd9ZNF0MgbjFx3CuiEaGWSO3nY4icajWTo+h0BCHzhjI3n+voW114TDci2CjrijmDfg0Ks5M0rpdafXWuCg=="/>
-        </item>
-        <item>
-            <title>0.20.1</title>
-            <pubDate>Thu, 20 Aug 2026 05:40:08 +0000</pubDate>
-            <sparkle:version>68</sparkle:version>
-            <sparkle:shortVersionString>0.20.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.20.1/Stasis.dmg" length="2979901" type="application/octet-stream" sparkle:edSignature="OClpX9pH+lwG4gUXBW3goKj/aD1y2ZDY+zh8Dc1woN8ZJa+ndUvilp4IQnUbEKUzGKslohc5bOqcI3KyJLuBDg=="/>
         </item>
     </channel>
 </rss>

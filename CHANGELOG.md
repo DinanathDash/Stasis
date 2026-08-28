@@ -6,6 +6,12 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+---
+
+## 0.21.2 - 2026-08-28
+
 Fixed an issue where toggling off 'Manage charging' during a forced discharge failed to re-enable the power adapter.
 
 ### Bug Fixes & Refinements
