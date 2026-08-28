@@ -6,8 +6,13 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
-XPC security validation, calibration state improvements, and DMG layout updates.
+- No unreleased changes yet.
 
+---
+
+## 0.21.1 - 2026-08-28
+
+XPC security validation, calibration state improvements, and DMG layout updates.
 ### Features & Core Capabilities
 
 - **XPC Security:** Implemented code signature validation for incoming XPC connections and added input validation for charging configuration settings.
