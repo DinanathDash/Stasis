@@ -80,7 +80,11 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
         newConnection.exportedObject = helper
 
         newConnection.invalidationHandler = {
-            logger.info("XPC connection invalidated, but daemon stays alive")
+            logger.info("XPC connection invalidated. Resetting to safe defaults and stopping power events.")
+            Task { @MainActor in
+                ChargingPowerState.restoreDefaults()
+                ChargingPowerEvents.stop()
+            }
         }
 
         newConnection.resume()
