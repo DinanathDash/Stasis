@@ -6,7 +6,23 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
-- No unreleased changes yet.
+XPC security validation, calibration state improvements, and DMG layout updates.
+
+### Features & Core Capabilities
+
+- **XPC Security:** Implemented code signature validation for incoming XPC connections and added input validation for charging configuration settings.
+- **Code Signing:** Dynamically generating code signing requirements using the leaf certificate's common name to enforce identity and team ID verification.
+- **Calibration States:** Added MagSafe LED control to calibration states and improved charging mode display logic.
+
+### Bug Fixes & Refinements
+
+- **XPC Connection:** Reset power state and stop monitoring events when the XPC connection is invalidated.
+- **Helper Identity:** Updated bundle identifier requirement to lowercase in ChargingHelper and Helper targets.
+
+### Infrastructure & Build
+
+- **DMG Layout:** Updated DMG layout, bumped macOS support, and added a local DMG testing script.
+- **Release Workflow:** Refined the release workflow configuration and updated GitHub Actions dependencies.
 
 ---
 
