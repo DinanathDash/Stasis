@@ -40,9 +40,9 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
             return false
         }
 
-        // Construct the requirement: identifier "com.dinanathdash.stasis"
+        // Construct the requirement: identifier "com.dinanathdash.stasis" and Team ID
         var requirement: SecRequirement?
-        let reqString = "identifier \"com.dinanathdash.stasis\"" as CFString
+        let reqString = "anchor apple generic and identifier \"com.dinanathdash.stasis\" and (certificate leaf[subject.OU] = \"63P4XT247T\" or certificate leaf[subject.CN] = \"Apple Development: dashdinanath056@gmail.com (63P4XT247T)\")" as CFString
         let reqStatus = SecRequirementCreateWithString(reqString, [], &requirement)
         guard reqStatus == errSecSuccess, let validReq = requirement else {
             logger.error("Failed to create SecRequirement")
