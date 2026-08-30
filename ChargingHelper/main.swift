@@ -48,15 +48,24 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
         var dict: CFDictionary?
         let staticCode = unsafeBitCast(code, to: SecStaticCode.self)
         guard SecCodeCopySigningInformation(staticCode, SecCSFlags(rawValue: kSecCSSigningInformation), &dict) == errSecSuccess,
-              let info = dict as? [String: Any],
-              let certs = info[kSecCodeInfoCertificates as String] as? [SecCertificate],
-              let leaf = certs.first else { return false }
+              let info = dict as? [String: Any] else { return false }
         
-        var cnCF: CFString?
-        SecCertificateCopyCommonName(leaf, &cnCF)
-        guard let commonName = cnCF as String? else { return false }
+        let flags = info[kSecCodeInfoFlags as String] as? UInt32 ?? 0
+        let isAdHoc = (flags & SecCodeSignatureFlags.adhoc.rawValue) != 0
         
-        let reqString = "anchor apple generic and identifier \"com.dinanathdash.stasis\" and certificate leaf[subject.CN] = \"\(commonName)\"" as CFString
+        let reqString: CFString
+        if isAdHoc {
+            reqString = "identifier \"com.dinanathdash.stasis\"" as CFString
+        } else {
+            guard let certs = info[kSecCodeInfoCertificates as String] as? [SecCertificate],
+                  let leaf = certs.first else { return false }
+            
+            var cnCF: CFString?
+            SecCertificateCopyCommonName(leaf, &cnCF)
+            guard let commonName = cnCF as String? else { return false }
+            
+            reqString = "anchor apple generic and identifier \"com.dinanathdash.stasis\" and certificate leaf[subject.CN] = \"\(commonName)\"" as CFString
+        }
         
         var requirement: SecRequirement?
         let reqStatus = SecRequirementCreateWithString(reqString, [], &requirement)
