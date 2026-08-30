@@ -94,7 +94,7 @@ struct ChargingSettingsView: View {
                     }
                 }
 
-                if manageCharging && helperManager.helperStatus == .installed {
+                if manageCharging {
                     LabeledContent {
                         HStack(spacing: 8) {
                             Slider(
@@ -126,16 +126,14 @@ struct ChargingSettingsView: View {
             } footer: {
                 if !hasAnyControl {
                     Text("Charge management is not supported on this device.")
-                } else if manageCharging
-                    && helperManager.helperStatus == .installed
-                {
+                } else if manageCharging {
                     Text(
                         "For reliable charge management, ensure that \"Optimize Battery Charging\" is disabled and Apple's native Charge Limit is exactly at **\(100.formattedPercentage)** in **System Settings → Battery**."
                     )
                 }
             }
 
-            if manageCharging && helperManager.helperStatus == .installed {
+            if manageCharging {
                 Section {
                     Toggle("Automatic discharge", isOn: $automaticDischarge)
                         .disabled(!hasAdapterControl)

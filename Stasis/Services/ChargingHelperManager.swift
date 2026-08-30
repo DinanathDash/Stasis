@@ -113,9 +113,31 @@ class ChargingHelperManager {
     func refreshStatus() {
         let currentStatus = SMAppService.daemon(plistName: Self.plistName).status
         switch currentStatus {
-        case .enabled: helperStatus = .installed
+        case .enabled:
+            Task {
+                if await checkLiveness() {
+                    await MainActor.run { self.helperStatus = .installed }
+                } else {
+                    await MainActor.run { self.helperStatus = .notInstalled }
+                }
+            }
         case .requiresApproval: helperStatus = .requiresApproval
         default: helperStatus = .notInstalled
+        }
+    }
+    
+    private func checkLiveness() async -> Bool {
+        return await withCheckedContinuation { continuation in
+            guard let helper = getHelper(errorHandler: { _ in
+                continuation.resume(returning: false)
+            }) else {
+                continuation.resume(returning: false)
+                return
+            }
+            
+            helper.ping { success in
+                continuation.resume(returning: success)
+            }
         }
     }
 

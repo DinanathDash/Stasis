@@ -13,42 +13,29 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
         let pid = newConnection.processIdentifier
         let attributes = [kSecGuestAttributePid: pid] as CFDictionary
 
-        var code: SecCode?
-        let status = SecCodeCopyGuestWithAttributes(nil, attributes, [], &code)
-        guard status == errSecSuccess, let validCode = code else {
+        var guestCode: SecCode?
+        let status = SecCodeCopyGuestWithAttributes(nil, attributes, [], &guestCode)
+        guard status == errSecSuccess, let validCode = guestCode else {
             return false
         }
 
-        // Dynamically build requirement matching our own signing certificate's Common Name
-        var selfCode: SecCode?
-        guard SecCodeCopySelf(SecCSFlags(rawValue: 0), &selfCode) == errSecSuccess,
-              let code = selfCode else { return false }
+        // Find the containing Stasis.app bundle
+        var appURL = URL(fileURLWithPath: Bundle.main.bundlePath)
+        while appURL.path != "/" && appURL.pathExtension != "app" {
+            appURL = appURL.deletingLastPathComponent()
+        }
         
-        var dict: CFDictionary?
-        let staticCode = unsafeBitCast(code, to: SecStaticCode.self)
-        guard SecCodeCopySigningInformation(staticCode, SecCSFlags(rawValue: kSecCSSigningInformation), &dict) == errSecSuccess,
-              let info = dict as? [String: Any] else { return false }
+        guard appURL.pathExtension == "app" else { return false }
         
-        let flags = info[kSecCodeInfoFlags as String] as? UInt32 ?? 0
-        let isAdHoc = (flags & SecCodeSignatureFlags.adhoc.rawValue) != 0
-        
-        let reqString: CFString
-        if isAdHoc {
-            reqString = "identifier \"com.dinanathdash.stasis\"" as CFString
-        } else {
-            guard let certs = info[kSecCodeInfoCertificates as String] as? [SecCertificate],
-                  let leaf = certs.first else { return false }
-            
-            var cnCF: CFString?
-            SecCertificateCopyCommonName(leaf, &cnCF)
-            guard let commonName = cnCF as String? else { return false }
-            
-            reqString = "anchor apple generic and identifier \"com.dinanathdash.stasis\" and certificate leaf[subject.CN] = \"\(commonName)\"" as CFString
+        var appStaticCode: SecStaticCode?
+        guard SecStaticCodeCreateWithPath(appURL as CFURL, [], &appStaticCode) == errSecSuccess,
+              let appCode = appStaticCode else {
+            return false
         }
         
         var requirement: SecRequirement?
-        let reqStatus = SecRequirementCreateWithString(reqString, [], &requirement)
-        guard reqStatus == errSecSuccess, let validReq = requirement else {
+        guard SecCodeCopyDesignatedRequirement(appCode, [], &requirement) == errSecSuccess,
+              let validReq = requirement else {
             return false
         }
 

@@ -24,27 +24,6 @@ class MenuBuilder {
     func populateMenu(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        if viewModel.daemonSyncError {
-            let errorItem = createMenuItem(view: DaemonErrorView())
-            menu.addItem(errorItem)
-            menu.addItem(NSMenuItem.separator())
-        }
-        
-        if let error = viewModel.daemonError {
-            let errorItem = createMenuItem(view: HStack {
-                Image(systemName: "xmark.octagon.fill")
-                    .foregroundColor(.red)
-                Text(error)
-                    .foregroundColor(.red)
-                    .font(.caption)
-                    .lineLimit(3)
-                Spacer()
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 4))
-            menu.addItem(errorItem)
-            menu.addItem(NSMenuItem.separator())
-        }
 
         let mainInfoItem = createMenuItem(
             view: BatteryMainInfoView(viewModel: viewModel)
@@ -430,21 +409,6 @@ struct ChargeToLimitToggleView: View {
     }
 }
 
-struct DaemonErrorView: View {
-    var body: some View {
-        HStack {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundColor(.red)
-            Text("Daemon Error - Settings Not Synced")
-                .foregroundColor(.red)
-                .font(.callout)
-                .bold()
-            Spacer()
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 4)
-    }
-}
 
 struct BatteryCalibrationToggleView: View {
     let viewModel: MenuViewModel

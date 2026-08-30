@@ -56,6 +56,8 @@ class ChargeManager {
     private func syncSettingsToDaemon() {
         guard ChargingHelperManager.shared.isInstalled else {
             logger.info("Skipping sync: helper is not installed")
+            daemonSyncError = true
+            showDaemonErrorAlertIfNeeded()
             return
         }
 
