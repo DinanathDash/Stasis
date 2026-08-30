@@ -6,7 +6,16 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
-- No unreleased changes yet.
+Major stability update addressing privileged daemon crashes and XPC reliability in ad-hoc builds.
+
+### Bug Fixes & Refinements
+
+- **XPC Security & Build Support:** Refactored XPC validation to use `SecCodeCopyDesignatedRequirement` combined with `processIdentifier`, resolving a critical `EX_CONFIG` launch crash on ad-hoc release builds while maintaining robust security against spoofing.
+- **Daemon Liveness & Sync:** Replaced the unreliable `SMAppService.status` check with an active XPC `ping` for true daemon liveness verification. Silent sync failures are now caught and immediately surfaced to the user.
+- **Daemon Re-installation:** Fixed a 32-second UI thread blocking issue during daemon installation and ensured `manageCharging` preferences are cleanly wiped upon uninstallation to prevent unintended charging pauses on restart.
+- **Heat Protection:** Fixed a logic bug where heat protection failed to re-enable the power adapter, inadvertently draining the battery while trying to cool it down.
+- **SMC Read Reliability:** SMC read failures (e.g. from the unprivileged helper) are now properly surfaced to the UI instead of silently masking as zero values (0.00W).
+- **Launchd Compatibility:** Added required `CFBundleIdentifier` and bundle keys to the `ChargingHelper` Info.plist to satisfy strict `launchd` constraint requirements.
 
 ---
 
