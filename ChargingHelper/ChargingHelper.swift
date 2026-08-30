@@ -24,6 +24,10 @@ final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendabl
         )
     }
 
+    func ping(reply: @escaping @Sendable (Bool) -> Void) {
+        reply(true)
+    }
+
     func setSettings(settings: [String: NSObject & Sendable], reply: @escaping @Sendable (Bool, String?) -> Void) {
         Task { @MainActor in
             ChargingSettings.setSettings(settings: settings)
@@ -90,6 +94,8 @@ final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendabl
 
     func resetToDefaults(reply: @escaping @Sendable (Bool, String?) -> Void) {
         Task { @MainActor in
+            UserDefaults.standard.removeObject(forKey: "manageCharging")
+            UserDefaults.standard.synchronize()
             ChargingPowerEvents.chargingMode = .standard
             ChargingPowerState.restoreDefaults()
             reply(true, nil)

@@ -127,7 +127,8 @@ enum ChargingPowerEvents {
            let temp = IOKitHelper.getBatteryTemperature(),
            temp > Double(ChargingSettings.heatProtectionLimit) {
             ChargingPowerState.heatProtectionActive = true
-            logger.info("Heat protection engaged (Temp: \(temp)C). Disabling charging.")
+            logger.info("Heat protection engaged (Temp: \(temp)C). Disabling charging and running on AC.")
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
             return ChargingPowerState.disableCharging(force: force)
         }
         

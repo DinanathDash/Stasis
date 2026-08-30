@@ -1,6 +1,7 @@
 import Foundation
 
 @objc protocol ChargingHelperProtocol {
+    func ping(reply: @escaping @Sendable (Bool) -> Void)
     func setSettings(settings: [String: NSObject & Sendable], reply: @escaping @Sendable (Bool, String?) -> Void)
     func getSettings(reply: @escaping @Sendable ([String: NSObject & Sendable]) -> Void)
     func chargeToLimit(reply: @escaping @Sendable (Bool, String?) -> Void)

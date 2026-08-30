@@ -178,14 +178,19 @@ class BatteryService {
                 return
             }
 
-            helper.readBatteryMetrics { batteryVoltage, batteryCurrent, batteryPower in
-                continuation.resume(
-                    returning: SMCBatteryReading(
-                        batteryVoltage: batteryVoltage,
-                        batteryCurrent: batteryCurrent,
-                        batteryPower: batteryPower
+            helper.readBatteryMetrics { batteryVoltage, batteryCurrent, batteryPower, errorMsg in
+                if let errorMsg = errorMsg {
+                    self.logger.error("SMC battery read failed in helper: \(errorMsg)")
+                    continuation.resume(returning: nil)
+                } else {
+                    continuation.resume(
+                        returning: SMCBatteryReading(
+                            batteryVoltage: batteryVoltage,
+                            batteryCurrent: batteryCurrent,
+                            batteryPower: batteryPower
+                        )
                     )
-                )
+                }
             }
         }
     }
@@ -201,14 +206,19 @@ class BatteryService {
                 return
             }
 
-            helper.readAdapterMetrics { adapterVoltage, adapterCurrent, adapterPower in
-                continuation.resume(
-                    returning: SMCAdapterReading(
-                        adapterVoltage: adapterVoltage,
-                        adapterCurrent: adapterCurrent,
-                        adapterPower: adapterPower
+            helper.readAdapterMetrics { adapterVoltage, adapterCurrent, adapterPower, errorMsg in
+                if let errorMsg = errorMsg {
+                    self.logger.error("SMC adapter read failed in helper: \(errorMsg)")
+                    continuation.resume(returning: nil)
+                } else {
+                    continuation.resume(
+                        returning: SMCAdapterReading(
+                            adapterVoltage: adapterVoltage,
+                            adapterCurrent: adapterCurrent,
+                            adapterPower: adapterPower
+                        )
                     )
-                )
+                }
             }
         }
     }
