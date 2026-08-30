@@ -5,6 +5,26 @@
         <description>Most recent changes for Stasis.</description>
         <language>en</language>
         <item>
+            <title>0.21.3</title>
+            <pubDate>Sun, 30 Aug 2026 17:10:48 +0000</pubDate>
+            <sparkle:version>73</sparkle:version>
+            <sparkle:shortVersionString>0.21.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
+            <description><![CDATA[<p>Major stability update addressing privileged daemon crashes and XPC reliability in ad-hoc builds.</p>
+<h3>Bug Fixes &amp; Refinements</h3>
+<ul>
+<li><strong>XPC Security &amp; Build Support:</strong> Refactored XPC validation to use <code>SecCodeCopyDesignatedRequirement</code> combined with <code>processIdentifier</code>, resolving a critical <code>EX_CONFIG</code> launch crash on ad-hoc release builds while maintaining robust security against spoofing.</li>
+<li><strong>Daemon Liveness &amp; Sync:</strong> Replaced the unreliable <code>SMAppService.status</code> check with an active XPC <code>ping</code> for true daemon liveness verification. Silent sync failures are now caught and immediately surfaced to the user.</li>
+<li><strong>Daemon Re-installation:</strong> Fixed a 32-second UI thread blocking issue during daemon installation and ensured <code>manageCharging</code> preferences are cleanly wiped upon uninstallation to prevent unintended charging pauses on restart.</li>
+<li><strong>Heat Protection:</strong> Fixed a logic bug where heat protection failed to re-enable the power adapter, inadvertently draining the battery while trying to cool it down.</li>
+<li><strong>SMC Read Reliability:</strong> SMC read failures (e.g. from the unprivileged helper) are now properly surfaced to the UI instead of silently masking as zero values (0.00W).</li>
+<li><strong>Launchd Compatibility:</strong> Added required <code>CFBundleIdentifier</code> and bundle keys to the <code>ChargingHelper</code> Info.plist to satisfy strict <code>launchd</code> constraint requirements.</li>
+</ul>
+
+]]></description>
+            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.21.3/Stasis.dmg" length="4545583" type="application/octet-stream" sparkle:edSignature="J4nDnByUqr+hY45r+7D/6b5wTboKSNOj1ALBBJ502sWiFDndNeVZP4fVtJaRDvLkdB30fVCR1WMMEidRgd2VCg=="/>
+        </item>
+        <item>
             <title>0.21.2</title>
             <pubDate>Fri, 28 Aug 2026 15:24:00 +0000</pubDate>
             <sparkle:version>72</sparkle:version>
@@ -29,14 +49,6 @@
 
 ]]></description>
             <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.21.1/Stasis.dmg" length="4547331" type="application/octet-stream" sparkle:edSignature="p4Xhqh7nLAUeM/vByJgTvHMtymOcQIR+XA4EDNMHxfahhTYQC1OhKHlTYlqT/uB5OHd2vYDMwpLWfkjRDJGBAA=="/>
-        </item>
-        <item>
-            <title>0.20.2</title>
-            <pubDate>Thu, 20 Aug 2026 05:49:53 +0000</pubDate>
-            <sparkle:version>69</sparkle:version>
-            <sparkle:shortVersionString>0.20.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.20.2/Stasis.dmg" length="2979847" type="application/octet-stream" sparkle:edSignature="Bkfcd9ZNF0MgbjFx3CuiEaGWSO3nY4icajWTo+h0BCHzhjI3n+voW114TDci2CjrijmDfg0Ks5M0rpdafXWuCg=="/>
         </item>
     </channel>
 </rss>

@@ -6,6 +6,12 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+---
+
+## 0.21.3 - 2026-08-30
+
 Major stability update addressing privileged daemon crashes and XPC reliability in ad-hoc builds.
 
 ### Bug Fixes & Refinements
