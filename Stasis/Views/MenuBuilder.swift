@@ -24,7 +24,6 @@ class MenuBuilder {
     func populateMenu(_ menu: NSMenu) {
         menu.removeAllItems()
 
-
         let mainInfoItem = createMenuItem(
             view: BatteryMainInfoView(viewModel: viewModel)
         )
@@ -45,7 +44,7 @@ class MenuBuilder {
             }
         }
 
-        if viewModel.manageChargingEnabled && viewModel.adapterConnected {
+        if viewModel.manageChargingEnabled, viewModel.adapterConnected {
             if Defaults[.showAdvancedChargingControls] {
                 menu.addItem(NSMenuItem.separator())
                 menu.addItem(createMenuItem(view: ChargeToLimitToggleView(viewModel: viewModel)))
@@ -58,7 +57,7 @@ class MenuBuilder {
         menu.addItem(NSMenuItem.separator())
 
         let settingsItem = NSMenuItem(
-            title: String(localized:  "Settings"),
+            title: String(localized: "Settings"),
             action: #selector(handleSettings),
             keyEquivalent: ","
         )
@@ -137,7 +136,7 @@ class MenuBuilder {
                 )
             )
         }
-        if Defaults[.showSessionEnergy] && viewModel.shouldShowSessionEnergy {
+        if Defaults[.showSessionEnergy], viewModel.shouldShowSessionEnergy {
             items.append(
                 createInfoItem(
                     label: String(localized: "Session Energy"),
@@ -408,7 +407,6 @@ struct ChargeToLimitToggleView: View {
         .padding(.vertical, 4)
     }
 }
-
 
 struct BatteryCalibrationToggleView: View {
     let viewModel: MenuViewModel

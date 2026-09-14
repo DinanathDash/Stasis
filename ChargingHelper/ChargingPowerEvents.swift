@@ -41,9 +41,10 @@ enum ChargingPowerEvents {
             self.handlePercentEvent()
         }
 
-        let callback: IOServiceInterestCallback = { refCon, service, messageType, messageArgument in
+        let callback: IOServiceInterestCallback = { _, _, messageType, messageArgument in
             if messageType == PowerEvents.kIOMessageCanSystemSleep ||
-               messageType == PowerEvents.kIOMessageSystemWillSleep {
+                messageType == PowerEvents.kIOMessageSystemWillSleep
+            {
                 IOAllowPowerChange(
                     PowerEvents.root_port,
                     Int(bitPattern: messageArgument)
@@ -78,27 +79,27 @@ enum ChargingPowerEvents {
     }
 
     static func chargeToLimit() -> (Bool, String?) {
-        self.chargingMode = .toLimit
+        chargingMode = .toLimit
         return evaluateState(force: true)
     }
 
     static func chargeToFull() -> (Bool, String?) {
-        self.chargingMode = .toFull
+        chargingMode = .toFull
         return evaluateState(force: true)
     }
 
     static func disableCharging() -> (Bool, String?) {
-        self.chargingMode = .standard
+        chargingMode = .standard
         return ChargingPowerState.disableCharging(force: true)
     }
 
     static func forceDischarge() -> (Bool, String?) {
-        self.chargingMode = .forceDischarge
+        chargingMode = .forceDischarge
         return evaluateState(force: true)
     }
 
     static func cancelOverride() -> (Bool, String?) {
-        self.chargingMode = .standard
+        chargingMode = .standard
         return evaluateState(force: true)
     }
 
@@ -117,24 +118,25 @@ enum ChargingPowerEvents {
     @discardableResult
     static func evaluateState(force: Bool = false) -> (Bool, String?) {
         let (percent, _) = IOKitHelper.getPercentRemaining()
-        
+
         defer {
             ChargingPowerState.syncMagSafeState(percent: percent)
         }
-        
+
         // Heat Protection
         if ChargingSettings.enableHeatProtectionMode,
            let temp = IOKitHelper.getBatteryTemperature(),
-           temp > Double(ChargingSettings.heatProtectionLimit) {
+           temp > Double(ChargingSettings.heatProtectionLimit)
+        {
             ChargingPowerState.heatProtectionActive = true
             logger.info("Heat protection engaged (Temp: \(temp)C). Disabling charging and running on AC.")
             _ = ChargingPowerState.enablePowerAdapter(force: force)
             return ChargingPowerState.disableCharging(force: force)
         }
-        
+
         ChargingPowerState.heatProtectionActive = false
-        
-        if self.chargingMode == .forceDischarge {
+
+        if chargingMode == .forceDischarge {
             _ = ChargingPowerState.disableCharging(force: force)
             return ChargingPowerState.disablePowerAdapter(force: force)
         }
@@ -149,17 +151,17 @@ enum ChargingPowerEvents {
 
         if !isUnlimited {
             // When disconnected, reset to standard so that next plug-in resumes normal limits
-            self.chargingMode = .standard
+            chargingMode = .standard
             return ChargingPowerState.disableCharging(force: force)
         }
 
         // Hysteresis logic
         if percent >= limit {
-            if self.chargingMode == .toFull && percent < 100 {
+            if chargingMode == .toFull, percent < 100 {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.enableCharging(force: force)
             } else {
-                if ChargingSettings.automaticDischarge && percent > limit {
+                if ChargingSettings.automaticDischarge, percent > limit {
                     _ = ChargingPowerState.disablePowerAdapter(force: force)
                 } else {
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
@@ -168,10 +170,10 @@ enum ChargingPowerEvents {
             }
         } else {
             _ = ChargingPowerState.enablePowerAdapter(force: force)
-            
-            if ChargingSettings.sailingMode && self.chargingMode == .standard {
+
+            if ChargingSettings.sailingMode, chargingMode == .standard {
                 let sailingThreshold = limit >= ChargingSettings.sailingModeLimit ? limit - ChargingSettings.sailingModeLimit : 0
-                if percent >= sailingThreshold && ChargingPowerState.isChargingDisabled() {
+                if percent >= sailingThreshold, ChargingPowerState.isChargingDisabled() {
                     // Stay disabled in sailing mode range
                     ChargingPowerState.syncMagSafeState(percent: percent)
                     return (true, nil)
@@ -184,59 +186,65 @@ enum ChargingPowerEvents {
 
 @MainActor
 enum PowerEvents {
-    private static func err_system(_ x: UInt32) -> UInt32 { return (x & 0x3f) << 26 }
-    private static func err_sub(_ x: UInt32) -> UInt32 { return (x & 0xfff) << 14 }
+    private static func err_system(_ x: UInt32) -> UInt32 {
+        return (x & 0x3F) << 26
+    }
+
+    private static func err_sub(_ x: UInt32) -> UInt32 {
+        return (x & 0xFFF) << 14
+    }
+
     private static let sys_iokit = err_system(0x38)
     private static let sub_iokit_common = err_sub(0)
     private static func iokit_common_msg(_ message: UInt32) -> UInt32 {
-        return (sys_iokit|sub_iokit_common|message)
+        return sys_iokit | sub_iokit_common | message
     }
-    
+
     static let kIOMessageCanSystemSleep = iokit_common_msg(0x270)
     static let kIOMessageSystemWillSleep = iokit_common_msg(0x280)
     static let kIOMessageSystemHasPoweredOn = iokit_common_msg(0x300)
-    
-    private static var notifyPortRef: IONotificationPortRef? = nil
+
+    private static var notifyPortRef: IONotificationPortRef?
     private static var notifierObject: io_object_t = IO_OBJECT_NULL
     private(set) static var root_port: io_connect_t = IO_OBJECT_NULL
-    
-    static func register(callback: @escaping IOServiceInterestCallback) -> Bool {
-        assert(self.root_port == IO_OBJECT_NULL)
-        assert(self.notifyPortRef == nil)
-        assert(self.notifierObject == IO_OBJECT_NULL)
 
-        self.root_port = IORegisterForSystemPower(
+    static func register(callback: @escaping IOServiceInterestCallback) -> Bool {
+        assert(root_port == IO_OBJECT_NULL)
+        assert(notifyPortRef == nil)
+        assert(notifierObject == IO_OBJECT_NULL)
+
+        root_port = IORegisterForSystemPower(
             nil,
-            &self.notifyPortRef,
+            &notifyPortRef,
             callback,
-            &self.notifierObject
+            &notifierObject
         )
-        guard self.root_port != IO_OBJECT_NULL else {
+        guard root_port != IO_OBJECT_NULL else {
             return false
         }
 
-        assert(self.notifyPortRef != nil)
-        assert(self.notifierObject != IO_OBJECT_NULL)
+        assert(notifyPortRef != nil)
+        assert(notifierObject != IO_OBJECT_NULL)
 
         IONotificationPortSetDispatchQueue(
-            self.notifyPortRef!,
+            notifyPortRef!,
             DispatchQueue.main
         )
-        
+
         return true
     }
 
     static func deregister() {
-        assert(self.root_port != IO_OBJECT_NULL)
-        assert(self.notifyPortRef != nil)
-        assert(self.notifierObject != IO_OBJECT_NULL)
+        assert(root_port != IO_OBJECT_NULL)
+        assert(notifyPortRef != nil)
+        assert(notifierObject != IO_OBJECT_NULL)
 
-        IODeregisterForSystemPower(&self.notifierObject)
-        IOServiceClose(self.root_port)
-        IONotificationPortDestroy(self.notifyPortRef!)
+        IODeregisterForSystemPower(&notifierObject)
+        IOServiceClose(root_port)
+        IONotificationPortDestroy(notifyPortRef!)
 
-        self.root_port = IO_OBJECT_NULL
-        self.notifyPortRef = nil
-        self.notifierObject = IO_OBJECT_NULL
+        root_port = IO_OBJECT_NULL
+        notifyPortRef = nil
+        notifierObject = IO_OBJECT_NULL
     }
 }

@@ -35,7 +35,7 @@ final class UpdaterManager: NSObject, ObservableObject {
         }
     }
 
-    private override init() {
+    override private init() {
         // startingUpdater: false -- we call start() explicitly in applicationDidFinishLaunching.
         controller = SPUStandardUpdaterController(
             startingUpdater: false,
@@ -51,10 +51,10 @@ final class UpdaterManager: NSObject, ObservableObject {
     /// Call from applicationDidFinishLaunching to begin the automatic update schedule.
     func start() {
         #if DEBUG
-        // Never check for updates in debug builds.
-        return
+            // Never check for updates in debug builds.
+            return
         #else
-        controller.startUpdater()
+            controller.startUpdater()
         #endif
     }
 
@@ -62,10 +62,10 @@ final class UpdaterManager: NSObject, ObservableObject {
     /// to .regular activation policy so Sparkle's update window can appear.
     func checkForUpdates() {
         #if DEBUG
-        return
+            return
         #else
-        NSApp.activate(ignoringOtherApps: true)
-        controller.checkForUpdates(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            controller.checkForUpdates(nil)
         #endif
     }
 }

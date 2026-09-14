@@ -18,11 +18,11 @@ public struct AdapterCapabilities: Codable, Sendable {
     public let magSafeControl: Bool
 }
 
-/*
-* Based on:
-* https://github.com/mhaeuser/Battery-Toolkit/blob/ed3adf103abfdad53223ce6f0a764ae7163c385b/Libraries/SMCComm%2BMagSafe.swift
-* https://github.com/acidanthera/VirtualSMC/blob/55b89a23f51beda82581dbab795615838a3e6e56/Docs/SMCSensorKeys.txt
-*/
+/**
+ * Based on:
+ * https://github.com/mhaeuser/Battery-Toolkit/blob/ed3adf103abfdad53223ce6f0a764ae7163c385b/Libraries/SMCComm%2BMagSafe.swift
+ * https://github.com/acidanthera/VirtualSMC/blob/55b89a23f51beda82581dbab795615838a3e6e56/Docs/SMCSensorKeys.txt
+ */
 public struct SMCAdapter: Sendable {
     public let capabilities: AdapterCapabilities
 
@@ -38,17 +38,12 @@ public struct SMCAdapter: Sendable {
         return SMCAdapter(capabilities: capabilities, hasACLC: hasACLC)
     }
 
-    private init(capabilities: AdapterCapabilities, hasACLC: Bool) {
-        self.capabilities = capabilities
-        self.hasACLC = hasACLC
-    }
-
     public static func getVoltage() throws -> Double {
-        Double(try SMCKit.shared.read("VD0R") as Float)
+        try Double(SMCKit.shared.read("VD0R") as Float)
     }
 
     public static func getCurrent() throws -> Double {
-        Double(try SMCKit.shared.read("ID0R") as Float)
+        try Double(SMCKit.shared.read("ID0R") as Float)
     }
 
     public func getMagSafeLEDState() throws -> MagSafeLEDState {

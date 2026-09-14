@@ -33,7 +33,7 @@ struct PowerSankeyView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { _ in
             ZStack {
                 flowsAndLabels
 
@@ -60,7 +60,7 @@ struct PowerSankeyView: View {
     private var flowsAndLabels: some View {
         let hasAnyOutput = outputPower > 0
         let hasTwoOutputs = outputPortPowers.count >= 2
-        
+
         switch powerSource {
         case .acAdapter:
             if batteryPower > 0 {
@@ -77,19 +77,19 @@ struct PowerSankeyView: View {
                     let H = geo.size.height
                     let LH = Layout.largeNodeHeight
                     let gap = Layout.spacerHeight
-                    
+
                     if outputPower > 0 {
                         let leftTop = (H / 2) - (LH / 2)
                         let left1 = leftTop + LH / 6
                         let left2 = leftTop + LH / 2
                         let left3 = leftTop + 5 * LH / 6
-                        
+
                         let totalGap = gap * 2
                         let segH = (H - totalGap) / 3
                         let right1 = segH / 2
                         let right2 = segH + gap + segH / 2
                         let right3 = (2 * segH) + (2 * gap) + segH / 2
-                        
+
                         flowLabel(for: batteryPower, leftY: left1, rightY: right1, width: w, midX: midX)
                         flowLabel(for: systemPower, leftY: left2, rightY: right2, width: w, midX: midX)
                         flowLabel(for: outputPower, leftY: left3, rightY: right3, width: w, midX: midX)
@@ -97,11 +97,11 @@ struct PowerSankeyView: View {
                         let leftTop = (H / 2) - (LH / 2)
                         let left1 = leftTop + LH / 4
                         let left2 = leftTop + 3 * LH / 4
-                        
+
                         let smallH = (H - gap) / 2
                         let right1 = smallH / 2
                         let right2 = H - smallH / 2
-                        
+
                         flowLabel(for: batteryPower, leftY: left1, rightY: right1, width: w, midX: midX)
                         flowLabel(for: systemPower, leftY: left2, rightY: right2, width: w, midX: midX)
                     }
@@ -122,19 +122,19 @@ struct PowerSankeyView: View {
                     let H = geo.size.height
                     let LH = Layout.largeNodeHeight
                     let gap = Layout.spacerHeight
-                    
+
                     if outputPortPowers.count >= 2 {
                         let leftTop = (H / 2) - (LH / 2)
                         let left1 = leftTop + LH / 6
                         let left2 = leftTop + LH / 2
                         let left3 = leftTop + 5 * LH / 6
-                        
+
                         let totalGap = gap * 2
                         let segH = (H - totalGap) / 3
                         let right1 = segH / 2
                         let right2 = segH + gap + segH / 2
                         let right3 = (2 * segH) + (2 * gap) + segH / 2
-                        
+
                         flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
                         flowLabel(for: outputPortPowers[0], leftY: left2, rightY: right2, width: w, midX: midX)
                         flowLabel(for: outputPortPowers[1], leftY: left3, rightY: right3, width: w, midX: midX)
@@ -142,11 +142,11 @@ struct PowerSankeyView: View {
                         let leftTop = (H / 2) - (LH / 2)
                         let left1 = leftTop + LH / 4
                         let left2 = leftTop + 3 * LH / 4
-                        
+
                         let smallH = (H - gap) / 2
                         let right1 = smallH / 2
                         let right2 = H - smallH / 2
-                        
+
                         flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
                         flowLabel(for: outputPower, leftY: left2, rightY: right2, width: w, midX: midX)
                     } else {
@@ -165,14 +165,14 @@ struct PowerSankeyView: View {
                 let H = geo.size.height
                 let LH = Layout.largeNodeHeight
                 let gap = Layout.spacerHeight
-                
+
                 let smallH = (H - gap) / 2
                 let left1 = smallH / 2
                 let left2 = H - smallH / 2
-                
+
                 let right1 = (H / 2) - (LH / 4)
                 let right2 = (H / 2) + (LH / 4)
-                
+
                 flowLabel(for: batteryPower, leftY: left1, rightY: right1, width: w, midX: midX)
                 flowLabel(for: adapterPower, leftY: left2, rightY: right2, width: w, midX: midX)
             }
@@ -203,32 +203,32 @@ struct PowerSankeyView: View {
                 let H = geo.size.height
                 let LH = Layout.largeNodeHeight
                 let gap = Layout.spacerHeight
-                
+
                 if adapterConnected {
                     let nodeH = (H - gap) / 2
                     if hasTwoOutputs {
                         let totalGap = gap * 2
                         let segH = (H - totalGap) / 3
-                        
+
                         let left1 = nodeH / 6
                         let right1 = segH / 2
-                        
+
                         let left2 = nodeH / 2
                         let right2 = segH + gap + (segH / 2)
-                        
+
                         let left3 = 5 * nodeH / 6
                         let right3 = (2 * segH) + (2 * gap) + (segH / 2)
-                        
+
                         flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
                         flowLabel(for: outputPortPowers[0], leftY: left2, rightY: right2, width: w, midX: midX)
                         flowLabel(for: outputPortPowers[1], leftY: left3, rightY: right3, width: w, midX: midX)
                     } else if hasAnyOutput {
                         let left1 = nodeH / 4
                         let right1 = nodeH / 2
-                        
+
                         let left2 = 3 * nodeH / 4
                         let right2 = H - (nodeH / 2)
-                        
+
                         flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
                         flowLabel(for: outputPower, leftY: left2, rightY: right2, width: w, midX: midX)
                     } else {
@@ -236,7 +236,7 @@ struct PowerSankeyView: View {
                         let right1 = H / 2
                         flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
                     }
-                    
+
                     // Adapter Label (0W)
                     PowerLabel(power: 0)
                         .opacity(0.3)
@@ -247,13 +247,13 @@ struct PowerSankeyView: View {
                         let left1 = leftTop + LH / 6
                         let left2 = leftTop + LH / 2
                         let left3 = leftTop + 5 * LH / 6
-                        
+
                         let totalGap = gap * 2
                         let segH = (H - totalGap) / 3
                         let right1 = segH / 2
                         let right2 = segH + gap + segH / 2
                         let right3 = (2 * segH) + (2 * gap) + segH / 2
-                        
+
                         flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
                         flowLabel(for: outputPortPowers[0], leftY: left2, rightY: right2, width: w, midX: midX)
                         flowLabel(for: outputPortPowers[1], leftY: left3, rightY: right3, width: w, midX: midX)
@@ -261,11 +261,11 @@ struct PowerSankeyView: View {
                         let leftTop = (H / 2) - (LH / 2)
                         let left1 = leftTop + LH / 4
                         let left2 = leftTop + 3 * LH / 4
-                        
+
                         let smallH = (H - gap) / 2
                         let right1 = smallH / 2
                         let right2 = H - smallH / 2
-                        
+
                         flowLabel(for: systemPower, leftY: left1, rightY: right1, width: w, midX: midX)
                         flowLabel(for: outputPower, leftY: left2, rightY: right2, width: w, midX: midX)
                     } else {
@@ -327,7 +327,6 @@ struct PowerSankeyView: View {
         }
     }
 
-    @ViewBuilder
     private var rightNodes: some View {
         VStack(spacing: 0) {
             let hasTwoOutputs = outputPortPowers.count >= 2
@@ -565,7 +564,7 @@ struct PowerSankeyView: View {
         let leftX = Layout.nodeWidth + Layout.gap
         let rightX = size.width - Layout.nodeWidth - Layout.gap
         let leftNodeHeight = (size.height - Layout.spacerHeight) / 2
-        
+
         let totalGap = Layout.spacerHeight * 2
         let segmentHeight = (size.height - totalGap) / 3
 

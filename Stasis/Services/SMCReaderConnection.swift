@@ -26,7 +26,7 @@ class SMCReaderConnection {
     }
 
     func connect() {
-        logger.info("Setting up XPC connection to \(self.serviceName)")
+        logger.info("Setting up XPC connection to \(serviceName)")
         connection = NSXPCConnection(serviceName: serviceName)
         connection?.remoteObjectInterface = NSXPCInterface(
             with: HelperProtocol.self
@@ -68,7 +68,7 @@ class SMCReaderConnection {
         let delay =
             Self.baseReconnectDelay * pow(2.0, Double(reconnectAttempts - 1))
         logger.info(
-            "Scheduling reconnect attempt \(self.reconnectAttempts) in \(delay)s"
+            "Scheduling reconnect attempt \(reconnectAttempts) in \(delay)s"
         )
 
         reconnectTask = Task {
@@ -85,5 +85,4 @@ class SMCReaderConnection {
         connection?.invalidate()
         connection = nil
     }
-
 }

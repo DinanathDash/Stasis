@@ -4,8 +4,8 @@ import Foundation
 import IOKit.pwr_mgt
 import Observation
 import os.log
-import smc_power
 import ServiceManagement
+import smc_power
 
 @MainActor
 @Observable
@@ -18,7 +18,7 @@ class ChargeManager {
     private(set) var forceDischargeActive = false
     private(set) var chargeToLimitActive = false
     private(set) var daemonSyncError = false
-    private(set) var daemonError: String? = nil
+    private(set) var daemonError: String?
     private var hasShownDaemonErrorAlert = false
 
     private let logger = Logger(
@@ -39,7 +39,7 @@ class ChargeManager {
                     .enableHeatProtectionMode, .manageMagSafeLED,
                     .chargeLimit, .sailingModeLimit, .heatProtectionLimit,
                     .disableSleepUntilChargeLimit, .disableSleepWhileDischarging, .chargingMagSafeLEDState,
-                    .pausedMagSafeLEDState, .dischargingMagSafeLEDState, .heatProtectionMagSafeLEDState
+                    .pausedMagSafeLEDState, .dischargingMagSafeLEDState, .heatProtectionMagSafeLEDState,
                 ],
                 initial: true
             ) {
@@ -75,12 +75,12 @@ class ChargeManager {
             "chargingMagSafeLEDState": Defaults[.chargingMagSafeLEDState].rawValue as NSNumber,
             "pausedMagSafeLEDState": Defaults[.pausedMagSafeLEDState].rawValue as NSNumber,
             "dischargingMagSafeLEDState": Defaults[.dischargingMagSafeLEDState].rawValue as NSNumber,
-            "heatProtectionMagSafeLEDState": Defaults[.heatProtectionMagSafeLEDState].rawValue as NSNumber
+            "heatProtectionMagSafeLEDState": Defaults[.heatProtectionMagSafeLEDState].rawValue as NSNumber,
         ]
 
         Task {
             let maxRetries = 20
-            for attempt in 1...maxRetries {
+            for attempt in 1 ... maxRetries {
                 do {
                     try await batteryService.setSettings(settings: settings)
                     logger.info("Successfully synced settings to daemon on attempt \(attempt)")
@@ -105,7 +105,7 @@ class ChargeManager {
     private func showDaemonErrorAlertIfNeeded() {
         guard !hasShownDaemonErrorAlert else { return }
         hasShownDaemonErrorAlert = true
-        
+
         let alert = NSAlert()
         alert.icon = NSImage(named: "AppIcon")
         alert.messageText = String(localized: "Background Helper Disconnected")
@@ -113,14 +113,14 @@ class ChargeManager {
         alert.alertStyle = .critical
         alert.addButton(withTitle: String(localized: "Open Settings"))
         alert.addButton(withTitle: String(localized: "Dismiss"))
-        
+
         alert.window.level = .screenSaver
         alert.window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        
+
         DispatchQueue.main.async {
             NSApp.activate(ignoringOtherApps: true)
         }
-        
+
         NSSound.beep()
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {

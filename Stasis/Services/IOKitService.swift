@@ -20,7 +20,7 @@ class IOKitService {
         category: "IOKitService"
     )
 
-    private var calibratedHealthCache: Int? = nil
+    private var calibratedHealthCache: Int?
     private var lastCalibratedFetch: Date = .distantPast
 
     func metricsStream() -> AsyncStream<(BatteryMetrics, AdapterMetrics)> {
@@ -144,8 +144,8 @@ class IOKitService {
         // Raw health (max capacity vs design)
         batteryMetrics.rawBatteryHealth =
             capacities.design > 0
-            ? (capacities.max * 100) / capacities.design
-            : 100
+                ? (capacities.max * 100) / capacities.design
+                : 100
         // Calibrated health (cached from system_profiler)
         batteryMetrics.calibratedBatteryHealth = calibratedHealthCache
 
@@ -211,7 +211,7 @@ class IOKitService {
 
         let rawCurrentCapacity: Int =
             getPropertyValue(batteryService, key: "AppleRawCurrentCapacity")
-            ?? 0
+                ?? 0
         let rawMaxCapacity: Int =
             getPropertyValue(batteryService, key: "AppleRawMaxCapacity") ?? 0
 
@@ -221,7 +221,7 @@ class IOKitService {
         } else {
             let currentCapacity: Int =
                 getPropertyValue(batteryService, key: "CurrentCapacity")
-                ?? displayedPercent
+                    ?? displayedPercent
             hardwarePercent = currentCapacity
         }
 
@@ -274,7 +274,6 @@ class IOKitService {
                 let range = Range(match.range(at: 1), in: output),
                 let percent = Int(output[range])
             {
-
                 // Update cache on the main actor (UI‑safe)
                 Task { @MainActor in
                     self.calibratedHealthCache = percent
@@ -286,8 +285,8 @@ class IOKitService {
 
     private func getTimeRemaining(powerInfo: [String: Any]?) -> Int? {
         guard let timeToEmpty = powerInfo?[kIOPSTimeToEmptyKey] as? Int,
-            timeToEmpty > 0,
-            timeToEmpty != Int(kIOPSTimeRemainingUnknown)
+              timeToEmpty > 0,
+              timeToEmpty != Int(kIOPSTimeRemainingUnknown)
         else {
             return nil
         }
@@ -297,8 +296,8 @@ class IOKitService {
 
     private func getTimeToFull(powerInfo: [String: Any]?) -> Int? {
         guard let timeToFull = powerInfo?[kIOPSTimeToFullChargeKey] as? Int,
-            timeToFull > 0,
-            timeToFull != Int(kIOPSTimeRemainingUnknown)
+              timeToFull > 0,
+              timeToFull != Int(kIOPSTimeRemainingUnknown)
         else {
             return nil
         }
@@ -322,8 +321,8 @@ class IOKitService {
 
     private func getBatteryTemperature(powerInfo: [String: Any]?) -> Double? {
         if let powerInfo,
-            let temp = powerInfo[kIOPSTemperatureKey] as? Int,
-            temp > 0
+           let temp = powerInfo[kIOPSTemperatureKey] as? Int,
+           temp > 0
         {
             return decikelvinToCelsius(temp)
         }
@@ -343,14 +342,13 @@ class IOKitService {
 
     private nonisolated func decikelvinToCelsius(_ decikelvin: Int) -> Double? {
         let celsius = (Double(decikelvin) / 10.0) - 273.15
-        return (0...80).contains(celsius) ? celsius : nil
+        return (0 ... 80).contains(celsius) ? celsius : nil
     }
 
-    private func getBatteryCapacities() -> (current: Int, max: Int, design: Int)
-    {
+    private func getBatteryCapacities() -> (current: Int, max: Int, design: Int) {
         let currentCapacity: Int =
             getPropertyValue(batteryService, key: "AppleRawCurrentCapacity")
-            ?? 0
+                ?? 0
         let maxCapacity: Int =
             getPropertyValue(batteryService, key: "AppleRawMaxCapacity") ?? 0
         let designCapacity: Int =
@@ -404,11 +402,11 @@ class IOKitService {
             if let wattsMilliwatts = detail["Watts"] as? NSNumber {
                 milliwatts = wattsMilliwatts.doubleValue
             } else if let currentMilliamps = detail["Current"] as? NSNumber,
-                let voltageMillivolts = detail["AdapterVoltage"] as? NSNumber
+                      let voltageMillivolts = detail["AdapterVoltage"] as? NSNumber
             {
                 milliwatts =
                     currentMilliamps.doubleValue * voltageMillivolts.doubleValue
-                    / 1000.0
+                        / 1000.0
             } else {
                 milliwatts = 0
             }
@@ -433,21 +431,20 @@ class IOKitService {
         }
     }
 
-        private func getConnectedUSBAccessories() -> [AccessoryType] {
+    private func getConnectedUSBAccessories() -> [AccessoryType] {
         var iterator: io_iterator_t = 0
         let matchingDict = IOServiceMatching("IOUSBHostDevice")
         let result = IOServiceGetMatchingServices(kIOMainPortDefault, matchingDict, &iterator)
-        
+
         var portGroups: [UInt32: [AccessoryType]] = [:]
-        
+
         if result == kIOReturnSuccess {
             var service = IOIteratorNext(iterator)
             while service != 0 {
                 if let name = IORegistryEntryCreateCFProperty(service, "USB Product Name" as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? String {
                     let lower = name.lowercased()
                     // Exclude internal Apple devices like Trackpad, Keyboard, Camera, Headset, Touch Bar
-                    if !lower.contains("trackpad") && !lower.contains("keyboard") && !lower.contains("camera") && !lower.contains("headset") && !lower.contains("touch bar") && !lower.contains("bcm20702") && !lower.contains("bluetooth") && !lower.contains("ambient light") && !lower.contains("apple internal") {
-                        
+                    if !lower.contains("trackpad"), !lower.contains("keyboard"), !lower.contains("camera"), !lower.contains("headset"), !lower.contains("touch bar"), !lower.contains("bcm20702"), !lower.contains("bluetooth"), !lower.contains("ambient light"), !lower.contains("apple internal") {
                         var type: AccessoryType = .unknown
                         if lower.contains("iphone") || lower.contains("ipad") || lower.contains("ipod") || lower.contains("pixel") || lower.contains("galaxy") || lower.contains("phone") {
                             type = .phone
@@ -464,9 +461,9 @@ class IOKitService {
                         } else {
                             type = .unknown
                         }
-                        
+
                         if let locationID = IORegistryEntryCreateCFProperty(service, "locationID" as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? UInt32 {
-                            let rootPort = locationID & 0xFFF00000
+                            let rootPort = locationID & 0xFFF0_0000
                             portGroups[rootPort, default: []].append(type)
                         }
                     }
@@ -475,9 +472,11 @@ class IOKitService {
                 service = IOIteratorNext(iterator)
             }
         }
-        
+
         return portGroups.values.map { items in
-            if items.count > 1 { return .hub }
+            if items.count > 1 {
+                return .hub
+            }
             return items.first ?? .unknown
         }
     }

@@ -1,6 +1,6 @@
 import Foundation
-import ServiceManagement
 import os.log
+import ServiceManagement
 
 enum ChargingHelperStatus {
     case notInstalled
@@ -48,7 +48,7 @@ class ChargingHelperManager {
             // processes the background item notification, even though the
             // registration advanced to requiresApproval or enabled.
             let currentStatus = SMAppService.daemon(plistName: Self.plistName).status
-            if currentStatus != .enabled && currentStatus != .requiresApproval {
+            if currentStatus != .enabled, currentStatus != .requiresApproval {
                 throw error
             }
         }
@@ -60,7 +60,7 @@ class ChargingHelperManager {
         logger.info("Force upgrading charging helper daemon")
         disconnect()
         try? service.unregister()
-        
+
         // IMPORTANT: backgroundtaskmanagementd (BTM) has a notorious bug on macOS 13+
         // where it aggressively caches the code signature of the previous daemon.
         // If we register() too quickly after unregister(), BTM will throw errSecCSReqFailed (-67028)
@@ -70,11 +70,11 @@ class ChargingHelperManager {
         Task {
             do {
                 try await Task.sleep(for: .seconds(1.5))
-                
+
                 // Re-instantiate to clear internal SMAppService state
                 let newService = SMAppService.daemon(plistName: Self.plistName)
                 try newService.register()
-                
+
                 await MainActor.run {
                     self.service = newService
                     self.logger.info("Force upgrade register successful")
@@ -100,11 +100,11 @@ class ChargingHelperManager {
             // Wait briefly for the reset to complete before we destroy the daemon
             _ = semaphore.wait(timeout: .now() + 2.0)
         }
-        
+
         disconnect()
         try service.unregister()
         helperStatus = .notInstalled
-        
+
         // Force the UI toggle off since the helper is gone
         UserDefaults.standard.set(false, forKey: "manageCharging")
         UserDefaults.standard.synchronize()
@@ -125,7 +125,7 @@ class ChargingHelperManager {
         default: helperStatus = .notInstalled
         }
     }
-    
+
     private func checkLiveness() async -> Bool {
         return await withCheckedContinuation { continuation in
             guard let helper = getHelper(errorHandler: { _ in
@@ -134,7 +134,7 @@ class ChargingHelperManager {
                 continuation.resume(returning: false)
                 return
             }
-            
+
             helper.ping { success in
                 continuation.resume(returning: success)
             }

@@ -35,12 +35,12 @@ class SignificantEnergyService {
 
     func refresh() async {
         guard Defaults[.showSignificantEnergyApps] else {
-            self.apps = []
+            apps = []
             return
         }
         let pidPowers = await fetchTopPowerMetrics()
         let filteredApps = filterAndBuildApps(from: pidPowers)
-        self.apps = filteredApps
+        apps = filteredApps
     }
 
     private func fetchTopPowerMetrics() async -> [(pid_t, Double)] {
@@ -79,13 +79,15 @@ class SignificantEnergyService {
         let lines = lastSection.components(separatedBy: .newlines)
         for line in lines {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
-            if trimmed.isEmpty || trimmed.hasPrefix("POWER") { continue }
+            if trimmed.isEmpty || trimmed.hasPrefix("POWER") {
+                continue
+            }
             let tokens = trimmed.components(separatedBy: .whitespaces).filter {
                 !$0.isEmpty
             }
             guard tokens.count >= 2,
-                let pid = pid_t(tokens[0]),
-                let power = Double(tokens[1])
+                  let pid = pid_t(tokens[0]),
+                  let power = Double(tokens[1])
             else {
                 continue
             }
@@ -113,7 +115,7 @@ class SignificantEnergyService {
 
             // Skip our own app
             if let bundleID = app.bundleIdentifier,
-                bundleID == Bundle.main.bundleIdentifier
+               bundleID == Bundle.main.bundleIdentifier
             {
                 continue
             }

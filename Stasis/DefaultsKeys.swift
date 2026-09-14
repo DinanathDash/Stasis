@@ -1,7 +1,7 @@
 import Defaults
 import Foundation
-import SwiftUI
 import smc_power
+import SwiftUI
 
 extension MagSafeLEDState: Defaults.Serializable {}
 
@@ -12,13 +12,17 @@ enum OutputVisualizationMode: String, CaseIterable, Defaults.Serializable {
     case always
 }
 
-enum BatteryPercentageVisibility: String, CaseIterable, Defaults.Serializable, Identifiable {
+enum BatteryPercentageVisibility: String, CaseIterable, Defaults.Serializable,
+    Identifiable
+{
     case hidden = "Hidden"
     case nextToIcon = "Next to icon"
     case insideIcon = "Inside icon"
     case insideIconAndNextToItWhenPowered = "Inside (Outside on power)"
-    
-    var id: Self { self }
+
+    var id: Self {
+        self
+    }
 
     var localizedName: String {
         switch self {
@@ -42,8 +46,10 @@ enum NotchHUDSound: String, CaseIterable, Defaults.Serializable, Identifiable {
     case pop = "Pop"
     case tink = "Tink"
     case none = "None"
-    
-    var id: Self { self }
+
+    var id: Self {
+        self
+    }
 
     var localizedName: String {
         switch self {
@@ -65,11 +71,15 @@ enum NotchHUDSound: String, CaseIterable, Defaults.Serializable, Identifiable {
     }
 }
 
-enum NotchHUDDisplayMode: String, CaseIterable, Defaults.Serializable, Identifiable {
+enum NotchHUDDisplayMode: String, CaseIterable, Defaults.Serializable,
+    Identifiable
+{
     case macDisplayOnly = "Mac Display Only"
     case allDisplays = "All Displays"
-    
-    var id: Self { self }
+
+    var id: Self {
+        self
+    }
 
     var localizedName: String {
         switch self {
@@ -108,7 +118,9 @@ enum AppLanguage: String, CaseIterable, Defaults.Serializable, Identifiable {
     case japanese = "日本語"
     case korean = "한국어"
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var title: LocalizedStringKey {
         switch self {
@@ -200,7 +212,7 @@ extension Defaults.Keys {
     static let firstRun = Key<Bool>("firstRun", default: false)
     static let appLanguage = Key<AppLanguage>("appLanguage", default: .system)
 
-    // Status Icon
+    /// Status Icon
     static let batteryPercentageVisibility = Key<BatteryPercentageVisibility>(
         "batteryPercentageVisibility",
         default: .nextToIcon
@@ -231,7 +243,7 @@ extension Defaults.Keys {
         default: .frog
     )
 
-    // Menu Dashboard
+    /// Menu Dashboard
     static let showTimeTillDischarge = Key<Bool>(
         "showTimeTillDischarge",
         default: true
@@ -250,7 +262,10 @@ extension Defaults.Keys {
     static let showBatteryMode = Key<Bool>("showBatteryMode", default: true)
     static let showInternalPower = Key<Bool>("showInternalPower", default: true)
     static let showExternalPower = Key<Bool>("showExternalPower", default: true)
-    static let showSessionEnergy = Key<Bool>("showSessionEnergy", default: false)
+    static let showSessionEnergy = Key<Bool>(
+        "showSessionEnergy",
+        default: false
+    )
     static let showPowerDistribution = Key<Bool>(
         "showPowerDistribution",
         default: true
@@ -294,7 +309,7 @@ extension Defaults.Keys {
         default: false
     )
 
-    // Charging - Heat Protection
+    /// Charging - Heat Protection
     static let enableHeatProtectionMode = Key<Bool>(
         "enableHeatProtectionMode",
         default: true
@@ -332,7 +347,7 @@ extension Defaults.Keys {
         default: false
     )
 
-    // Calibration
+    /// Calibration
     static let enableAutomaticCalibration = Key<Bool>(
         "enableAutomaticCalibration",
         default: false

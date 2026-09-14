@@ -23,21 +23,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var needsMenuRebuild = false
 
     @MainActor
-    static private(set) var shared: AppDelegate?
+    private(set) static var shared: AppDelegate?
 
     override init() {
         super.init()
         Self.shared = self
     }
 
-    var currentBatteryService: BatteryService? { batteryService }
-    var currentChargeManager: ChargeManager? { chargeManager }
-    var currentViewModel: MenuViewModel? { viewModel }
-    var currentCalibrationManager: CalibrationManager? { calibrationManager }
+    var currentBatteryService: BatteryService? {
+        batteryService
+    }
+
+    var currentChargeManager: ChargeManager? {
+        chargeManager
+    }
+
+    var currentViewModel: MenuViewModel? {
+        viewModel
+    }
+
+    var currentCalibrationManager: CalibrationManager? {
+        calibrationManager
+    }
 
     @MainActor
     func ensureServicesReady() async -> (BatteryService, ChargeManager, MenuViewModel, CalibrationManager)? {
-        for _ in 0..<30 {
+        for _ in 0 ..< 30 {
             if let batteryService, let chargeManager, let viewModel, let calibrationManager {
                 return (batteryService, chargeManager, viewModel, calibrationManager)
             }
@@ -54,7 +65,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusBarManager?.openMenu()
     }
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
+    func applicationDidFinishLaunching(_: Notification) {
         // Perform first‑run / version‑upgrade reset of user defaults
         let launchState = resetStasisPreferencesIfNeeded()
         // Exit the app immediately if the device doesn't have a battery
@@ -82,10 +93,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             } else {
                 try? ChargingHelperManager.shared.install()
             }
-            self.forceSyncSettings()
+            forceSyncSettings()
         } else if launchState == .firstRun {
             try? ChargingHelperManager.shared.install()
-            self.forceSyncSettings()
+            forceSyncSettings()
         }
 
         NSAppleEventManager.shared().setEventHandler(
@@ -102,15 +113,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
-    func application(_ application: NSApplication, open urls: [URL]) {
+    func application(_: NSApplication, open urls: [URL]) {
         for url in urls {
             StasisURLHandler.shared.handleURL(url)
         }
     }
 
-    @objc private func handleGetURLEvent(_ event: NSAppleEventDescriptor, withReplyEvent replyEvent: NSAppleEventDescriptor) {
+    @objc private func handleGetURLEvent(_ event: NSAppleEventDescriptor, withReplyEvent _: NSAppleEventDescriptor) {
         guard let urlString = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue,
-              let url = URL(string: urlString) else {
+              let url = URL(string: urlString)
+        else {
             return
         }
         StasisURLHandler.shared.handleURL(url)
@@ -118,7 +130,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     static var isRestarting = false
 
-    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
         if Self.isRestarting {
             return .terminateNow
         }
@@ -129,14 +141,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         alert.alertStyle = .warning
         alert.addButton(withTitle: String(localized: "Don't Quit"))
         alert.addButton(withTitle: String(localized: "Quit Anyway"))
-        
+
         alert.window.level = .screenSaver
         alert.window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        
+
         DispatchQueue.main.async {
             NSApp.activate(ignoringOtherApps: true)
         }
-        
+
         NSSound.beep()
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
@@ -198,7 +210,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     .showTwoDecimalPowerValues,
                     .showOutputPortsText, .outputVisualizationMode,
                     .manageCharging, .showAdvancedChargingControls,
-                    .appLanguage, .showSignificantEnergyApps
+                    .appLanguage, .showSignificantEnergyApps,
                 ],
                 initial: false
             ) {
@@ -267,13 +279,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     // MARK: - First‑run / version‑upgrade preferences reset
+
     private func resetStasisPreferencesIfNeeded() -> AppLaunchState {
         // Bundle identifier for the app (fallback to known identifier)
         _ = Bundle.main.bundleIdentifier ?? "com.dinanathdash.stasis"
         // Current app version
         let currentVersion =
             Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-            ?? ""
+                ?? ""
         // If this is the first launch, just record it
         if Defaults[.firstRun] {
             Defaults[.firstRun] = false
@@ -287,12 +300,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return .unchanged
     }
 
-    func menuWillOpen(_ menu: NSMenu) {
+    func menuWillOpen(_: NSMenu) {
         isMenuOpen = true
         viewModel.menuWillOpen()
     }
 
-    func menuDidClose(_ menu: NSMenu) {
+    func menuDidClose(_: NSMenu) {
         isMenuOpen = false
         if needsMenuRebuild {
             rebuildMenu()

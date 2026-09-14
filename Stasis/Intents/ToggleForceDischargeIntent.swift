@@ -17,7 +17,8 @@ struct ToggleForceDischargeIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady() else {
+              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady()
+        else {
             throw CustomIntentError.stasisNotReady
         }
 

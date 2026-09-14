@@ -2,9 +2,12 @@ import Foundation
 
 @objc protocol HelperProtocol {
     func readBatteryMetrics(
-        reply: @escaping @Sendable (Double, Double, Double, String?) -> Void)
+        reply: @escaping @Sendable (Double, Double, Double, String?) -> Void
+    )
     func readAdapterMetrics(
-        reply: @escaping @Sendable (Double, Double, Double, String?) -> Void)
+        reply: @escaping @Sendable (Double, Double, Double, String?) -> Void
+    )
     func getCapabilities(
-        reply: @escaping @Sendable (Bool, Bool, Bool, Bool) -> Void)
+        reply: @escaping @Sendable (Bool, Bool, Bool, Bool) -> Void
+    )
 }

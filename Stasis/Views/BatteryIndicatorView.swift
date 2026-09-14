@@ -8,7 +8,9 @@ struct BatteryIndicatorView: View {
     var batteryPercentageVisibility: BatteryPercentageVisibility = .nextToIcon
     var showState: Bool = false
 
-    private var isPowered: Bool { chargingMode != .discharging }
+    private var isPowered: Bool {
+        chargingMode != .discharging
+    }
 
     private var shouldShowInsidePercentage: Bool {
         (batteryPercentageVisibility == .insideIcon || batteryPercentageVisibility == .insideIconAndNextToItWhenPowered)
@@ -85,8 +87,8 @@ struct BatteryIndicatorView: View {
                     GeometryReader { geo in
                         let fillWidth =
                             (geo.size.width - Layout.fillInset * 2)
-                            * CGFloat(batteryLevel)
-                            / 100
+                                * CGFloat(batteryLevel)
+                                / 100
                         RoundedRectangle(
                             cornerRadius: Layout.cornerRadius - Layout.fillInset
                         )

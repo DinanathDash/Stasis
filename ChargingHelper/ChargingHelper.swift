@@ -18,7 +18,7 @@ final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendabl
             ChargingPowerState.initialize(battery: battery, adapter: adapter)
             ChargingPowerEvents.start()
         }
-        
+
         logger.info(
             "Initialized (charging=\(battery.capabilities.inhibitChargeControl), discharge=\(battery.capabilities.forceDischargeControl), magSafe=\(adapter.capabilities.magSafeControl))"
         )
@@ -102,4 +102,3 @@ final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendabl
         }
     }
 }
-

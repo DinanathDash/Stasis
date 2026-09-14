@@ -1,6 +1,6 @@
 import Foundation
-import Security
 import os.log
+import Security
 import smc_power
 
 let logger = Logger(
@@ -26,7 +26,7 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
     }
 
     func listener(
-        _ listener: NSXPCListener,
+        _: NSXPCListener,
         shouldAcceptNewConnection newConnection: NSXPCConnection
     ) -> Bool {
         // Validate the code signature of the connecting process
@@ -45,22 +45,24 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
         while appURL.path != "/" && appURL.pathExtension != "app" {
             appURL = appURL.deletingLastPathComponent()
         }
-        
+
         guard appURL.pathExtension == "app" else {
             logger.error("Failed to find containing Stasis.app bundle")
             return false
         }
-        
+
         var appStaticCode: SecStaticCode?
         guard SecStaticCodeCreateWithPath(appURL as CFURL, [], &appStaticCode) == errSecSuccess,
-              let appCode = appStaticCode else {
+              let appCode = appStaticCode
+        else {
             logger.error("Failed to create SecStaticCode for app bundle")
             return false
         }
-        
+
         var requirement: SecRequirement?
         guard SecCodeCopyDesignatedRequirement(appCode, [], &requirement) == errSecSuccess,
-              let validReq = requirement else {
+              let validReq = requirement
+        else {
             logger.error("Failed to copy Designated Requirement from app bundle")
             return false
         }
@@ -106,7 +108,7 @@ ChargingPowerState.initialize(battery: battery, adapter: adapter)
 // Start monitoring power events in the background
 ChargingPowerEvents.start()
 
-// Setup graceful teardown
+/// Setup graceful teardown
 let termSource = DispatchSource.makeSignalSource(
     signal: SIGTERM,
     queue: DispatchQueue.main
@@ -116,6 +118,7 @@ termSource.setEventHandler {
     ChargingPowerEvents.stop()
     exit(0)
 }
+
 termSource.resume()
 signal(SIGTERM, SIG_IGN)
 

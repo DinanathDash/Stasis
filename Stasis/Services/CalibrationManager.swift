@@ -174,7 +174,7 @@ class CalibrationManager {
         guard Defaults[.calibrationStatus] == .idle else { return }
 
         let now = Date()
-        
+
         if let snoozeUntil = Defaults[.calibrationSnoozeUntil], now < snoozeUntil {
             return
         }
@@ -184,18 +184,18 @@ class CalibrationManager {
 
         // If never calibrated, consider it ready immediately when time matches
         let lastDate = Defaults[.lastCalibrationDate] ?? .distantPast
-        
+
         let calendar = Calendar.current
         let daysSince = calendar.dateComponents([.day], from: lastDate, to: now).day ?? 0
-        
+
         if daysSince >= intervalDays {
             let currentHour = calendar.component(.hour, from: now)
             let currentMinute = calendar.component(.minute, from: now)
             let targetHour = calendar.component(.hour, from: targetTime)
             let targetMinute = calendar.component(.minute, from: targetTime)
-            
+
             // Allow triggering within a 5-minute window if we missed it or are at the time
-            if currentHour == targetHour && currentMinute >= targetMinute && currentMinute < targetMinute + 5 {
+            if currentHour == targetHour, currentMinute >= targetMinute, currentMinute < targetMinute + 5 {
                 logger.info("Automatic calibration schedule triggered. Requesting user permission.")
                 // Bump snooze by 5 minutes so we don't spam them within the window if they ignore it
                 Defaults[.calibrationSnoozeUntil] = now.addingTimeInterval(300)
@@ -204,7 +204,7 @@ class CalibrationManager {
             }
         }
     }
-    
+
     private func requestCalibrationPermission() {
         let alert = NSAlert()
         alert.icon = NSImage(named: "AppIcon")

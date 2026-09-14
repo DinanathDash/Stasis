@@ -1,14 +1,14 @@
 import Foundation
+import IOPMPrivate
 import os.log
 import smc_power
-import IOPMPrivate
 
 @MainActor
 enum ChargingPowerState {
-    static private(set) var chargingDisabled = false
-    static private(set) var powerDisabled = false
+    private(set) static var chargingDisabled = false
+    private(set) static var powerDisabled = false
     static var heatProtectionActive = false
-    
+
     private static var battery: SMCBattery?
     private static var adapter: SMCAdapter?
     private static var sleepDisabledByStasis = false
@@ -18,32 +18,32 @@ enum ChargingPowerState {
     static func initialize(battery: SMCBattery, adapter: SMCAdapter) {
         self.battery = battery
         self.adapter = adapter
-        
+
         do {
             if battery.capabilities.inhibitChargeControl {
-                self.chargingDisabled = try battery.getChargingInhibited()
+                chargingDisabled = try battery.getChargingInhibited()
             }
             if battery.capabilities.forceDischargeControl {
-                self.powerDisabled = try battery.getForceDischarging()
+                powerDisabled = try battery.getForceDischarging()
             }
         } catch {
             logger.error("Failed to read initial states: \(error.localizedDescription)")
         }
-        
+
         GlobalSleep.restoreOnStart()
     }
 
     static func isChargingDisabled() -> Bool {
-        return self.chargingDisabled
+        return chargingDisabled
     }
 
     static func isPowerAdapterDisabled() -> Bool {
-        return self.powerDisabled
+        return powerDisabled
     }
 
     static func syncSleepState() {
-        let shouldDisableForCharging = !self.chargingDisabled && ChargingSettings.disableSleepUntilChargeLimit
-        let shouldDisableForDischarging = self.powerDisabled && ChargingSettings.disableSleepWhileDischarging
+        let shouldDisableForCharging = !chargingDisabled && ChargingSettings.disableSleepUntilChargeLimit
+        let shouldDisableForDischarging = powerDisabled && ChargingSettings.disableSleepWhileDischarging
 
         if shouldDisableForCharging || shouldDisableForDischarging {
             if !sleepDisabledByStasis {
@@ -59,15 +59,15 @@ enum ChargingPowerState {
     }
 
     static func disableCharging(force: Bool = false) -> (Bool, String?) {
-        guard force || !self.chargingDisabled else { return (true, nil) }
-        guard let battery = self.battery else { return (false, "Battery is nil") }
+        guard force || !chargingDisabled else { return (true, nil) }
+        guard let battery = battery else { return (false, "Battery is nil") }
         guard battery.capabilities.inhibitChargeControl else { return (false, "inhibitChargeControl is false") }
 
         do {
             try battery.setChargingInhibited(true)
-            self.chargingDisabled = true
+            chargingDisabled = true
             logger.debug("SMC set charging inhibited to true")
-            
+
             syncSleepState()
             let (percent, _) = IOKitHelper.getPercentRemaining()
             syncMagSafeState(percent: percent)
@@ -79,15 +79,15 @@ enum ChargingPowerState {
     }
 
     static func enableCharging(force: Bool = false) -> (Bool, String?) {
-        guard force || self.chargingDisabled else { return (true, nil) }
-        guard let battery = self.battery else { return (false, "Battery is nil") }
+        guard force || chargingDisabled else { return (true, nil) }
+        guard let battery = battery else { return (false, "Battery is nil") }
         guard battery.capabilities.inhibitChargeControl else { return (false, "inhibitChargeControl is false") }
 
         do {
             try battery.setChargingInhibited(false)
-            self.chargingDisabled = false
+            chargingDisabled = false
             logger.debug("SMC set charging inhibited to false")
-            
+
             syncSleepState()
             let (percent, _) = IOKitHelper.getPercentRemaining()
             syncMagSafeState(percent: percent)
@@ -99,13 +99,13 @@ enum ChargingPowerState {
     }
 
     static func disablePowerAdapter(force: Bool = false) -> (Bool, String?) {
-        guard force || !self.powerDisabled else { return (true, nil) }
-        guard let battery = self.battery else { return (false, "Battery is nil") }
+        guard force || !powerDisabled else { return (true, nil) }
+        guard let battery = battery else { return (false, "Battery is nil") }
         guard battery.capabilities.forceDischargeControl else { return (false, "forceDischargeControl is false") }
 
         do {
             try battery.setForceDischarging(true)
-            self.powerDisabled = true
+            powerDisabled = true
             logger.debug("SMC set force discharging to true")
             syncSleepState()
             return (true, nil)
@@ -116,20 +116,20 @@ enum ChargingPowerState {
     }
 
     static func enablePowerAdapter(force: Bool = false) -> (Bool, String?) {
-        guard force || self.powerDisabled else { return (true, nil) }
-        guard let battery = self.battery else { return (false, "Battery is nil") }
+        guard force || powerDisabled else { return (true, nil) }
+        guard let battery = battery else { return (false, "Battery is nil") }
         guard battery.capabilities.forceDischargeControl else { return (false, "forceDischargeControl is false") }
 
         do {
             try battery.setForceDischarging(false)
-            self.powerDisabled = false
+            powerDisabled = false
             logger.debug("SMC set force discharging to false")
-            
-            if self.chargingDisabled {
+
+            if chargingDisabled {
                 try? battery.setChargingInhibited(true)
                 logger.debug("SMC re-asserted charging inhibited to true after disabling power adapter")
             }
-            
+
             syncSleepState()
             return (true, nil)
         } catch {
@@ -143,7 +143,7 @@ enum ChargingPowerState {
         if !force {
             guard ChargingSettings.manageMagSafeLED else { return false }
         }
-        guard let adapter = self.adapter, adapter.capabilities.magSafeControl else { return false }
+        guard let adapter = adapter, adapter.capabilities.magSafeControl else { return false }
         guard let ledState = MagSafeLEDState(rawValue: target) else { return false }
 
         do {
@@ -165,11 +165,11 @@ enum ChargingPowerState {
             return
         }
 
-        if self.powerDisabled {
+        if powerDisabled {
             manageMagsafeLED(target: ChargingSettings.dischargingMagSafeLEDState)
-        } else if self.heatProtectionActive {
+        } else if heatProtectionActive {
             manageMagsafeLED(target: ChargingSettings.heatProtectionMagSafeLEDState)
-        } else if self.chargingDisabled || percent == 100 {
+        } else if chargingDisabled || percent == 100 {
             manageMagsafeLED(target: ChargingSettings.pausedMagSafeLEDState)
         } else {
             manageMagsafeLED(target: ChargingSettings.chargingMagSafeLEDState)
@@ -191,36 +191,36 @@ enum GlobalSleep {
     private static var sleepAssertion: IOPMAssertionID = 0
 
     static func restoreOnStart() {
-        guard let value = UserDefaults.standard.object(forKey: self.previousSleepDisabledKey) as? Bool else {
+        guard let value = UserDefaults.standard.object(forKey: previousSleepDisabledKey) as? Bool else {
             return
         }
-        
-        self.setSleepDisabledIOPMValue(value: value as CFBoolean)
-        UserDefaults.standard.removeObject(forKey: self.previousSleepDisabledKey)
+
+        setSleepDisabledIOPMValue(value: value as CFBoolean)
+        UserDefaults.standard.removeObject(forKey: previousSleepDisabledKey)
         _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
     }
 
     static func forceRestore() {
-        guard self.disabledCounter > 0 else { return }
-        self.disabledCounter = 0
-        self.restorePrevious()
+        guard disabledCounter > 0 else { return }
+        disabledCounter = 0
+        restorePrevious()
     }
 
     static func restore() {
-        guard self.disabledCounter > 0 else { return }
-        self.disabledCounter -= 1
-        guard self.disabledCounter == 0 else { return }
-        self.restorePrevious()
+        guard disabledCounter > 0 else { return }
+        disabledCounter -= 1
+        guard disabledCounter == 0 else { return }
+        restorePrevious()
     }
 
     static func disable() {
-        assert(self.disabledCounter >= 0)
-        self.disabledCounter += 1
-        guard self.disabledCounter == 1 else { return }
+        assert(disabledCounter >= 0)
+        disabledCounter += 1
+        guard disabledCounter == 1 else { return }
 
-        let sleepDisable = self.getSleepDisabledIOPMValue()
-        self.previousDisabled = sleepDisable
-        UserDefaults.standard.setValue(sleepDisable, forKey: self.previousSleepDisabledKey)
+        let sleepDisable = getSleepDisabledIOPMValue()
+        previousDisabled = sleepDisable
+        UserDefaults.standard.setValue(sleepDisable, forKey: previousSleepDisabledKey)
         _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
 
         // Create an explicit assertion to prevent system sleep (helps with clamshell mode transition)
@@ -233,7 +233,7 @@ enum GlobalSleep {
         )
 
         guard !sleepDisable else { return }
-        self.setSleepDisabledIOPMValue(value: kCFBooleanTrue)
+        setSleepDisabledIOPMValue(value: kCFBooleanTrue)
     }
 
     private static func getSleepDisabledIOPMValue() -> Bool {
@@ -256,13 +256,13 @@ enum GlobalSleep {
             sleepAssertion = 0
         }
 
-        guard !self.previousDisabled else {
-            self.previousDisabled = false
+        guard !previousDisabled else {
+            previousDisabled = false
             return
         }
-        
-        self.setSleepDisabledIOPMValue(value: kCFBooleanFalse)
-        UserDefaults.standard.removeObject(forKey: self.previousSleepDisabledKey)
+
+        setSleepDisabledIOPMValue(value: kCFBooleanFalse)
+        UserDefaults.standard.removeObject(forKey: previousSleepDisabledKey)
         _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
     }
 }

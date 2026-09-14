@@ -10,7 +10,8 @@ struct GetBatteryStatusIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         guard let appDelegate = AppDelegate.shared,
-              let (_, _, viewModel, _) = await appDelegate.ensureServicesReady() else {
+              let (_, _, viewModel, _) = await appDelegate.ensureServicesReady()
+        else {
             throw CustomIntentError.stasisNotReady
         }
 
@@ -64,7 +65,7 @@ enum CustomIntentError: Swift.Error, CustomLocalizedStringResourceConvertible {
         switch self {
         case .stasisNotReady:
             return "Stasis services are not ready or running."
-        case .invalidLimit(let value):
+        case let .invalidLimit(value):
             return "Charge limit \(value.formattedPercentage) is invalid. Must be between 50 and 100."
         }
     }

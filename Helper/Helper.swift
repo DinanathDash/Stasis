@@ -34,8 +34,12 @@ final class Helper: NSObject, HelperProtocol {
             var adapterVoltage = try SMCAdapter.getVoltage()
             var adapterCurrent = try SMCAdapter.getCurrent()
 
-            if abs(adapterVoltage) < 0.1 { adapterVoltage = 0 }
-            if abs(adapterCurrent) < 0.1 { adapterCurrent = 0 }
+            if abs(adapterVoltage) < 0.1 {
+                adapterVoltage = 0
+            }
+            if abs(adapterCurrent) < 0.1 {
+                adapterCurrent = 0
+            }
 
             let adapterPower = adapterVoltage * adapterCurrent
 

@@ -20,10 +20,10 @@ final class DynamicallyResizingHostingView<V: View>: NSHostingView<V> {
 
     override func layout() {
         super.layout()
-        if let menuItem = self.menuItem, let menu = menuItem.menu {
-            let currentHeight = self.fittingSize.height
-            if abs(self.frame.height - currentHeight) > 0.5 {
-                self.frame.size.height = currentHeight
+        if let menuItem = menuItem, let menu = menuItem.menu {
+            let currentHeight = fittingSize.height
+            if abs(frame.height - currentHeight) > 0.5 {
+                frame.size.height = currentHeight
                 menu.update()
             }
         }
@@ -81,7 +81,6 @@ struct SignificantEnergyMenuView: View {
         }
     }
 
-    @ViewBuilder
     private var expandedContentView: some View {
         Group {
             if apps.isEmpty {

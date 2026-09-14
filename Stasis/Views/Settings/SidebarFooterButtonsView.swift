@@ -15,12 +15,12 @@ enum AppResetHelper {
         // Disable launch at login and actively unregister to clear OS cache
         LaunchAtLoginService.shared.setLaunchAtLogin(false)
         try? SMAppService.mainApp.unregister()
-        
+
         // Remove all persisted defaults for this app bundle
         let bundleID = Bundle.main.bundleIdentifier ?? "com.dinanathdash.stasis"
         UserDefaults.standard.removePersistentDomain(forName: bundleID)
         UserDefaults.standard.synchronize() // Force write
-        
+
         // Reset system permissions (Accessibility, Background Items, etc.) to force OS cache flush
         let tccProcess = Process()
         tccProcess.launchPath = "/usr/bin/tccutil"

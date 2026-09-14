@@ -10,7 +10,7 @@ public struct BatteryCapabilities: Codable, Sendable {
     public let forceDischargeControl: Bool
 }
 
-/*
+/**
  * Based on:
  * https://github.com/AsahiLinux/linux/blob/79a307df1e18f144610742ac9ee60080c3983875/drivers/power/supply/macsmc-power.c
  * https://github.com/mhaeuser/Battery-Toolkit/blob/ed3adf103abfdad53223ce6f0a764ae7163c385b/Libraries/SMCComm%2BPower.swift
@@ -43,21 +43,13 @@ public struct SMCBattery: Sendable {
             hasCHIE: hasCHIE
         )
     }
-    
-    private init(capabilities: BatteryCapabilities, hasCH0C: Bool, hasCHTE: Bool, hasCH0I: Bool, hasCHIE: Bool) {
-        self.capabilities = capabilities
-        self.hasCH0C = hasCH0C
-        self.hasCHTE = hasCHTE
-        self.hasCH0I = hasCH0I
-        self.hasCHIE = hasCHIE
-    }
 
     public static func getVoltage() throws -> Double {
-        Double(try SMCKit.shared.read("B0AV") as UInt16) / 1000.0
+        try Double(SMCKit.shared.read("B0AV") as UInt16) / 1000.0
     }
 
     public static func getCurrent() throws -> Double {
-        Double(try SMCKit.shared.read("B0AC") as Int16) / 1000.0
+        try Double(SMCKit.shared.read("B0AC") as Int16) / 1000.0
     }
 
     public func getChargingInhibited() throws -> Bool {

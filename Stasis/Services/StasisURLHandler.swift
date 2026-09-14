@@ -7,14 +7,14 @@ import UserNotifications
 final class StasisURLHandler: NSObject, UNUserNotificationCenterDelegate {
     static let shared = StasisURLHandler()
 
-    private override init() {
+    override private init() {
         super.init()
         UNUserNotificationCenter.current().delegate = self
     }
 
     nonisolated func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification,
+        _: UNUserNotificationCenter,
+        willPresent _: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
         completionHandler([.banner, .sound])
@@ -34,7 +34,8 @@ final class StasisURLHandler: NSObject, UNUserNotificationCenterDelegate {
 
     private func executeURLCommand(_ url: URL) async {
         guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, viewModel, calibrationManager) = await appDelegate.ensureServicesReady() else {
+              let (_, chargeManager, viewModel, calibrationManager) = await appDelegate.ensureServicesReady()
+        else {
             showNotification(title: String(localized: "Stasis Error"), message: String(localized: "Stasis background services are not running or ready."))
             return
         }
@@ -186,7 +187,7 @@ final class StasisURLHandler: NSObject, UNUserNotificationCenterDelegate {
     }
 
     private func showNotification(title: String, message: String) {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
             let content = UNMutableNotificationContent()
             content.title = title
             content.body = message

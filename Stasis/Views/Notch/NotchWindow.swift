@@ -2,7 +2,6 @@ import AppKit
 import SwiftUI
 
 class NotchWindow: NSPanel {
-
     /// Shadow padding around the content to allow for drop shadows or glow effects.
     /// Increase if your content has large shadows.
     var shadowPadding: CGFloat = 20
@@ -51,8 +50,7 @@ class NotchWindow: NSPanel {
 
         let hosting = NSHostingView(rootView:
             content
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        )
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top))
         hosting.translatesAutoresizingMaskIntoConstraints = false
         contentView = hosting
 
@@ -69,7 +67,7 @@ class NotchWindow: NSPanel {
         // Use the entire screen width to prevent clipping
         let totalWidth = screen.frame.width
         let totalHeight = contentHeight + shadowPadding
-        
+
         let x = screen.frame.origin.x
         // Position below the menu bar
         let y = screen.visibleFrame.maxY - totalHeight - 10
@@ -77,8 +75,7 @@ class NotchWindow: NSPanel {
 
         let hosting = NSHostingView(rootView:
             content
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        )
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center))
         hosting.translatesAutoresizingMaskIntoConstraints = false
         contentView = hosting
 
@@ -89,15 +86,15 @@ class NotchWindow: NSPanel {
 
     /// Hide with a fade-out animation.
     func hideNotch(completion: (@Sendable () -> Void)? = nil) {
-        NSAnimationContext.runAnimationGroup({ ctx in
+        NSAnimationContext.runAnimationGroup { ctx in
             ctx.duration = 0.3
             animator().alphaValue = 0
-        }, completionHandler: { [weak self] in
+        } completionHandler: { [weak self] in
             DispatchQueue.main.async {
                 self?.orderOut(nil)
                 completion?()
             }
-        })
+        }
     }
 
     /// Whether the given screen has a hardware notch.

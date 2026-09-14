@@ -112,7 +112,7 @@ enum ChargingSettings {
             "chargingMagSafeLEDState": chargingMagSafeLEDState as NSNumber,
             "pausedMagSafeLEDState": pausedMagSafeLEDState as NSNumber,
             "dischargingMagSafeLEDState": dischargingMagSafeLEDState as NSNumber,
-            "heatProtectionMagSafeLEDState": heatProtectionMagSafeLEDState as NSNumber
+            "heatProtectionMagSafeLEDState": heatProtectionMagSafeLEDState as NSNumber,
         ]
     }
 

@@ -1,5 +1,5 @@
-import SwiftUI
 import Observation
+import SwiftUI
 
 @MainActor
 @Observable
@@ -12,9 +12,11 @@ class NotchHUDState {
 
     // Dynamic metrics for an asymmetric pill that wraps perfectly tightly around content
     // but uses a visual offset to keep the physical hardware notch dead center
-    
+
     var leftContentWidth: CGFloat {
-        if !isVisible { return 0 }
+        if !isVisible {
+            return 0
+        }
         // 16pt outer padding + text width + 16pt inner padding
         let font = NSFont.systemFont(ofSize: 13, weight: .medium)
         let textWidth = (statusText as NSString).boundingRect(
@@ -25,16 +27,20 @@ class NotchHUDState {
         ).width
         return 20 + ceil(textWidth) + 16
     }
-    
+
     var rightContentWidth: CGFloat {
-        if !isVisible { return 0 }
+        if !isVisible {
+            return 0
+        }
         // 16pt inner padding + battery icon + 16pt outer padding
         return 16 + 60 + 16 // battery is around 60 wide
     }
 
-    // Math to keep the gap perfectly centered on screen despite an asymmetrical shape
+    /// Math to keep the gap perfectly centered on screen despite an asymmetrical shape
     var correctionOffset: CGFloat {
-        if !isVisible { return 0 }
+        if !isVisible {
+            return 0
+        }
         // Math to keep the 180 gap perfectly centered on screen despite an asymmetrical shape
         return (rightContentWidth - leftContentWidth) / 2
     }
@@ -45,7 +51,9 @@ struct ChargingNotchView: View {
     var notchWidth: CGFloat = 180
 
     var dynamicWidth: CGFloat {
-        if !state.isVisible { return notchWidth }
+        if !state.isVisible {
+            return notchWidth
+        }
         return state.leftContentWidth + notchWidth + state.rightContentWidth
     }
 
@@ -63,7 +71,7 @@ struct ChargingNotchView: View {
 
             // CENTER: The physical notch width
             Spacer()
-                .frame(width: notchWidth) 
+                .frame(width: notchWidth)
 
             // RIGHT SIDE: Battery
             BatteryIndicatorView(

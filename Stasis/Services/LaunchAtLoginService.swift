@@ -1,6 +1,6 @@
 import Foundation
-import ServiceManagement
 import os.log
+import ServiceManagement
 
 class LaunchAtLoginService {
     static let shared = LaunchAtLoginService()

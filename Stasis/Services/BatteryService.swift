@@ -11,7 +11,7 @@ enum XPCError: LocalizedError {
         switch self {
         case .helperUnavailable:
             "XPC helper is unavailable"
-        case .commandFailed(let message):
+        case let .commandFailed(message):
             "Command failed: \(message)"
         }
     }
@@ -101,7 +101,7 @@ class BatteryService {
             }
         }
 
-        self.deviceCapabilities = capabilities
+        deviceCapabilities = capabilities
         logger.info(
             "Capabilities loaded: charging=\(capabilities.chargingControl), adapter=\(capabilities.adapterControl), magSafe=\(capabilities.hasMagSafe)"
         )
@@ -352,7 +352,8 @@ class BatteryService {
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(
-                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error"))
+                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error")
+                    )
                 }
             }
         }
@@ -372,7 +373,8 @@ class BatteryService {
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(
-                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error"))
+                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error")
+                    )
                 }
             }
         }
@@ -392,7 +394,8 @@ class BatteryService {
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(
-                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error"))
+                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error")
+                    )
                 }
             }
         }
@@ -412,7 +415,8 @@ class BatteryService {
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(
-                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error"))
+                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error")
+                    )
                 }
             }
         }
@@ -432,7 +436,8 @@ class BatteryService {
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(
-                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error"))
+                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error")
+                    )
                 }
             }
         }
@@ -452,7 +457,8 @@ class BatteryService {
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(
-                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error"))
+                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error")
+                    )
                 }
             }
         }
@@ -472,7 +478,8 @@ class BatteryService {
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(
-                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error"))
+                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error")
+                    )
                 }
             }
         }
@@ -492,7 +499,8 @@ class BatteryService {
                     continuation.resume(returning: ())
                 } else {
                     continuation.resume(
-                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error"))
+                        throwing: XPCError.commandFailed(errorMessage ?? "Unknown error")
+                    )
                 }
             }
         }

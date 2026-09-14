@@ -1,5 +1,5 @@
-import SwiftUI
 import smc_power
+import SwiftUI
 
 enum SettingsTab: String, CaseIterable, Identifiable {
     case general = "General"
@@ -9,17 +9,19 @@ enum SettingsTab: String, CaseIterable, Identifiable {
     case shortcuts = "Shortcuts & Help"
     case about = "About"
 
-    var id: String { rawValue }
-    
+    var id: String {
+        rawValue
+    }
+
     var title: LocalizedStringKey {
-            switch self {
-            case .general: return "General"
-            case .dashboard: return "Dashboard"
-            case .charging: return "Charging"
-            case .advanced: return "Advanced"
-            case .shortcuts: return "Shortcuts & Help"
-            case .about: return "About"
-            }
+        switch self {
+        case .general: return "General"
+        case .dashboard: return "Dashboard"
+        case .charging: return "Charging"
+        case .advanced: return "Advanced"
+        case .shortcuts: return "Shortcuts & Help"
+        case .about: return "About"
+        }
     }
 
     var icon: String {
@@ -151,7 +153,9 @@ struct SettingsView: View {
     private func recordNavigation() {
         guard !isHistoryNavigation else { return }
         let tab = selectedTab
-        if navigationHistory.last == tab { return }
+        if navigationHistory.last == tab {
+            return
+        }
         if historyIndex < navigationHistory.count - 1 {
             navigationHistory = Array(navigationHistory.prefix(historyIndex + 1))
         }

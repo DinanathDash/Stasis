@@ -14,7 +14,9 @@ struct OutputPortPower: Codable, Equatable, Identifiable {
     var portIndex: Int
     var powerWatts: Double
 
-    var id: Int { portIndex }
+    var id: Int {
+        portIndex
+    }
 }
 
 struct BatteryMetrics: Codable, Equatable {

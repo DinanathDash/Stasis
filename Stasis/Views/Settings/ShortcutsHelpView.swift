@@ -90,7 +90,7 @@ struct ShortcutsHelpView: View {
             description: "Enable or disable custom MagSafe LED color indication.",
             urlString: "stasis://magsafe-led?enable=true",
             exampleCLI: "open \"stasis://magsafe-led?enable=true\""
-        )
+        ),
     ]
 
     var body: some View {

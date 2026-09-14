@@ -1,8 +1,8 @@
 import Defaults
-import ServiceManagement
-import SwiftUI
 import os.log
+import ServiceManagement
 import smc_power
+import SwiftUI
 
 struct ChargingSettingsView: View {
     @Default(.manageCharging) var manageCharging
@@ -19,7 +19,7 @@ struct ChargingSettingsView: View {
     @Default(.chargingMagSafeLEDState) var chargingMagSafeLEDState
     @Default(.pausedMagSafeLEDState) var pausedMagSafeLEDState
     @Default(.dischargingMagSafeLEDState) var dischargingMagSafeLEDState
-    
+
     // Calibration settings
     @Default(.enableAutomaticCalibration) var enableAutomaticCalibration
     @Default(.calibrationIntervalDays) var calibrationIntervalDays
@@ -102,7 +102,7 @@ struct ChargingSettingsView: View {
                                     get: { Double(chargeLimit) },
                                     set: { chargeLimit = Int($0) }
                                 ),
-                                in: 50...100,
+                                in: 50 ... 100,
                                 step: 5
                             )
                             Text(chargeLimit.formattedPercentage)
@@ -184,7 +184,7 @@ struct ChargingSettingsView: View {
                                         get: { Double(sailingModeLimit) },
                                         set: { sailingModeLimit = Int($0) }
                                     ),
-                                    in: 1...20,
+                                    in: 1 ... 20,
                                     step: 1
                                 )
                                 Text(sailingModeLimit.formattedPercentage)
@@ -234,7 +234,7 @@ struct ChargingSettingsView: View {
                                         get: { Double(heatProtectionLimit) },
                                         set: { heatProtectionLimit = Int($0) }
                                     ),
-                                    in: 30...50,
+                                    in: 30 ... 50,
                                     step: 1
                                 )
                                 Text("\(heatProtectionLimit)°C")
@@ -277,7 +277,7 @@ struct ChargingSettingsView: View {
                                 Text(String(localized: "Blinking Orange Slow")).tag(MagSafeLEDState.blinkOrangeSlow)
                                 Text(String(localized: "Blinking Orange Fast")).tag(MagSafeLEDState.blinkOrangeFast)
                             }
-                            
+
                             Picker(String(localized: "LED when paused or limit reached"), selection: $pausedMagSafeLEDState) {
                                 Text(String(localized: "Reset to System")).tag(MagSafeLEDState.reset)
                                 Text(String(localized: "Off")).tag(MagSafeLEDState.off)
@@ -286,7 +286,7 @@ struct ChargingSettingsView: View {
                                 Text(String(localized: "Blinking Orange Slow")).tag(MagSafeLEDState.blinkOrangeSlow)
                                 Text(String(localized: "Blinking Orange Fast")).tag(MagSafeLEDState.blinkOrangeFast)
                             }
-                            
+
                             Picker(String(localized: "LED while discharging"), selection: $dischargingMagSafeLEDState) {
                                 Text(String(localized: "Reset to System")).tag(MagSafeLEDState.reset)
                                 Text(String(localized: "Off")).tag(MagSafeLEDState.off)
@@ -343,13 +343,13 @@ struct ChargingSettingsView: View {
                             Text("Every 30 days").tag(30)
                             Text("Every 60 days").tag(60)
                         }
-                        
+
                         DatePicker("Time of Day", selection: Binding(
                             get: { self.calibrationTimeOfDay },
                             set: { self.calibrationTimeOfDay = $0 }
                         ), displayedComponents: .hourAndMinute)
                     }
-                    
+
                     LabeledContent("Status") {
                         switch calibrationStatus {
                         case .idle:

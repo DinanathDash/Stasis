@@ -1,14 +1,13 @@
 import AppKit
-import SwiftUI
 import smc_power
-
+import SwiftUI
 
 @MainActor
 class SettingsWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
     private let capabilities: DeviceCapabilities
     private let chargeManager: ChargeManager
-    
+
     init(capabilities: DeviceCapabilities, chargeManager: ChargeManager) {
         self.capabilities = capabilities
         self.chargeManager = chargeManager
@@ -41,17 +40,16 @@ class SettingsWindowController: NSObject, NSWindowDelegate {
         newWindow.setContentSize(NSSize(width: 750, height: 540))
         newWindow.isReleasedWhenClosed = false
         newWindow.collectionBehavior = [.moveToActiveSpace, .fullScreenPrimary]
-        
+
         newWindow.center() // Center it on first launch after reset
 
         newWindow.delegate = self
         window = newWindow
         newWindow.setFrameAutosaveName("SettingsWindow")
-        
+
         newWindow.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
 
-        self.window = newWindow
+        window = newWindow
     }
-    
 }

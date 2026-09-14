@@ -1,13 +1,12 @@
 import Defaults
-import SwiftUI
 import ServiceManagement
+import SwiftUI
 
 struct AboutSettingsView: View {
     @Environment(\.openURL) private var openURL
     @ObservedObject private var updaterManager = UpdaterManager.shared
 
-    init() {
-    }
+    init() {}
 
     var body: some View {
         Form {
@@ -50,7 +49,7 @@ struct AboutSettingsView: View {
                         openURL(
                             URL(
                                 string:
-                                    "https://github.com/DinanathDash/Stasis/issues/new?template=bug_report.yml"
+                                "https://github.com/DinanathDash/Stasis/issues/new?template=bug_report.yml"
                             )!
                         )
                     } label: {
@@ -63,7 +62,7 @@ struct AboutSettingsView: View {
                         openURL(
                             URL(
                                 string:
-                                    "https://github.com/DinanathDash/Stasis/issues/new?template=feature_request.yml"
+                                "https://github.com/DinanathDash/Stasis/issues/new?template=feature_request.yml"
                             )!
                         )
                     } label: {
@@ -108,8 +107,8 @@ struct AboutSettingsView: View {
                     set: { updaterManager.updateCheckInterval = $0 }
                 )) {
                     Text("Daily").tag(TimeInterval(86400))
-                    Text("Weekly").tag(TimeInterval(604800))
-                    Text("Monthly").tag(TimeInterval(2592000))
+                    Text("Weekly").tag(TimeInterval(604_800))
+                    Text("Monthly").tag(TimeInterval(2_592_000))
                 }
                 .disabled(!updaterManager.automaticallyChecksForUpdates)
 
@@ -137,13 +136,11 @@ struct AboutSettingsView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
         .contentMargins(.top, 4, for: .scrollContent)
         .scrollEdgeEffectStyleSoftIfAvailable()
-
     }
 
     private var versionText: String? {
@@ -168,14 +165,14 @@ extension NSAlert {
         alert.informativeText = String(localized: String.LocalizationValue(message))
         alert.alertStyle = style
         alert.addButton(withTitle: String(localized: "OK"))
-        
+
         alert.window.level = .screenSaver
         alert.window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        
+
         DispatchQueue.main.async {
             NSApp.activate(ignoringOtherApps: true)
         }
-        
+
         NSSound.beep()
         alert.runModal()
     }

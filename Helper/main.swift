@@ -1,12 +1,11 @@
 import Foundation
 import Security
 
-
 class ServiceDelegate: NSObject, NSXPCListenerDelegate {
     let helper = Helper()
 
     func listener(
-        _ listener: NSXPCListener,
+        _: NSXPCListener,
         shouldAcceptNewConnection newConnection: NSXPCConnection
     ) -> Bool {
         // Validate the code signature of the connecting process
@@ -24,18 +23,20 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
         while appURL.path != "/" && appURL.pathExtension != "app" {
             appURL = appURL.deletingLastPathComponent()
         }
-        
+
         guard appURL.pathExtension == "app" else { return false }
-        
+
         var appStaticCode: SecStaticCode?
         guard SecStaticCodeCreateWithPath(appURL as CFURL, [], &appStaticCode) == errSecSuccess,
-              let appCode = appStaticCode else {
+              let appCode = appStaticCode
+        else {
             return false
         }
-        
+
         var requirement: SecRequirement?
         guard SecCodeCopyDesignatedRequirement(appCode, [], &requirement) == errSecSuccess,
-              let validReq = requirement else {
+              let validReq = requirement
+        else {
             return false
         }
 

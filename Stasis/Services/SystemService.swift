@@ -19,7 +19,7 @@ enum SystemService {
 
         let timeInterval =
             TimeInterval(bootTime.tv_sec) + TimeInterval(bootTime.tv_usec)
-            / 1_000_000.0
+                / 1_000_000.0
         return Date(timeIntervalSince1970: timeInterval)
     }
 }

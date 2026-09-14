@@ -16,10 +16,10 @@ class MenuViewModel {
     }
 
     var batteryPercentageText: String = 0.formattedPercentage
-    var powerSourceText: String = String(localized: "Battery")
-    var timeRemainingText: String = String(localized: "Calculating...")
+    var powerSourceText: String = .init(localized: "Battery")
+    var timeRemainingText: String = .init(localized: "Calculating...")
     var uptimeText: String = "00:00"
-    var batteryModeText: String = String(localized: "Unknown")
+    var batteryModeText: String = .init(localized: "Unknown")
     var batteryTemperatureText: String = "0°C"
     var externalInputText: String = "0V @ 0A"
     var internalInputText: String = "0V @ 0A"
@@ -35,7 +35,7 @@ class MenuViewModel {
     var systemPower: Double = 0
     var outputPower: Double = 0
     var outputPortPowers: [OutputPortPower] = []
-    var outputPortDetailsText: String = String(localized: "None")
+    var outputPortDetailsText: String = .init(localized: "None")
     var powerSource: PowerSource = .battery
     var isCharging: Bool = false
     var hasMultiPort: Bool = false
@@ -47,11 +47,27 @@ class MenuViewModel {
     var chargeLimitOverrideActive: Bool {
         chargeManager.chargeLimitOverrideActive
     }
-    var forceDischargeActive: Bool { chargeManager.forceDischargeActive }
-    var chargeToLimitActive: Bool { chargeManager.chargeToLimitActive }
-    var daemonSyncError: Bool { chargeManager.daemonSyncError }
-    var daemonError: String? { chargeManager.daemonError }
-    var manageChargingEnabled: Bool { Defaults[.manageCharging] }
+
+    var forceDischargeActive: Bool {
+        chargeManager.forceDischargeActive
+    }
+
+    var chargeToLimitActive: Bool {
+        chargeManager.chargeToLimitActive
+    }
+
+    var daemonSyncError: Bool {
+        chargeManager.daemonSyncError
+    }
+
+    var daemonError: String? {
+        chargeManager.daemonError
+    }
+
+    var manageChargingEnabled: Bool {
+        Defaults[.manageCharging]
+    }
+
     var adapterConnected: Bool = false
 
     private var metricsObservation: Task<Void, Never>?
@@ -78,7 +94,7 @@ class MenuViewModel {
         self.batteryService = batteryService
         self.chargeManager = chargeManager
         self.significantEnergyService = significantEnergyService
-        self.bootTimestamp = SystemService.bootTimestamp()
+        bootTimestamp = SystemService.bootTimestamp()
         startObservingMetrics()
         startObservingSettings()
         startObservingPowerMode()
@@ -111,7 +127,7 @@ class MenuViewModel {
             for await _ in Defaults.updates(
                 [
                     .useHardwarePercentage, .useRawHardwareHealth,
-                    .calibrationStatus, .showTwoDecimalPowerValues
+                    .calibrationStatus, .showTwoDecimalPowerValues,
                 ],
                 initial: false
             ) {
@@ -154,9 +170,15 @@ class MenuViewModel {
         if Defaults[.calibrationStatus] != .idle {
             Defaults[.calibrationStatus] = .idle
         } else {
-            if chargeLimitOverrideActive { toggleChargeLimitOverride() }
-            if forceDischargeActive { toggleForceDischarge() }
-            if chargeToLimitActive { toggleChargeToLimit() }
+            if chargeLimitOverrideActive {
+                toggleChargeLimitOverride()
+            }
+            if forceDischargeActive {
+                toggleForceDischarge()
+            }
+            if chargeToLimitActive {
+                toggleChargeToLimit()
+            }
             Defaults[.calibrationStatus] = .discharging
         }
     }
@@ -189,8 +211,8 @@ class MenuViewModel {
         let useHardware = Defaults[.useHardwarePercentage]
         let percentage =
             useHardware
-            ? safeMetrics.hardwareBatteryPercentage
-            : safeMetrics.batteryPercentage
+                ? safeMetrics.hardwareBatteryPercentage
+                : safeMetrics.batteryPercentage
         displayPercentage = percentage
         batteryPercentageText = percentage.formattedPercentage
 
@@ -218,9 +240,9 @@ class MenuViewModel {
         updateUptimeText()
 
         let physicallyPluggedIn = adapter.adapterConnected
-        
+
         let calibrationStatus = Defaults[.calibrationStatus]
-        
+
         isCalibrating = (calibrationStatus != .idle)
 
         if calibrationStatus != .idle {
@@ -262,7 +284,7 @@ class MenuViewModel {
             }
         } else {
             chargingMode = .discharging
-            if physicallyPluggedIn && forceDischargeActive {
+            if physicallyPluggedIn, forceDischargeActive {
                 batteryModeText = String(localized: "Force Discharging")
             } else {
                 batteryModeText = String(localized: "Discharging")
@@ -287,7 +309,7 @@ class MenuViewModel {
 
         internalInputText =
             "\(safeMetrics.batteryVoltage.formatted(voltageFormat))V @ \(safeMetrics.batteryCurrent.formatted(currentFormat))A (\(abs(safeMetrics.batteryPower).formatted(powerFormat))W)"
-            
+
         if !physicallyPluggedIn {
             if disconnectTime == nil {
                 disconnectTime = now
@@ -308,7 +330,7 @@ class MenuViewModel {
             }
             lastEnergyCalculationTime = now
         }
-        
+
         let showTwoDecimalPlaces = Defaults[.showTwoDecimalPowerValues]
         let formattedEnergy = PowerValueFormatter.string(
             from: sessionEnergyAccumulatedWh,
@@ -329,7 +351,7 @@ class MenuViewModel {
         let rawOutputPower = preferredOutputPower
 
         if safeMetrics.outputPorts.isEmpty, now < outputPortsHoldUntil,
-            !stableOutputPorts.isEmpty
+           !stableOutputPorts.isEmpty
         {
             outputPortPowers = stableOutputPorts
         } else {
@@ -353,22 +375,22 @@ class MenuViewModel {
             let showTwoDecimalPlaces = Defaults[.showTwoDecimalPowerValues]
             outputPortDetailsText =
                 outputPortPowers
-                .map {
-                    let power = PowerValueFormatter.string(
-                        from: $0.powerWatts,
-                        showTwoDecimalPlaces: showTwoDecimalPlaces
-                    )
-                    return String(
-                        localized:
+                    .map {
+                        let power = PowerValueFormatter.string(
+                            from: $0.powerWatts,
+                            showTwoDecimalPlaces: showTwoDecimalPlaces
+                        )
+                        return String(
+                            localized:
                             "Port \($0.portIndex): \(power) W"
-                    )
-                }
-                .joined(separator: " • ")
+                        )
+                    }
+                    .joined(separator: " • ")
         }
-        
+
         // Smart map accessories to output ports based on power
         var availableAccessories = safeMetrics.connectedAccessories
-        
+
         // Priority for matching
         let accessoryPriority: [AccessoryType] = [.hub, .display, .phone, .network, .storage, .printer, .unknown]
         availableAccessories.sort { a, b in
@@ -376,20 +398,20 @@ class MenuViewModel {
             let idxB = accessoryPriority.firstIndex(of: b) ?? 100
             return idxA < idxB
         }
-        
+
         let sortedPorts = outputPortPowers.sorted { $0.powerWatts > $1.powerWatts }
         var portIconMap: [Int: String] = [:]
-        
+
         for port in sortedPorts {
             let p = port.powerWatts
             var selectedIcon = "cable.connector" // Generic fallback
-            
+
             if p > 15.0 {
                 selectedIcon = "externaldrive.fill"
             } else {
                 selectedIcon = "iphone" // default medium
             }
-            
+
             if !availableAccessories.isEmpty {
                 let acc = availableAccessories.removeFirst()
                 switch acc {
@@ -404,9 +426,9 @@ class MenuViewModel {
             }
             portIconMap[port.portIndex] = selectedIcon
         }
-        
+
         outputIcons = outputPortPowers.map { portIconMap[$0.portIndex] ?? "cable.connector" }
-        
+
         hasMultiPort = safeMetrics.hasMultiPort
         connectedAccessories = safeMetrics.connectedAccessories
         powerSource = derivedPowerSource
@@ -430,7 +452,7 @@ class MenuViewModel {
 
     private func derivePowerSource(
         battery: BatteryMetrics,
-        adapter: AdapterMetrics
+        adapter _: AdapterMetrics
     ) -> PowerSource {
         guard battery.externalConnected else { return .battery }
 
@@ -448,9 +470,9 @@ class MenuViewModel {
         }
 
         let uptime = max(0, Int(Date().timeIntervalSince(bootTimestamp)))
-        let days = uptime / 86_400
-        let hours = (uptime % 86_400) / 3_600
-        let minutes = (uptime % 3_600) / 60
+        let days = uptime / 86400
+        let hours = (uptime % 86400) / 3600
+        let minutes = (uptime % 3600) / 60
 
         if days > 0 {
             uptimeText = String(localized: "\(days)d \(hours)h \(minutes)m")
@@ -516,7 +538,7 @@ class MenuViewModel {
         currentCapacity: Int,
         maxCapacity: Int,
         batteryCurrent: Double,
-        powerSource: PowerSource,
+        powerSource _: PowerSource,
         isCharging: Bool,
         adapterConnected: Bool,
         batteryPercentage: Int
@@ -547,7 +569,7 @@ class MenuViewModel {
 
         let effectiveMinutes =
             adjustedReportedMinutes >= 0
-            ? adjustedReportedMinutes : (capacityMinutes ?? trendMinutes)
+                ? adjustedReportedMinutes : (capacityMinutes ?? trendMinutes)
         guard let effectiveMinutes, effectiveMinutes >= 0 else {
             return String(localized: "Calculating...")
         }
@@ -578,7 +600,7 @@ class MenuViewModel {
         let remainingToFull = max(1, 100 - batteryPercentage)
         let scaled =
             Double(reportedMinutes) * Double(remainingToTarget)
-            / Double(remainingToFull)
+                / Double(remainingToFull)
         return Int(ceil(scaled))
     }
 
@@ -594,7 +616,7 @@ class MenuViewModel {
         maxCapacity: Int,
         batteryCurrent: Double,
         isCharging: Bool,
-        batteryPercentage: Int
+        batteryPercentage _: Int
     ) -> Int? {
         guard currentCapacity > 0, maxCapacity > 0 else { return nil }
 
@@ -606,7 +628,9 @@ class MenuViewModel {
         if isCharging {
             guard batteryCurrent > 0.05 else { return nil }
             let remainingCapacity = targetCapacity - currentCapacity
-            if remainingCapacity <= 0 { return 0 }
+            if remainingCapacity <= 0 {
+                return 0
+            }
 
             // batteryCurrent is in Amps (e.g. 1.5). Capacity is in mAh (e.g. 4000).
             // Convert Amps to mA
