@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 struct NotchShape: Shape {
     var topCornerRadius: CGFloat
     var bottomCornerRadius: CGFloat
@@ -9,7 +10,7 @@ struct NotchShape: Shape {
         self.bottomCornerRadius = bottomCornerRadius
     }
 
-    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+    nonisolated var animatableData: AnimatablePair<CGFloat, CGFloat> {
         get { .init(topCornerRadius, bottomCornerRadius) }
         set {
             topCornerRadius = newValue.first
@@ -17,7 +18,7 @@ struct NotchShape: Shape {
         }
     }
 
-    func path(in rect: CGRect) -> Path {
+    nonisolated func path(in rect: CGRect) -> Path {
         var path = Path()
 
         // Start at the top-left corner

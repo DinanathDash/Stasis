@@ -59,16 +59,18 @@ do shell script "open 'stasis://charge-limit?value=80'"
 
 Every Stasis command supports both full parameter assignment (`?enable=true`/`false`) and automatic toggling when omitted.
 
+> **Note on macOS 27+ Compatibility:** Manual charging controls marked with an asterisk (*) are gracefully disabled on macOS 27 due to OS-level restrictions where Apple has locked down SMC keys, preventing forced discharging below the system's 80% charge limit.
+
 | Action | URL Scheme Command | Example Terminal Command |
 | :--- | :--- | :--- |
 | **Open Dashboard** | `stasis://dashboard` | `open "stasis://dashboard"` |
 | **Open Menu Bar Dialog** | `stasis://menu` | `open "stasis://menu"` |
 | **Get Battery Status** | `stasis://status` | `open "stasis://status"` |
 | **Set Charge Limit** | `stasis://charge-limit?value=80` | `open "stasis://charge-limit?value=80"` |
-| **Toggle Top-Up to 100%** | `stasis://topup?enable=true` | `open "stasis://topup?enable=true"` |
-| **Toggle Sailing Mode** | `stasis://sailing?enable=true` | `open "stasis://sailing?enable=true"` |
-| **Set Sailing Mode Range** | `stasis://sailing-limit?value=5` | `open "stasis://sailing-limit?value=5"` |
-| **Toggle Force Discharge** | `stasis://force-discharge?enable=true` | `open "stasis://force-discharge?enable=true"` |
+| **Toggle Top-Up to 100%** * | `stasis://topup?enable=true` | `open "stasis://topup?enable=true"` |
+| **Toggle Sailing Mode** * | `stasis://sailing?enable=true` | `open "stasis://sailing?enable=true"` |
+| **Set Sailing Mode Range** * | `stasis://sailing-limit?value=5` | `open "stasis://sailing-limit?value=5"` |
+| **Toggle Force Discharge** * | `stasis://force-discharge?enable=true` | `open "stasis://force-discharge?enable=true"` |
 | **Start Battery Calibration** | `stasis://calibrate?action=start` | `open "stasis://calibrate?action=start"` |
 | **Cancel Battery Calibration**| `stasis://calibrate?action=cancel`| `open "stasis://calibrate?action=cancel"`|
 | **Toggle Heat Protection** | `stasis://heat-protection?enable=true` | `open "stasis://heat-protection?enable=true"` |

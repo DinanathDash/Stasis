@@ -8,7 +8,7 @@ Stasis gives you real-time insight into your MacBook's power system and lets you
 
 > **Apple Silicon only.** Fully supported on all Apple Silicon MacBooks (M-series chips).
 >
-> Requires **macOS 14.8 – 26.6**.
+> Requires **macOS 14.8 – 27.0**.
 
 ![Stasis Menu Bar](assets/images/FullApp.jpg)
 
@@ -17,10 +17,10 @@ Stasis gives you real-time insight into your MacBook's power system and lets you
 ## Highlights
 
 - **Hardware Charge Limit** — Set a maximum charge level (50–100%) enforced at the hardware level via the SMC, remaining active even through system sleep or power cycling.
-- **Sailing Mode** — Prevent micro-charging cycles by allowing the battery to float naturally within a configurable upper and lower percentage range.
-- **Automatic Discharge** — Safely drain battery charge down to your target limit while plugged into power.
+- **Sailing Mode** *(macOS 14–26 only)* — Prevent micro-charging cycles by allowing the battery to float naturally within a configurable upper and lower percentage range.
+- **Automatic Discharge** *(macOS 14–26 only)* — Safely drain battery charge down to your target limit while plugged into power.
 - **Heat Protection** — Automatically pause charging when battery temperature exceeds your safety threshold.
-- **Apple Shortcuts & Siri Automation** — Native Apple Shortcuts and Siri support via 13 App Intents (including `Open Dashboard`, `Get Battery Status`, `Set Charge Limit`, `Toggle Top-Up to 100%`, `Toggle Sailing Mode`, `Toggle Force Discharge`, and `Start/Cancel Battery Calibration`).
+- **Apple Shortcuts & Siri Automation** — Native Apple Shortcuts and Siri support via 13 App Intents (Note: Manual charging control Intents are disabled on macOS 27+).
 - **Apps Using Significant Energy** — Real-time detection and menu bar display of apps consuming excessive energy, with a configurable dashboard toggle.
 - **Battery Calibration Service** — Guided 3-stage calibration workflow (**Discharge to 15% → Recharge to 100% → Rest at 100%**) to recalibrate your battery gauge and SMC sensors.
 - **Dynamic Island Notch HUD** — Sleek hardware notch overlay for charging state notifications and power alerts, powered by `TopWindowElevator` to stay visible above system UI and lock screens.
@@ -65,7 +65,7 @@ xattr -dr com.apple.quarantine /Applications/Stasis.app
 ## Key Features & Automations
 
 ### 1. Apple Shortcuts & Siri Integration
-Stasis registers native App Intents and Siri Shortcuts:
+Stasis registers native App Intents and Siri Shortcuts (Note: Features marked with * are disabled on macOS 27 due to OS restrictions):
 - **`Get Battery Status`**: Retrieve real-time battery percentage, charging state, wattage, voltage, amperage, temperature, and health metrics.
 - **`Set Charge Limit`**: Programmatically change the hardware charge limit (50%–100%).
 - **`Toggle Top-Up to 100%`**: Enable or disable Charge Limit Override to temporarily charge to 100%.

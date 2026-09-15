@@ -162,6 +162,11 @@ jobs:
           # Replace sha256 in stasis.rb
           sed -i '' 's/sha256 ".*"/sha256 "'${{ env.sha256 }}'"/' Casks/stasis.rb
           
+          # Update SECURITY.md
+          MAJOR_MINOR=$(echo "${{ env.version }}" | cut -d. -f1,2)
+          sed -i '' -E "s/\| \*\*[0-9]+\.[0-9]+\.x \(Latest\)\*\* \|/| **${MAJOR_MINOR}.x (Latest)** |/" SECURITY.md
+          sed -i '' -E "s/\| < [0-9]+\.[0-9]+\.0 \|/| < ${MAJOR_MINOR}.0 |/" SECURITY.md
+          
           # Commit the updated files to the repository
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -169,5 +174,6 @@ jobs:
           git add stasis.xcodeproj/project.pbxproj
           git add appcast.xml
           git add CHANGELOG.md
+          git add SECURITY.md
           git commit -m "chore: bump version to v${{ env.version }}, update Homebrew Cask, and update appcast [skip ci]"
           git push origin main
