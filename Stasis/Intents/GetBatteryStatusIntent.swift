@@ -60,6 +60,7 @@ struct GetBatteryStatusIntent: AppIntent {
 enum CustomIntentError: Swift.Error, CustomLocalizedStringResourceConvertible {
     case stasisNotReady
     case invalidLimit(Int)
+    case unsupportedOnOS(LocalizedStringResource)
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
@@ -67,6 +68,8 @@ enum CustomIntentError: Swift.Error, CustomLocalizedStringResourceConvertible {
             return "Stasis services are not ready or running."
         case let .invalidLimit(value):
             return "Charge limit \(value.formattedPercentage) is invalid. Must be between 50 and 100."
+        case let .unsupportedOnOS(feature):
+            return "\(feature) is not supported on this macOS version."
         }
     }
 }

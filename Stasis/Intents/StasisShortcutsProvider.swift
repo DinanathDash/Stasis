@@ -1,7 +1,12 @@
 import AppIntents
 import Foundation
 
+@available(macOS 13.0, *)
 struct StasisShortcutsProvider: AppShortcutsProvider {
+    static var shortcutTileColor: ShortcutTileColor {
+        .navy
+    }
+
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
             intent: OpenMenuIntent(),
@@ -43,16 +48,6 @@ struct StasisShortcutsProvider: AppShortcutsProvider {
             systemImageName: "battery.75"
         )
         AppShortcut(
-            intent: ToggleTopUpIntent(),
-            phrases: [
-                "Top up battery in \(.applicationName)",
-                "Charge to 100 percent in \(.applicationName)",
-                "Stop top up in \(.applicationName)",
-            ],
-            shortTitle: "Toggle Top-Up to 100 percent",
-            systemImageName: "bolt.fill.batteryblock.fill"
-        )
-        AppShortcut(
             intent: ToggleSailingModeIntent(),
             phrases: [
                 "Toggle sailing mode in \(.applicationName)",
@@ -61,6 +56,16 @@ struct StasisShortcutsProvider: AppShortcutsProvider {
             ],
             shortTitle: "Toggle Sailing Mode",
             systemImageName: "sailboat.fill"
+        )
+        AppShortcut(
+            intent: ToggleTopUpIntent(),
+            phrases: [
+                "Top up battery in \(.applicationName)",
+                "Charge to 100 percent in \(.applicationName)",
+                "Stop top up in \(.applicationName)",
+            ],
+            shortTitle: "Toggle Top-Up to 100 percent",
+            systemImageName: "bolt.fill.batteryblock.fill"
         )
         AppShortcut(
             intent: ToggleForceDischargeIntent(),

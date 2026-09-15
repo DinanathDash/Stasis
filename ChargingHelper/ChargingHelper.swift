@@ -12,7 +12,12 @@ final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendabl
         category: "ChargingHelper"
     )
 
+    private let battery: SMCBattery
+    private let adapter: SMCAdapter
+
     init(battery: SMCBattery, adapter: SMCAdapter) {
+        self.battery = battery
+        self.adapter = adapter
         super.init()
         Task { @MainActor in
             ChargingPowerState.initialize(battery: battery, adapter: adapter)
@@ -20,12 +25,22 @@ final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendabl
         }
 
         logger.info(
-            "Initialized (charging=\(battery.capabilities.inhibitChargeControl), discharge=\(battery.capabilities.forceDischargeControl), magSafe=\(adapter.capabilities.magSafeControl))"
+            "Initialized (charging=\(battery.capabilities.inhibitChargeControl), nativeLimit=\(battery.capabilities.nativeChargeLimitControl), discharge=\(battery.capabilities.forceDischargeControl), magSafe=\(adapter.capabilities.magSafeControl))"
         )
     }
 
     func ping(reply: @escaping @Sendable (Bool) -> Void) {
         reply(true)
+    }
+
+    func getCapabilities(reply: @escaping @Sendable (Bool, Bool, Bool, Bool, Bool) -> Void) {
+        let powerUIAvailable = (try? PowerUIChargeBackend()) != nil
+        // chargingControl is true if we can stop charging — either via legacy inhibit OR native CHLT (macOS 27+)
+        let chargingControl = battery.capabilities.inhibitChargeControl || battery.capabilities.nativeChargeLimitControl || powerUIAvailable
+        let adapterControl = battery.capabilities.forceDischargeControl
+        let hasMagSafe = adapter.capabilities.magSafeControl
+        let magsafeLEDControl = adapter.capabilities.magSafeControl
+        reply(chargingControl, adapterControl, hasMagSafe, magsafeLEDControl, powerUIAvailable)
     }
 
     func setSettings(settings: [String: NSObject & Sendable], reply: @escaping @Sendable (Bool, String?) -> Void) {

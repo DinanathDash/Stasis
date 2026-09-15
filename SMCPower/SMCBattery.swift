@@ -1,13 +1,23 @@
 import Foundation
 import SMCKit
+import os.log
+
+private let logger = Logger(subsystem: "com.dinanathdash.stasis", category: "SMCBattery")
 
 public enum SMCBatteryError: Error, Sendable {
     case unsupportedCapability
 }
 
 public struct BatteryCapabilities: Codable, Sendable {
+    /// CH0C or CHTE present → can inhibit charging (macOS 26 and earlier)
     public let inhibitChargeControl: Bool
+    /// CH0I or CHIE present → can force-discharge (macOS 26 and earlier)
     public let forceDischargeControl: Bool
+    /// bfF0/bfD0/bfE0 present → firmware charge limit keys
+    /// NOTE: confirmed notPrivileged on macOS 27 test hardware (Mac14,9, 26A428)
+    public let firmwareChargeControl: Bool
+    /// CHLT present → macOS 27 hardware. PowerUI availability checked separately in app layer.
+    public let nativeChargeLimitControl: Bool
 }
 
 /**
@@ -15,6 +25,13 @@ public struct BatteryCapabilities: Codable, Sendable {
  * https://github.com/AsahiLinux/linux/blob/79a307df1e18f144610742ac9ee60080c3983875/drivers/power/supply/macsmc-power.c
  * https://github.com/mhaeuser/Battery-Toolkit/blob/ed3adf103abfdad53223ce6f0a764ae7163c385b/Libraries/SMCComm%2BPower.swift
  * https://github.com/acidanthera/VirtualSMC/blob/55b89a23f51beda82581dbab795615838a3e6e56/Docs/SMCSensorKeys.txt
+ *
+ * macOS 27 reverse-engineering findings (Stasis project, 2026):
+ * - CH0C and CHTE are no longer present on Apple Silicon with macOS 27.
+ * - CHLT is the new native charge-limit key written by System Settings.
+ * - Raw SMC writes to CHLT and bfF0/bfD0/bfE0 return notPrivileged even from root.
+ * - Stasis uses PowerUISmartChargeClient (private framework, same as System Settings)
+ *   for charge limit control on macOS 27. See NativeChargeSession.swift.
  */
 public struct SMCBattery: Sendable {
     public let capabilities: BatteryCapabilities
@@ -23,16 +40,27 @@ public struct SMCBattery: Sendable {
     private let hasCHTE: Bool
     private let hasCH0I: Bool
     private let hasCHIE: Bool
+    private let hasCHLT: Bool
 
     public static func probe() throws -> SMCBattery {
         let hasCH0C = try SMCKit.shared.isKeyFound("CH0C")
         let hasCHTE = try SMCKit.shared.isKeyFound("CHTE")
         let hasCH0I = try SMCKit.shared.isKeyFound("CH0I")
         let hasCHIE = try SMCKit.shared.isKeyFound("CHIE")
+        let hasCHLT = try SMCKit.shared.isKeyFound("CHLT")
+
+        // Firmware keys: probe but expect notPrivileged on macOS 27 hardware
+        let hasFirmware = (try? SMCKit.shared.isKeyFound("bfF0")) == true
+            && (try? SMCKit.shared.isKeyFound("bfD0")) == true
+            && (try? SMCKit.shared.isKeyFound("bfE0")) == true
+
+        logger.info("SMC probe: CH0C=\(hasCH0C) CHTE=\(hasCHTE) CH0I=\(hasCH0I) CHIE=\(hasCHIE) CHLT=\(hasCHLT) firmware=\(hasFirmware)")
 
         let capabilities = BatteryCapabilities(
             inhibitChargeControl: hasCH0C || hasCHTE,
-            forceDischargeControl: hasCH0I || hasCHIE
+            forceDischargeControl: hasCH0I || hasCHIE,
+            firmwareChargeControl: hasFirmware,
+            nativeChargeLimitControl: hasCHLT
         )
 
         return SMCBattery(
@@ -40,7 +68,8 @@ public struct SMCBattery: Sendable {
             hasCH0C: hasCH0C,
             hasCHTE: hasCHTE,
             hasCH0I: hasCH0I,
-            hasCHIE: hasCHIE
+            hasCHIE: hasCHIE,
+            hasCHLT: hasCHLT
         )
     }
 
@@ -51,6 +80,9 @@ public struct SMCBattery: Sendable {
     public static func getCurrent() throws -> Double {
         try Double(SMCKit.shared.read("B0AC") as Int16) / 1000.0
     }
+
+
+    // MARK: - Legacy inhibit-charge control (macOS 26 and earlier)
 
     public func getChargingInhibited() throws -> Bool {
         guard capabilities.inhibitChargeControl else { throw SMCBatteryError.unsupportedCapability }

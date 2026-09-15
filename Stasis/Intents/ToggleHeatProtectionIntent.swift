@@ -1,6 +1,7 @@
 import AppIntents
 import Defaults
 import Foundation
+import smc_power
 
 struct ToggleHeatProtectionIntent: AppIntent {
     static let title: LocalizedStringResource = "Toggle Heat Protection"
@@ -17,9 +18,13 @@ struct ToggleHeatProtectionIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady()
+              let (batteryService, chargeManager, _, _) = await appDelegate.ensureServicesReady()
         else {
             throw CustomIntentError.stasisNotReady
+        }
+
+        if batteryService.deviceCapabilities.nativeMode {
+            throw CustomIntentError.unsupportedOnOS("Heat Protection")
         }
 
         let targetState = enable ?? !Defaults[.enableHeatProtectionMode]

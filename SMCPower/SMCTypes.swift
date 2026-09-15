@@ -37,17 +37,20 @@ public struct DeviceCapabilities: Sendable {
     public let adapterControl: Bool
     public let hasMagSafe: Bool
     public let magsafeLEDControl: Bool
+    public let nativeMode: Bool
 
     public init(
         chargingControl: Bool,
         adapterControl: Bool,
         hasMagSafe: Bool,
-        magsafeLEDControl: Bool
+        magsafeLEDControl: Bool,
+        nativeMode: Bool = false
     ) {
         self.chargingControl = chargingControl
         self.adapterControl = adapterControl
         self.hasMagSafe = hasMagSafe
         self.magsafeLEDControl = magsafeLEDControl
+        self.nativeMode = nativeMode
     }
 
     public static func from(

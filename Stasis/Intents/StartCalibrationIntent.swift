@@ -1,5 +1,6 @@
 import AppIntents
 import Foundation
+import smc_power
 
 struct StartCalibrationIntent: AppIntent {
     static let title: LocalizedStringResource = "Start Battery Calibration"
@@ -9,9 +10,13 @@ struct StartCalibrationIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         guard let appDelegate = AppDelegate.shared,
-              let (_, _, _, calibrationManager) = await appDelegate.ensureServicesReady()
+              let (batteryService, _, _, calibrationManager) = await appDelegate.ensureServicesReady()
         else {
             throw CustomIntentError.stasisNotReady
+        }
+
+        if batteryService.deviceCapabilities.nativeMode {
+            throw CustomIntentError.unsupportedOnOS("Battery Calibration")
         }
 
         calibrationManager.startCalibration()

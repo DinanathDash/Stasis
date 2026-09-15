@@ -2,6 +2,9 @@ import AppKit
 import Defaults
 import Foundation
 import Observation
+import os.log
+import smc_power
+import SwiftUI
 
 @MainActor
 @Observable
@@ -10,6 +13,7 @@ class MenuViewModel {
     private let chargeManager: ChargeManager
     let significantEnergyService: SignificantEnergyService
     private let bootTimestamp: Date?
+    private var targetTimeEstimator = TargetTimeEstimator()
 
     var significantApps: [SignificantEnergyApp] {
         significantEnergyService.apps
@@ -62,6 +66,10 @@ class MenuViewModel {
 
     var daemonError: String? {
         chargeManager.daemonError
+    }
+
+    var nativeMode: Bool {
+        batteryService.deviceCapabilities.nativeMode
     }
 
     var manageChargingEnabled: Bool {
@@ -226,16 +234,24 @@ class MenuViewModel {
             adapterCapacityWatts: adapter.adapterCapacityWatts
         )
 
-        timeRemainingText = formatTimeRemaining(
-            reportedMinutes: safeMetrics.timeRemaining,
-            currentCapacity: safeMetrics.currentCapacity,
-            maxCapacity: safeMetrics.maxCapacity,
-            batteryCurrent: safeMetrics.batteryCurrent,
-            powerSource: derivedPowerSource,
-            isCharging: safeMetrics.isCharging,
-            adapterConnected: safeMetrics.externalConnected,
-            batteryPercentage: percentage
-        )
+        if Defaults[.manageCharging] {
+            let target = chargeManager.chargeLimitOverrideActive ? 100 : Defaults[.chargeLimit]
+            timeRemainingText = targetTimeEstimator.update(
+                safeMetrics, target: target, now: ProcessInfo.processInfo.systemUptime
+            ).text
+        } else {
+            targetTimeEstimator.reset()
+            timeRemainingText = formatTimeRemaining(
+                reportedMinutes: safeMetrics.timeRemaining,
+                currentCapacity: safeMetrics.currentCapacity,
+                maxCapacity: safeMetrics.maxCapacity,
+                batteryCurrent: safeMetrics.batteryCurrent,
+                powerSource: derivedPowerSource,
+                isCharging: safeMetrics.isCharging,
+                adapterConnected: safeMetrics.externalConnected,
+                batteryPercentage: percentage
+            )
+        }
 
         updateUptimeText()
 

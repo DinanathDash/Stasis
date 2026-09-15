@@ -138,14 +138,17 @@ class IOKitService {
                 getTimeRemaining(powerInfo: powerInfo) ?? -1
         }
 
-        let capacities = getBatteryCapacities()
-        batteryMetrics.currentCapacity = capacities.current
-        batteryMetrics.maxCapacity = capacities.max
-        // Raw health (max capacity vs design)
-        batteryMetrics.rawBatteryHealth =
-            capacities.design > 0
-                ? (capacities.max * 100) / capacities.design
-                : 100
+        var properties = [String: Any]()
+        var propertiesCF: Unmanaged<CFMutableDictionary>?
+        if IORegistryEntryCreateCFProperties(batteryService, &propertiesCF, kCFAllocatorDefault, 0) == kIOReturnSuccess,
+           let dict = propertiesCF?.takeRetainedValue() as? [String: Any] {
+            properties = dict
+        }
+
+        let capacities = BatteryReading.capacities(from: properties)
+        batteryMetrics.currentCapacity = capacities.current ?? 0
+        batteryMetrics.maxCapacity = capacities.maximum ?? 0
+        batteryMetrics.rawBatteryHealth = BatteryReading.estimatedHealth(from: properties) ?? 100
         // Calibrated health (cached from system_profiler)
         batteryMetrics.calibratedBatteryHealth = calibratedHealthCache
 

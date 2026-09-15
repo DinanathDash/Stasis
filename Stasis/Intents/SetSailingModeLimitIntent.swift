@@ -1,6 +1,7 @@
 import AppIntents
 import Defaults
 import Foundation
+import smc_power
 
 struct SetSailingModeLimitIntent: AppIntent {
     static let title: LocalizedStringResource = "Set Sailing Mode Drop Range"
@@ -17,12 +18,21 @@ struct SetSailingModeLimitIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady()
+              let (batteryService, chargeManager, _, _) = await appDelegate.ensureServicesReady()
         else {
             throw CustomIntentError.stasisNotReady
         }
 
-        let clampedDrop = min(max(dropPercentage, 1), 20)
+        var clampedDrop = min(max(dropPercentage, 1), 20)
+        if batteryService.deviceCapabilities.nativeMode {
+            let chargeLimit = Defaults[.chargeLimit]
+            if chargeLimit <= 80 {
+                throw CustomIntentError.unsupportedOnOS("Sailing Mode with a Charge Limit of \(chargeLimit)%")
+            }
+            let maxDrop = chargeLimit - 80
+            clampedDrop = min(max(dropPercentage, 5), maxDrop)
+        }
+
         Defaults[.sailingModeLimit] = clampedDrop
         Defaults[.manageCharging] = true
         chargeManager.forceSyncSettings()

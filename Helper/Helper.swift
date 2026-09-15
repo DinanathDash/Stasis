@@ -50,26 +50,36 @@ final class Helper: NSObject, HelperProtocol {
         }
     }
 
-    func getCapabilities(reply: @escaping @Sendable (Bool, Bool, Bool, Bool) -> Void) {
+    func getCapabilities(reply: @escaping @Sendable (Bool, Bool, Bool, Bool, Bool) -> Void) {
         do {
             let battery = try SMCBattery.probe()
             let adapter = try SMCAdapter.probe()
-            let capabilities = DeviceCapabilities.from(
-                battery: battery.capabilities,
-                adapter: adapter.capabilities
-            )
+
+            // macOS 27: check if PowerUI framework is available (no root needed)
+            let powerUIAvailable = (try? PowerUIChargeBackend()) != nil
+
+            // chargingControl = true if we can stop/control charging via ANY mechanism:
+            // - Legacy macOS 26: inhibitChargeControl (CH0C/CHTE)
+            // - macOS 27 (CHLT present): PowerUISmartChargeClient
+            let chargingControl = battery.capabilities.inhibitChargeControl
+                || battery.capabilities.nativeChargeLimitControl
+                || powerUIAvailable
+
+            let adapterControl = battery.capabilities.forceDischargeControl
+
             logger.info(
-                "Probed capabilities (charging=\(capabilities.chargingControl), adapter=\(capabilities.adapterControl), magSafe=\(capabilities.hasMagSafe))"
+                "Probed capabilities: chargingControl=\(chargingControl) [inhibit=\(battery.capabilities.inhibitChargeControl), chlt=\(battery.capabilities.nativeChargeLimitControl), powerUI=\(powerUIAvailable)] adapterControl=\(adapterControl) magSafe=\(adapter.capabilities.magSafeControl)"
             )
             reply(
-                capabilities.chargingControl,
-                capabilities.adapterControl,
-                capabilities.hasMagSafe,
-                capabilities.magsafeLEDControl
+                chargingControl,
+                adapterControl,
+                adapter.capabilities.magSafeControl,
+                adapter.capabilities.magSafeControl,
+                powerUIAvailable
             )
         } catch {
             logger.error("Failed to probe capabilities: \(error.localizedDescription)")
-            reply(false, false, false, false)
+            reply(false, false, false, false, false)
         }
     }
 }
