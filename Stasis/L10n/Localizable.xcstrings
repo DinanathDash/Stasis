@@ -108,6 +108,119 @@
         }
       }
     },
+    "%@ is not supported on this macOS version.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wird auf dieser macOS-Version nicht unterstützt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is not supported on this macOS version."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no es compatible con esta versión de macOS."
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no es compatible con esta versión de macOS."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ n'est pas pris en charge sur cette version de macOS."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ non è supportato in questa versione di macOS."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@はこのmacOSバージョンではサポートされていません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@은(는) 이 macOS 버전에서 지원되지 않습니다."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ wordt niet ondersteund op deze macOS-versie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não é suportado nesta versão do macOS."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não é suportado nesta versão do macOS."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ не поддерживается в этой версии macOS."
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nie je podporované v tejto verzii systému macOS."
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ni podprto v tej različici sistema macOS."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ bu macOS sürümünde desteklenmiyor."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ không được hỗ trợ trên phiên bản macOS này."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@在此macOS版本上不受支持。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@在此macOS版本上不受支援。"
+          }
+        }
+      }
+    },
     "%lld": {
       "localizations": {
         "de": {
@@ -23646,6 +23759,119 @@
         }
       }
     },
+    "Manual charging controls are not supported on this macOS version.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuelle Ladesteuerungen werden auf dieser macOS-Version nicht unterstützt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual charging controls are not supported on this macOS version."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los controles de carga manuales no son compatibles con esta versión de macOS."
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los controles de carga manuales no son compatibles con esta versión de macOS."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les contrôles de charge manuels ne sont pas pris en charge sur cette version de macOS."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I controlli di ricarica manuali non sono supportati in questa versione di macOS."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手動充電制御はこのmacOSバージョンではサポートされていません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 macOS 버전에서는 수동 충전 제어가 지원되지 않습니다."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handmatige oplaadbediening wordt niet ondersteund op deze macOS-versie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os controles de carregamento manuais não são suportados nesta versão do macOS."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os controles de carregamento manuais não são suportados nesta versão do macOS."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ручное управление зарядкой не поддерживается в этой версии macOS."
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuálne ovládanie nabíjania nie je podporované v tejto verzii systému macOS."
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ročni nadzor polnjenja ni podprt v tej različici sistema macOS."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuel şarj kontrolleri bu macOS sürümünde desteklenmiyor."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các điều khiển sạc thủ công không được hỗ trợ trên phiên bản macOS này."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此macOS版本不支持手动充电控制。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此macOS版本不支援手動充電控制。"
+          }
+        }
+      }
+    },
     "Menu Bar Icon": {
       "localizations": {
         "de": {
@@ -32054,6 +32280,119 @@
           "stringUnit": {
             "state": "translated",
             "value": "巡航模式已啟用。"
+          }
+        }
+      }
+    },
+    "Sailing Mode with a Charge Limit of %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sailing-Modus mit einem Ladelimit von %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sailing Mode with a Charge Limit of %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modo navegación con un límite de carga del %@"
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modo navegación con un límite de carga del %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mode croisière avec une limite de charge de %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modalità navigazione con un limite di ricarica del %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充電上限%@のセーリングモード"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "충전 제한이 %@인 세일링 모드"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sailing-modus met een oplaadlimiet van %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modo de navegação com um limite de carga de %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modo de navegação com um limite de carga de %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Режим плавания с лимитом заряда %@"
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Režim plachtenia s limitom nabitia %@"
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Način jadranja z omejitvijo napolnjenosti %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ şarj limitli yelken modu"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chế độ di chuyển với giới hạn sạc là %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充电上限为%@的巡航模式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充電上限為%@的巡航模式"
           }
         }
       }

@@ -4,6 +4,7 @@ import IOKit.ps
 import IOKit.pwr_mgt
 import notify
 import os.log
+import smc_power
 
 @MainActor
 enum ChargingPowerEvents {
@@ -129,33 +130,56 @@ enum ChargingPowerEvents {
            temp > Double(ChargingSettings.heatProtectionLimit)
         {
             ChargingPowerState.heatProtectionActive = true
-            logger.info("Heat protection engaged (Temp: \(temp)C). Disabling charging and running on AC.")
-            _ = ChargingPowerState.enablePowerAdapter(force: force)
-            return ChargingPowerState.disableCharging(force: force)
-        }
+            logger.info("Heat protection engaged (Temp: \(temp)°C)")
 
+            if ChargingPowerState.nativeMode {
+                // macOS 27: clamp PowerUI limit to current percent so firmware stops now
+                ChargingPowerState.applyNativeLimit(Int(percent))
+                _ = ChargingPowerState.enablePowerAdapter(force: force)
+                return ChargingPowerState.disableCharging(force: force)
+            } else {
+                // Legacy macOS 26: SMC inhibit
+                _ = ChargingPowerState.enablePowerAdapter(force: force)
+                return ChargingPowerState.disableCharging(force: force)
+            }
+        }
         ChargingPowerState.heatProtectionActive = false
 
+        // Force Discharge
         if chargingMode == .forceDischarge {
             _ = ChargingPowerState.disableCharging(force: force)
             return ChargingPowerState.disablePowerAdapter(force: force)
         }
 
+        // Charging Management Off
         if !ChargingSettings.manageCharging {
+            if ChargingPowerState.nativeMode {
+                ChargingPowerState.applyNativeLimit(100)
+            }
             _ = ChargingPowerState.enablePowerAdapter(force: force)
             return ChargingPowerState.enableCharging(force: force)
         }
 
+        // Disconnected
         let limit = ChargingSettings.chargeLimit
         let isUnlimited = IOKitHelper.isDrawingUnlimitedPower()
 
         if !isUnlimited {
-            // When disconnected, reset to standard so that next plug-in resumes normal limits
             chargingMode = .standard
             return ChargingPowerState.disableCharging(force: force)
         }
 
-        // Hysteresis logic
+        // macOS 27 PowerUI path
+        if ChargingPowerState.nativeMode {
+            return evaluateStateNative(percent: percent, limit: limit, force: force)
+        }
+
+        // Legacy macOS 26 (inhibit-based — UNTOUCHED)
+        let sailingActive = ChargingSettings.sailingMode && chargingMode == .standard
+        let sailingThreshold: UInt8 = sailingActive
+            ? (limit >= ChargingSettings.sailingModeLimit ? limit - ChargingSettings.sailingModeLimit : 0)
+            : 0
+
         if percent >= limit {
             if chargingMode == .toFull, percent < 100 {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
@@ -170,15 +194,62 @@ enum ChargingPowerEvents {
             }
         } else {
             _ = ChargingPowerState.enablePowerAdapter(force: force)
-
-            if ChargingSettings.sailingMode, chargingMode == .standard {
-                let sailingThreshold = limit >= ChargingSettings.sailingModeLimit ? limit - ChargingSettings.sailingModeLimit : 0
-                if percent >= sailingThreshold, ChargingPowerState.isChargingDisabled() {
-                    // Stay disabled in sailing mode range
+            if sailingActive, percent >= sailingThreshold {
+                if ChargingPowerState.isChargingDisabled() {
                     ChargingPowerState.syncMagSafeState(percent: percent)
                     return (true, nil)
                 }
+                return ChargingPowerState.disableCharging(force: force)
             }
+            return ChargingPowerState.enableCharging(force: force)
+        }
+    }
+
+    // MARK: - macOS 27 PowerUI evaluation
+
+    private static func powerUISailingThreshold(limit: UInt8, session: NativeChargeSession) -> Int? {
+        guard ChargingSettings.sailingMode else { return nil }
+        let raw = Int(limit) - Int(ChargingSettings.sailingModeLimit)
+        guard let threshold = session.nearestLimit(atOrBelow: raw), threshold >= 80,
+              threshold < Int(limit) else { return nil }
+        return threshold
+    }
+
+    @discardableResult
+    private static func evaluateStateNative(percent: UInt8, limit: UInt8, force: Bool) -> (Bool, String?) {
+        guard let session = ChargingPowerState.nativeSession else {
+            return (false, "nativeSession unexpectedly nil")
+        }
+
+        let sailingThreshold = powerUISailingThreshold(limit: limit, session: session)
+
+        if percent >= limit {
+            if chargingMode == .toFull, percent < 100 {
+                ChargingPowerState.applyNativeLimit(100)
+                _ = ChargingPowerState.enablePowerAdapter(force: force)
+                return ChargingPowerState.enableCharging(force: force)
+            } else {
+                ChargingPowerState.applyNativeLimit(Int(limit))
+                if ChargingSettings.automaticDischarge, percent > limit {
+                    _ = ChargingPowerState.disablePowerAdapter(force: force)
+                } else {
+                    _ = ChargingPowerState.enablePowerAdapter(force: force)
+                }
+                return ChargingPowerState.disableCharging(force: force)
+            }
+        } else if let threshold = sailingThreshold, Int(percent) >= threshold {
+            // Sailing zone: lower PowerUI limit to threshold — firmware stops here
+            ChargingPowerState.applyNativeLimit(threshold)
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
+            if ChargingPowerState.isChargingDisabled() {
+                ChargingPowerState.syncMagSafeState(percent: percent)
+                return (true, nil)
+            }
+            return ChargingPowerState.disableCharging(force: force)
+        } else {
+            // Below threshold (or sailing off): charge to limit
+            ChargingPowerState.applyNativeLimit(Int(limit))
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
             return ChargingPowerState.enableCharging(force: force)
         }
     }

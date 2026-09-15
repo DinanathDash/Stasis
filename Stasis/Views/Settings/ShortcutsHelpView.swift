@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import smc_power
 
 struct ShortcutItem: Identifiable {
     let id = UUID()
@@ -10,88 +11,98 @@ struct ShortcutItem: Identifiable {
 }
 
 struct ShortcutsHelpView: View {
+    let capabilities: DeviceCapabilities
     @State private var copiedURL: String? = nil
 
-    private let shortcuts: [ShortcutItem] = [
-        ShortcutItem(
-            title: "Open Dashboard",
-            description: "Open the main Stasis dashboard and settings window.",
-            urlString: "stasis://dashboard",
-            exampleCLI: "open \"stasis://dashboard\""
-        ),
-        ShortcutItem(
-            title: "Open Menu Bar Dialog",
-            description: "Open the Stasis menu bar dropdown dialog from anywhere.",
-            urlString: "stasis://menu",
-            exampleCLI: "open \"stasis://menu\""
-        ),
-        ShortcutItem(
-            title: "Get Battery Status",
-            description: "Show a banner notification with percentage, charging mode, wattage, health, and temperature.",
-            urlString: "stasis://status",
-            exampleCLI: "open \"stasis://status\""
-        ),
-        ShortcutItem(
-            title: "Set Charge Limit",
-            description: "Set the maximum battery charging limit (50 to 100 percent).",
-            urlString: "stasis://charge-limit?value=80",
-            exampleCLI: "open \"stasis://charge-limit?value=80\""
-        ),
-        ShortcutItem(
-            title: "Toggle Top-Up to 100 percent",
-            description: "Temporarily override the limit and charge to 100 percent (or cancel Top-Up).",
-            urlString: "stasis://topup?enable=true",
-            exampleCLI: "open \"stasis://topup?enable=true\""
-        ),
-        ShortcutItem(
-            title: "Toggle Sailing Mode",
-            description: "Enable or disable Sailing Mode (allow battery to discharge naturally before recharging).",
-            urlString: "stasis://sailing?enable=true",
-            exampleCLI: "open \"stasis://sailing?enable=true\""
-        ),
-        ShortcutItem(
-            title: "Set Sailing Mode Range",
-            description: "Set the Sailing Mode drop percentage below the charge limit (5 to 20 percent).",
-            urlString: "stasis://sailing-limit?value=5",
-            exampleCLI: "open \"stasis://sailing-limit?value=5\""
-        ),
-        ShortcutItem(
-            title: "Toggle Force Discharge",
-            description: "Enable or disable force discharging the battery while plugged into AC power.",
-            urlString: "stasis://force-discharge?enable=true",
-            exampleCLI: "open \"stasis://force-discharge?enable=true\""
-        ),
-        ShortcutItem(
-            title: "Start Battery Calibration",
-            description: "Start a full battery calibration cycle in Stasis.",
-            urlString: "stasis://calibrate?action=start",
-            exampleCLI: "open \"stasis://calibrate?action=start\""
-        ),
-        ShortcutItem(
-            title: "Cancel Battery Calibration",
-            description: "Cancel an ongoing battery calibration cycle.",
-            urlString: "stasis://calibrate?action=cancel",
-            exampleCLI: "open \"stasis://calibrate?action=cancel\""
-        ),
-        ShortcutItem(
-            title: "Toggle Heat Protection",
-            description: "Enable or disable Heat Protection Mode.",
-            urlString: "stasis://heat-protection?enable=true",
-            exampleCLI: "open \"stasis://heat-protection?enable=true\""
-        ),
-        ShortcutItem(
-            title: "Set Heat Protection Threshold",
-            description: "Set the temperature threshold for Heat Protection Mode (30°C to 50°C).",
-            urlString: "stasis://heat-protection-limit?value=35",
-            exampleCLI: "open \"stasis://heat-protection-limit?value=35\""
-        ),
-        ShortcutItem(
-            title: "Toggle MagSafe LED Control",
-            description: "Enable or disable custom MagSafe LED color indication.",
-            urlString: "stasis://magsafe-led?enable=true",
-            exampleCLI: "open \"stasis://magsafe-led?enable=true\""
-        ),
-    ]
+    private var shortcuts: [ShortcutItem] {
+        var items: [ShortcutItem] = [
+            ShortcutItem(
+                title: "Open Dashboard",
+                description: "Open the main Stasis dashboard and settings window.",
+                urlString: "stasis://dashboard",
+                exampleCLI: "open \"stasis://dashboard\""
+            ),
+            ShortcutItem(
+                title: "Open Menu Bar Dialog",
+                description: "Open the Stasis menu bar dropdown dialog from anywhere.",
+                urlString: "stasis://menu",
+                exampleCLI: "open \"stasis://menu\""
+            ),
+            ShortcutItem(
+                title: "Get Battery Status",
+                description: "Show a banner notification with percentage, charging mode, wattage, health, and temperature.",
+                urlString: "stasis://status",
+                exampleCLI: "open \"stasis://status\""
+            ),
+            ShortcutItem(
+                title: "Set Charge Limit",
+                description: "Set the maximum battery charging limit (50 to 100 percent).",
+                urlString: "stasis://charge-limit?value=80",
+                exampleCLI: "open \"stasis://charge-limit?value=80\""
+            ),
+            ShortcutItem(
+                title: "Toggle Sailing Mode",
+                description: "Enable or disable Sailing Mode (allow battery to discharge naturally before recharging).",
+                urlString: "stasis://sailing?enable=true",
+                exampleCLI: "open \"stasis://sailing?enable=true\""
+            ),
+            ShortcutItem(
+                title: "Set Sailing Mode Range",
+                description: "Set the Sailing Mode drop percentage below the charge limit (5 to 20 percent).",
+                urlString: "stasis://sailing-limit?value=5",
+                exampleCLI: "open \"stasis://sailing-limit?value=5\""
+            ),
+            ShortcutItem(
+                title: "Toggle MagSafe LED Control",
+                description: "Enable or disable custom MagSafe LED color indication.",
+                urlString: "stasis://magsafe-led?enable=true",
+                exampleCLI: "open \"stasis://magsafe-led?enable=true\""
+            )
+        ]
+
+        if !capabilities.nativeMode {
+            items.append(contentsOf: [
+                ShortcutItem(
+                    title: "Toggle Top-Up to 100 percent",
+                    description: "Temporarily override the limit and charge to 100 percent (or cancel Top-Up).",
+                    urlString: "stasis://topup?enable=true",
+                    exampleCLI: "open \"stasis://topup?enable=true\""
+                ),
+                ShortcutItem(
+                    title: "Toggle Force Discharge",
+                    description: "Enable or disable force discharging the battery while plugged into AC power.",
+                    urlString: "stasis://force-discharge?enable=true",
+                    exampleCLI: "open \"stasis://force-discharge?enable=true\""
+                ),
+                ShortcutItem(
+                    title: "Start Battery Calibration",
+                    description: "Start a full battery calibration cycle in Stasis.",
+                    urlString: "stasis://calibrate?action=start",
+                    exampleCLI: "open \"stasis://calibrate?action=start\""
+                ),
+                ShortcutItem(
+                    title: "Cancel Battery Calibration",
+                    description: "Cancel an ongoing battery calibration cycle.",
+                    urlString: "stasis://calibrate?action=cancel",
+                    exampleCLI: "open \"stasis://calibrate?action=cancel\""
+                ),
+                ShortcutItem(
+                    title: "Toggle Heat Protection",
+                    description: "Enable or disable Heat Protection Mode.",
+                    urlString: "stasis://heat-protection?enable=true",
+                    exampleCLI: "open \"stasis://heat-protection?enable=true\""
+                ),
+                ShortcutItem(
+                    title: "Set Heat Protection Threshold",
+                    description: "Set the temperature threshold for Heat Protection Mode (30°C to 50°C).",
+                    urlString: "stasis://heat-protection-limit?value=35",
+                    exampleCLI: "open \"stasis://heat-protection-limit?value=35\""
+                )
+            ])
+        }
+
+        return items
+    }
 
     var body: some View {
         ScrollView {

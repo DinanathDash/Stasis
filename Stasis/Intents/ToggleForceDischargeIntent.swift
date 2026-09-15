@@ -1,6 +1,7 @@
 import AppIntents
 import Defaults
 import Foundation
+import smc_power
 
 struct ToggleForceDischargeIntent: AppIntent {
     static let title: LocalizedStringResource = "Toggle Force Discharge"
@@ -17,9 +18,13 @@ struct ToggleForceDischargeIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady()
+              let (batteryService, chargeManager, _, _) = await appDelegate.ensureServicesReady()
         else {
             throw CustomIntentError.stasisNotReady
+        }
+
+        if batteryService.deviceCapabilities.nativeMode {
+            throw CustomIntentError.unsupportedOnOS("Force Discharge")
         }
 
         let targetState = enable ?? !chargeManager.forceDischargeActive

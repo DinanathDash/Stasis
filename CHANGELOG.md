@@ -6,7 +6,16 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
-- No unreleased changes yet.
+macOS 27 compatibility updates and strict concurrency improvements.
+
+### Features & Core Capabilities
+
+- **macOS 27 Compatibility:** Added explicit detection for macOS 27. Due to OS-level restrictions where Apple has locked down SMC keys that prevent forcing battery discharge below 80%, manual charging controls (Top Up, Charge Override, Force Discharge, and Sailing Mode) are now gracefully disabled and hidden on macOS 27 to prevent erratic charging behavior. The core charge limits remain fully functional.
+
+### Bug Fixes & Refinements
+
+- **Swift 6 Concurrency:** Resolved `#ConformanceIsolation` build errors affecting SwiftUI Shapes (e.g., `NotchShape`) on Xcode 16 by correctly isolating the struct to `@MainActor` and marking protocol requirements as `nonisolated`.
+- **Localization Formatting:** Standardized localization formats across 17 languages to correctly parse `%@` strings provided by `PercentageFormatter`, fixing compiler warnings and runtime string mismatch errors.
 
 ---
 

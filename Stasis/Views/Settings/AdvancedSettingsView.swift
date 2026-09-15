@@ -1,7 +1,9 @@
 import Defaults
 import SwiftUI
+import smc_power
 
 struct AdvancedSettingsView: View {
+    let capabilities: DeviceCapabilities
     @Default(.useHardwarePercentage) var useHardwarePercentage
     @Default(.useRawHardwareHealth) var useRawHardwareHealth
     @Default(.showAdvancedChargingControls) var showAdvancedChargingControls
@@ -27,6 +29,13 @@ struct AdvancedSettingsView: View {
 
             Section("Menu Controls") {
                 Toggle("Show manual charging controls", isOn: $showAdvancedChargingControls)
+                    .disabled(capabilities.nativeMode)
+                
+                if capabilities.nativeMode {
+                    Text("Manual charging controls are not supported on this macOS version.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .formStyle(.grouped)
@@ -37,5 +46,13 @@ struct AdvancedSettingsView: View {
 }
 
 #Preview {
-    AdvancedSettingsView()
+    AdvancedSettingsView(
+        capabilities: DeviceCapabilities(
+            chargingControl: true,
+            adapterControl: true,
+            hasMagSafe: true,
+            magsafeLEDControl: true,
+            nativeMode: false
+        )
+    )
 }

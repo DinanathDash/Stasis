@@ -58,7 +58,10 @@ struct ChargingSettingsView: View {
     }
 
     private var sailingResumePercentage: Int {
-        chargeLimit - sailingModeLimit
+        if capabilities.nativeMode && chargeLimit <= 85 {
+            return chargeLimit - 5
+        }
+        return chargeLimit - sailingModeLimit
     }
 
     var body: some View {
@@ -102,7 +105,7 @@ struct ChargingSettingsView: View {
                                     get: { Double(chargeLimit) },
                                     set: { chargeLimit = Int($0) }
                                 ),
-                                in: 50 ... 100,
+                                in: (capabilities.nativeMode ? 80.0 : 50.0) ... 100.0,
                                 step: 5
                             )
                             Text(chargeLimit.formattedPercentage)
@@ -172,94 +175,121 @@ struct ChargingSettingsView: View {
                     }
                 }
 
-                Section {
-                    Toggle("Enable sailing mode", isOn: $sailingMode)
-                        .disabled(!hasChargingControl)
-
-                    if sailingMode {
-                        LabeledContent {
-                            HStack(spacing: 8) {
-                                Slider(
-                                    value: Binding(
-                                        get: { Double(sailingModeLimit) },
-                                        set: { sailingModeLimit = Int($0) }
-                                    ),
-                                    in: 1 ... 20,
-                                    step: 1
-                                )
-                                Text(sailingModeLimit.formattedPercentage)
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
-                                    .frame(width: 40, alignment: .trailing)
-                            }
-                        } label: {
-                            Text("Threshold below limit")
-                        }
-
-                        LabeledContent("Charging resumes at") {
-                            Text(sailingResumePercentage.formattedPercentage)
-                                .monospacedDigit()
+                if capabilities.nativeMode && chargeLimit <= 80 {
+                    Section {
+                        Text("Sailing mode requires a charge limit above 80% on this device.")
+                            .foregroundStyle(.secondary)
+                    } header: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Sailing Mode")
+                            Text("Automatically resume charging when the battery drops below the threshold relative to your charge limit.")
+                                .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
                     }
-                } header: {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Sailing Mode")
-                        Text(
-                            "Automatically resume charging when the battery drops below the threshold relative to your charge limit."
-                        )
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    }
-                } footer: {
-                    if !hasChargingControl {
-                        Text(
-                            "Charging control is not supported on this device."
-                        )
+                } else {
+                    Section {
+                        Toggle("Enable sailing mode", isOn: $sailingMode)
+                            .disabled(!hasChargingControl)
+
+                        if sailingMode {
+                            LabeledContent {
+                                HStack(spacing: 8) {
+                                    if capabilities.nativeMode && chargeLimit <= 85 {
+                                        Text("5%")
+                                            .monospacedDigit()
+                                            .foregroundStyle(.secondary)
+                                            .frame(width: 40, alignment: .trailing)
+                                    } else {
+                                        Slider(
+                                            value: Binding(
+                                                get: {
+                                                    let lower = capabilities.nativeMode ? 5.0 : 1.0
+                                                    let upper = capabilities.nativeMode ? Double(chargeLimit - 80) : 20.0
+                                                    return min(max(Double(sailingModeLimit), lower), upper)
+                                                },
+                                                set: { sailingModeLimit = Int($0) }
+                                            ),
+                                            in: (capabilities.nativeMode ? 5.0 : 1.0) ... (capabilities.nativeMode ? Double(chargeLimit - 80) : 20.0),
+                                            step: capabilities.nativeMode ? 5.0 : 1.0
+                                        )
+                                        Text(sailingModeLimit.formattedPercentage)
+                                            .monospacedDigit()
+                                            .foregroundStyle(.secondary)
+                                            .frame(width: 40, alignment: .trailing)
+                                    }
+                                }
+                            } label: {
+                                Text("Threshold below limit")
+                            }
+
+                            LabeledContent("Charging resumes at") {
+                                Text(sailingResumePercentage.formattedPercentage)
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    } header: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Sailing Mode")
+                            Text(
+                                "Automatically resume charging when the battery drops below the threshold relative to your charge limit."
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        }
+                    } footer: {
+                        if !hasChargingControl {
+                            Text(
+                                "Charging control is not supported on this device."
+                            )
+                        }
                     }
                 }
 
-                Section {
-                    Toggle(
-                        "Enable heat protection",
-                        isOn: $enableHeatProtectionMode
-                    )
-                    .disabled(!hasChargingControl)
+                if !capabilities.nativeMode {
+                    Section {
+                        Toggle(
+                            "Enable heat protection",
+                            isOn: $enableHeatProtectionMode
+                        )
+                        .disabled(!hasChargingControl)
 
-                    if enableHeatProtectionMode {
-                        LabeledContent {
-                            HStack(spacing: 8) {
-                                Slider(
-                                    value: Binding(
-                                        get: { Double(heatProtectionLimit) },
-                                        set: { heatProtectionLimit = Int($0) }
-                                    ),
-                                    in: 30 ... 50,
-                                    step: 1
-                                )
-                                Text("\(heatProtectionLimit)°C")
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
-                                    .frame(width: 40, alignment: .trailing)
+                        if enableHeatProtectionMode {
+                            LabeledContent {
+                                HStack(spacing: 8) {
+                                    Slider(
+                                        value: Binding(
+                                            get: { Double(heatProtectionLimit) },
+                                            set: { heatProtectionLimit = Int($0) }
+                                        ),
+                                        in: 30 ... 50,
+                                        step: 1
+                                    )
+                                    Text("\(heatProtectionLimit)°C")
+                                        .monospacedDigit()
+                                        .foregroundStyle(.secondary)
+                                        .frame(width: 40, alignment: .trailing)
+                                }
+                            } label: {
+                                Text("Temperature limit")
                             }
-                        } label: {
-                            Text("Temperature limit")
                         }
-                    }
-                } header: {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Heat Protection")
-                        Text(
-                            "Pause charging when the battery temperature exceeds the threshold."
-                        )
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    }
-                } footer: {
-                    if !hasChargingControl {
-                        Text(
-                            "Charging control is not supported on this device."
-                        )
+                    } header: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Heat Protection")
+                            Text(
+                                "Pause charging when the battery temperature exceeds the threshold."
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        }
+                    } footer: {
+                        if !hasChargingControl {
+                            Text(
+                                "Charging control is not supported on this device."
+                            )
+                        }
                     }
                 }
 
@@ -329,74 +359,76 @@ struct ChargingSettingsView: View {
                     }
                 }
 
-                Section {
-                    Toggle("Enable automatic calibration", isOn: $enableAutomaticCalibration)
-                        .disabled(!hasAnyControl)
+                if !capabilities.nativeMode {
+                    Section {
+                        Toggle("Enable automatic calibration", isOn: $enableAutomaticCalibration)
+                            .disabled(!hasAnyControl)
 
-                    if enableAutomaticCalibration {
-                        Picker("Interval", selection: Binding(
-                            get: { self.calibrationIntervalDays },
-                            set: { self.calibrationIntervalDays = $0 }
-                        )) {
-                            Text("Every 7 days").tag(7)
-                            Text("Every 14 days").tag(14)
-                            Text("Every 30 days").tag(30)
-                            Text("Every 60 days").tag(60)
-                        }
-
-                        DatePicker("Time of Day", selection: Binding(
-                            get: { self.calibrationTimeOfDay },
-                            set: { self.calibrationTimeOfDay = $0 }
-                        ), displayedComponents: .hourAndMinute)
-                    }
-
-                    LabeledContent("Status") {
-                        switch calibrationStatus {
-                        case .idle:
-                            if let last = lastCalibrationDate {
-                                Text("Last calibrated on \(last.formatted(date: .abbreviated, time: .shortened))")
-                                    .foregroundStyle(.secondary)
-                            } else {
-                                Text("Never calibrated")
-                                    .foregroundStyle(.secondary)
+                        if enableAutomaticCalibration {
+                            Picker("Interval", selection: Binding(
+                                get: { self.calibrationIntervalDays },
+                                set: { self.calibrationIntervalDays = $0 }
+                            )) {
+                                Text("Every 7 days").tag(7)
+                                Text("Every 14 days").tag(14)
+                                Text("Every 30 days").tag(30)
+                                Text("Every 60 days").tag(60)
                             }
-                        case .discharging:
-                            Text("Discharging to \(15.formattedPercentage)...")
-                                .foregroundStyle(.orange)
-                        case .charging:
-                            Text("Charging to \(100.formattedPercentage)...")
-                                .foregroundStyle(.blue)
-                        case .resting:
-                            Text("Resting at \(100.formattedPercentage)...")
-                                .foregroundStyle(.green)
-                        }
-                    }
 
-                    if calibrationStatus == .idle {
-                        Button("Start Calibration Now") {
-                            Defaults[.calibrationStatus] = .discharging
+                            DatePicker("Time of Day", selection: Binding(
+                                get: { self.calibrationTimeOfDay },
+                                set: { self.calibrationTimeOfDay = $0 }
+                            ), displayedComponents: .hourAndMinute)
                         }
-                        .disabled(!hasAnyControl)
-                    } else {
-                        Button("Cancel Calibration") {
-                            Defaults[.calibrationStatus] = .idle
+
+                        LabeledContent("Status") {
+                            switch calibrationStatus {
+                            case .idle:
+                                if let last = lastCalibrationDate {
+                                    Text("Last calibrated on \(last.formatted(date: .abbreviated, time: .shortened))")
+                                        .foregroundStyle(.secondary)
+                                } else {
+                                    Text("Never calibrated")
+                                        .foregroundStyle(.secondary)
+                                }
+                            case .discharging:
+                                Text("Discharging to \(15.formattedPercentage)...")
+                                    .foregroundStyle(.orange)
+                            case .charging:
+                                Text("Charging to \(100.formattedPercentage)...")
+                                    .foregroundStyle(.blue)
+                            case .resting:
+                                Text("Resting at \(100.formattedPercentage)...")
+                                    .foregroundStyle(.green)
+                            }
                         }
-                        .foregroundStyle(.red)
-                    }
-                } header: {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Battery Calibration")
-                        Text(
-                            "Periodically run a full discharge and recharge cycle to maintain accurate battery capacity readings."
-                        )
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    }
-                } footer: {
-                    if !hasAnyControl {
-                        Text(
-                            "Battery calibration is not supported on this device."
-                        )
+
+                        if calibrationStatus == .idle {
+                            Button("Start Calibration Now") {
+                                Defaults[.calibrationStatus] = .discharging
+                            }
+                            .disabled(!hasAnyControl)
+                        } else {
+                            Button("Cancel Calibration") {
+                                Defaults[.calibrationStatus] = .idle
+                            }
+                            .foregroundStyle(.red)
+                        }
+                    } header: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Battery Calibration")
+                            Text(
+                                "Periodically run a full discharge and recharge cycle to maintain accurate battery capacity readings."
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        }
+                    } footer: {
+                        if !hasAnyControl {
+                            Text(
+                                "Battery calibration is not supported on this device."
+                            )
+                        }
                     }
                 }
             }

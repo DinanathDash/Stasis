@@ -85,9 +85,9 @@ struct SettingsView: View {
                 case .charging:
                     ChargingSettingsView(capabilities: capabilities)
                 case .advanced:
-                    AdvancedSettingsView()
+                    AdvancedSettingsView(capabilities: capabilities)
                 case .shortcuts:
-                    ShortcutsHelpView()
+                    ShortcutsHelpView(capabilities: capabilities)
                 case .about:
                     AboutSettingsView()
                 }

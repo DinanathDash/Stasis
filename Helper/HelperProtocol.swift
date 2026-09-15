@@ -8,6 +8,6 @@ import Foundation
         reply: @escaping @Sendable (Double, Double, Double, String?) -> Void
     )
     func getCapabilities(
-        reply: @escaping @Sendable (Bool, Bool, Bool, Bool) -> Void
+        reply: @escaping @Sendable (Bool, Bool, Bool, Bool, Bool) -> Void
     )
 }

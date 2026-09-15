@@ -1,6 +1,7 @@
 import AppIntents
 import Defaults
 import Foundation
+import smc_power
 
 struct ToggleTopUpIntent: AppIntent {
     static let title: LocalizedStringResource = "Toggle Top-Up to 100 percent"
@@ -17,9 +18,13 @@ struct ToggleTopUpIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady()
+              let (batteryService, chargeManager, _, _) = await appDelegate.ensureServicesReady()
         else {
             throw CustomIntentError.stasisNotReady
+        }
+
+        if batteryService.deviceCapabilities.nativeMode {
+            throw CustomIntentError.unsupportedOnOS("Charge Limit Override")
         }
 
         let targetState = enable ?? !chargeManager.chargeLimitOverrideActive

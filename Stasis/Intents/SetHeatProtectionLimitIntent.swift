@@ -1,6 +1,7 @@
 import AppIntents
 import Defaults
 import Foundation
+import smc_power
 
 struct SetHeatProtectionLimitIntent: AppIntent {
     static let title: LocalizedStringResource = "Set Heat Protection Temperature"
@@ -17,9 +18,13 @@ struct SetHeatProtectionLimitIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         guard let appDelegate = AppDelegate.shared,
-              let (_, chargeManager, _, _) = await appDelegate.ensureServicesReady()
+              let (batteryService, chargeManager, _, _) = await appDelegate.ensureServicesReady()
         else {
             throw CustomIntentError.stasisNotReady
+        }
+
+        if batteryService.deviceCapabilities.nativeMode {
+            throw CustomIntentError.unsupportedOnOS("Heat Protection")
         }
 
         let clampedTemp = min(max(temperatureC, 30), 50)

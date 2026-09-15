@@ -47,10 +47,12 @@ class MenuBuilder {
         if viewModel.manageChargingEnabled, viewModel.adapterConnected {
             if Defaults[.showAdvancedChargingControls] {
                 menu.addItem(NSMenuItem.separator())
-                menu.addItem(createMenuItem(view: ChargeToLimitToggleView(viewModel: viewModel)))
-                menu.addItem(createMenuItem(view: ChargeLimitOverrideToggleView(viewModel: viewModel)))
-                menu.addItem(createMenuItem(view: ForceDischargeToggleView(viewModel: viewModel)))
-                menu.addItem(createMenuItem(view: BatteryCalibrationToggleView(viewModel: viewModel)))
+                if !viewModel.nativeMode {
+                    menu.addItem(createMenuItem(view: ChargeToLimitToggleView(viewModel: viewModel)))
+                    menu.addItem(createMenuItem(view: ChargeLimitOverrideToggleView(viewModel: viewModel)))
+                    menu.addItem(createMenuItem(view: ForceDischargeToggleView(viewModel: viewModel)))
+                    menu.addItem(createMenuItem(view: BatteryCalibrationToggleView(viewModel: viewModel)))
+                }
             }
         }
 
