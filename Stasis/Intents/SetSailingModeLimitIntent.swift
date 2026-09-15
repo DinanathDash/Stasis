@@ -27,7 +27,7 @@ struct SetSailingModeLimitIntent: AppIntent {
         if batteryService.deviceCapabilities.nativeMode {
             let chargeLimit = Defaults[.chargeLimit]
             if chargeLimit <= 80 {
-                throw CustomIntentError.unsupportedOnOS("Sailing Mode with a Charge Limit of \(chargeLimit)%")
+                throw CustomIntentError.unsupportedOnOS("Sailing Mode with a Charge Limit of \(chargeLimit.formattedPercentage)")
             }
             let maxDrop = chargeLimit - 80
             clampedDrop = min(max(dropPercentage, 5), maxDrop)
