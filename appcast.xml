@@ -5,6 +5,26 @@
         <description>Most recent changes for Stasis.</description>
         <language>en</language>
         <item>
+            <title>0.22.0</title>
+            <pubDate>Tue, 15 Sep 2026 18:48:50 +0000</pubDate>
+            <sparkle:version>74</sparkle:version>
+            <sparkle:shortVersionString>0.22.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
+            <description><![CDATA[<p>macOS 27 compatibility updates and strict concurrency improvements.</p>
+<h3>Features &amp; Core Capabilities</h3>
+<ul>
+<li><strong>macOS 27 Compatibility:</strong> Added explicit detection for macOS 27. Due to OS-level restrictions where Apple has locked down SMC keys that prevent forcing battery discharge below 80%, manual charging controls (Top Up, Charge Override, Force Discharge, and Sailing Mode) are now gracefully disabled and hidden on macOS 27 to prevent erratic charging behavior. The core charge limits remain fully functional.</li>
+</ul>
+<h3>Bug Fixes &amp; Refinements</h3>
+<ul>
+<li><strong>Swift 6 Concurrency:</strong> Resolved <code>#ConformanceIsolation</code> build errors affecting SwiftUI Shapes (e.g., <code>NotchShape</code>) on Xcode 16 by correctly isolating the struct to <code>@MainActor</code> and marking protocol requirements as <code>nonisolated</code>.</li>
+<li><strong>Localization Formatting:</strong> Standardized localization formats across 17 languages to correctly parse <code>%@</code> strings provided by <code>PercentageFormatter</code>, fixing compiler warnings and runtime string mismatch errors.</li>
+</ul>
+
+]]></description>
+            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.22.0/Stasis.dmg" length="4570689" type="application/octet-stream" sparkle:edSignature="xuuKiMWrNc41BkjxAjBk/39WXKC/u4Bgpz75/sB7+VvrJH6lq9uy1hp7/QVpQpAjnBqVLfD+6Wd50DtyG0w8Cw=="/>
+        </item>
+        <item>
             <title>0.21.3</title>
             <pubDate>Sun, 30 Aug 2026 17:10:48 +0000</pubDate>
             <sparkle:version>73</sparkle:version>
@@ -38,17 +58,6 @@
 
 ]]></description>
             <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.21.2/Stasis.dmg" length="4547290" type="application/octet-stream" sparkle:edSignature="bd3aQJLYoIo8KT8tBUMakBdx4VdYkl92Yfyh4P7qCfNCGppKh2oLR+u1vbDZBrIZRBOSTle7aAHVW0sOHST0Bg=="/>
-        </item>
-        <item>
-            <title>0.21.1</title>
-            <pubDate>Fri, 28 Aug 2026 14:54:21 +0000</pubDate>
-            <sparkle:version>71</sparkle:version>
-            <sparkle:shortVersionString>0.21.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
-            <description><![CDATA[<p>XPC security validation, calibration state improvements, and DMG layout updates.</p>
-
-]]></description>
-            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.21.1/Stasis.dmg" length="4547331" type="application/octet-stream" sparkle:edSignature="p4Xhqh7nLAUeM/vByJgTvHMtymOcQIR+XA4EDNMHxfahhTYQC1OhKHlTYlqT/uB5OHd2vYDMwpLWfkjRDJGBAA=="/>
         </item>
     </channel>
 </rss>

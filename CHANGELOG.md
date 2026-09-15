@@ -6,6 +6,12 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+---
+
+## 0.22.0 - 2026-09-15
+
 macOS 27 compatibility updates and strict concurrency improvements.
 
 ### Features & Core Capabilities
