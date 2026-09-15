@@ -5,16 +5,15 @@ struct BatteryIndicatorView: View {
     let batteryLevel: Int
     let chargingMode: ChargingMode
     var isLowPowerModeEnabled: Bool = false
-    var batteryPercentageVisibility: BatteryPercentageVisibility = .nextToIcon
-    var showState: Bool = false
+    var batteryPercentageVisibility: BatteryPercentageVisibility = .insideIcon
+    var showState: Bool = true
 
     private var isPowered: Bool {
         chargingMode != .discharging
     }
 
     private var shouldShowInsidePercentage: Bool {
-        (batteryPercentageVisibility == .insideIcon || batteryPercentageVisibility == .insideIconAndNextToItWhenPowered)
-            && chargingMode == .discharging
+        batteryPercentageVisibility == .insideIcon || (batteryPercentageVisibility == .insideIconAndNextToItWhenPowered && !isPowered)
     }
 
     private var shouldShowOutsidePercentage: Bool {
@@ -31,42 +30,26 @@ struct BatteryIndicatorView: View {
     }
 
     private var fillColor: Color {
-        if showState && batteryLevel <= 10 {
+        if showState && batteryLevel <= 10 && chargingMode == .discharging {
             return .red
         }
         if isLowPowerModeEnabled {
+            // Standard LPM yellow
             return Color(red: 1.0, green: 214 / 255, blue: 0.0)
         }
         return .primary
     }
 
-    private var insidePercentageColor: Color {
-        // Keep strong contrast against fill colors used in the battery body.
-        if showState && batteryLevel <= 10 {
-            return .white
-        }
-        if isLowPowerModeEnabled {
-            return .white
-        }
-        return .black
-    }
-
-    private var insidePercentageOutlineColor: Color {
-        insidePercentageColor == .white ? .black : .white
-    }
-
     private enum Layout {
-        static let batteryHeight: CGFloat = 11.5
-        static let batteryWidth: CGFloat = 22
+        static let batteryHeight: CGFloat = 12.5
+        static let batteryWidth: CGFloat = 24.5
         static let terminalWidth: CGFloat = 1.5
-        static let terminalHeight: CGFloat = 4
-        static let cornerRadius: CGFloat = 3.0
-        static let strokeWidth: CGFloat = 1
-        static let fillInset: CGFloat = 1.5
+        static let terminalHeight: CGFloat = 5.0
+        static let cornerRadius: CGFloat = 4.0
     }
 
     private var menuBarPercentageFont: Font {
-        Font(NSFont.menuBarFont(ofSize: 11))
+        Font.system(size: 12, weight: .medium)
     }
 
     var body: some View {
@@ -78,132 +61,124 @@ struct BatteryIndicatorView: View {
                     .monospacedDigit()
             }
 
-            HStack(spacing: 0) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: Layout.cornerRadius)
-                        .stroke(lineWidth: Layout.strokeWidth)
-                        .opacity(0.4)
-
-                    GeometryReader { geo in
-                        let fillWidth =
-                            (geo.size.width - Layout.fillInset * 2)
-                                * CGFloat(batteryLevel)
-                                / 100
-                        RoundedRectangle(
-                            cornerRadius: Layout.cornerRadius - Layout.fillInset
-                        )
-                        .fill(fillColor)
-                        .frame(width: max(0, fillWidth))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(Layout.fillInset)
+            HStack(spacing: 1) {
+                // Battery Body
+                Canvas { context, size in
+                    let rect = CGRect(origin: .zero, size: size)
+                    let clipPath = Path(roundedRect: rect, cornerRadius: Layout.cornerRadius)
+                    context.clip(to: clipPath)
+                    
+                    // We must use a transparency layer so .destinationOut punches through the drawn shapes, not ignored.
+                    context.drawLayer { layerContext in
+                        // Empty background - slightly more whitish tone (opacity 0.50)
+                        layerContext.fill(clipPath, with: .color(Color.primary.opacity(0.50)))
+                        
+                        // Filled part
+                        let fillWidth = max(0, size.width * CGFloat(batteryLevel) / 100)
+                        let fillRect = CGRect(x: 0, y: 0, width: fillWidth, height: size.height)
+                        layerContext.fill(Path(fillRect), with: .color(fillColor))
+                        
+                        // Punch-out text/icon using Canvas blending
+                        if shouldShowInsidePercentage || (showState && isPowered) {
+                            layerContext.blendMode = .destinationOut
+                            
+                            let textWidth: CGFloat
+                            let gap: CGFloat = 0.5
+                            
+                            if shouldShowInsidePercentage, let textSymbol = layerContext.resolveSymbol(id: "text") {
+                                textWidth = textSymbol.size.width
+                            } else {
+                                textWidth = 0
+                            }
+                            
+                            let iconSize: CGSize
+                            let isPlug = (showState && chargingMode == .pluggedIn)
+                            
+                            if isPowered, let iconSymbol = layerContext.resolveSymbol(id: isPlug ? "plug" : "bolt") {
+                                // Plug is rotated -90 degrees, so its visual width is its layout height
+                                iconSize = isPlug ? CGSize(width: iconSymbol.size.height, height: iconSymbol.size.width) : iconSymbol.size
+                            } else {
+                                iconSize = .zero
+                            }
+                            
+                            let totalWidth = (textWidth > 0 ? textWidth : 0) + (textWidth > 0 && iconSize.width > 0 ? gap : 0) + iconSize.width
+                            let startX = (size.width - totalWidth) / 2
+                            
+                            if shouldShowInsidePercentage, let textSymbol = layerContext.resolveSymbol(id: "text") {
+                                let textX = startX + textWidth / 2
+                                layerContext.draw(textSymbol, at: CGPoint(x: textX, y: size.height / 2), anchor: .center)
+                            }
+                            
+                            if isPowered {
+                                let iconX = startX + (textWidth > 0 ? textWidth + gap : 0) + iconSize.width / 2
+                                if isPlug, let plugSymbol = layerContext.resolveSymbol(id: "plug") {
+                                    var plugContext = layerContext
+                                    plugContext.translateBy(x: iconX, y: size.height / 2)
+                                    plugContext.rotate(by: .degrees(-90))
+                                    plugContext.draw(plugSymbol, at: .zero, anchor: .center)
+                                } else if let boltSymbol = layerContext.resolveSymbol(id: "bolt") {
+                                    layerContext.draw(boltSymbol, at: CGPoint(x: iconX, y: size.height / 2), anchor: .center)
+                                }
+                            }
+                        }
+                    }
+                } symbols: {
+                    if shouldShowInsidePercentage {
+                        Text("\(batteryLevel)")
+                            .font(.system(size: 10, weight: .semibold))
+                            .fixedSize()
+                            .tag("text")
+                            .foregroundStyle(.black)
+                    }
+                    
+                    if showState && chargingMode == .charging {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: shouldShowInsidePercentage ? 7.5 : 10.5, weight: .semibold))
+                            .tag("bolt")
+                            .foregroundStyle(.black)
+                    } else if showState && chargingMode == .pluggedIn {
+                        Image(systemName: "powerplug.fill")
+                            .font(.system(size: shouldShowInsidePercentage ? 7.0 : 10.0, weight: .semibold))
+                            .tag("plug")
+                            .foregroundStyle(.black)
                     }
                 }
                 .frame(width: Layout.batteryWidth, height: Layout.batteryHeight)
-                .overlay {
-                    Group {
-                        if shouldShowInsidePercentage {
-                            ZStack {
-                                Text("\(batteryLevel)")
-                                    .font(.system(size: batteryLevel == 100 ? 7 : 8, weight: .black))
-                                    .monospacedDigit()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                                    .foregroundStyle(insidePercentageOutlineColor)
-                                    .offset(x: -0.5, y: 0)
-                                Text("\(batteryLevel)")
-                                    .font(.system(size: batteryLevel == 100 ? 7 : 8, weight: .black))
-                                    .monospacedDigit()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                                    .foregroundStyle(insidePercentageOutlineColor)
-                                    .offset(x: 0.5, y: 0)
-                                Text("\(batteryLevel)")
-                                    .font(.system(size: batteryLevel == 100 ? 7 : 8, weight: .black))
-                                    .monospacedDigit()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                                    .foregroundStyle(insidePercentageOutlineColor)
-                                    .offset(x: 0, y: -0.5)
-                                Text("\(batteryLevel)")
-                                    .font(.system(size: batteryLevel == 100 ? 7 : 8, weight: .black))
-                                    .monospacedDigit()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                                    .foregroundStyle(insidePercentageOutlineColor)
-                                    .offset(x: 0, y: 0.5)
-                                Text("\(batteryLevel)")
-                                    .font(.system(size: batteryLevel == 100 ? 7 : 8, weight: .black))
-                                    .monospacedDigit()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                                    .foregroundStyle(insidePercentageColor)
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        } else if showState && chargingMode == .charging {
-                            Image(systemName: "bolt.fill")
-                                .font(.system(size: 10.2, weight: .bold))
-                                .foregroundStyle(.white.opacity(0.88))
-                                .shadow(color: .black, radius: 0.5)
-                                .shadow(color: .black, radius: 0.5)
-                                .shadow(color: .black, radius: 0.5)
-                        } else if showState && chargingMode == .pluggedIn {
-                            Image(systemName: "powerplug.fill")
-                                .font(.system(size: 9.8, weight: .bold))
-                                .rotationEffect(.degrees(-90))
-                                .foregroundStyle(.white.opacity(0.88))
-                                .shadow(color: .black, radius: 0.5)
-                                .shadow(color: .black, radius: 0.5)
-                                .shadow(color: .black, radius: 0.5)
-                        }
-                    }
-                }
 
-                BatteryTerminal(
-                    width: Layout.terminalWidth,
-                    height: Layout.terminalHeight,
-                    cornerRadius: 1.25
+                // Battery Terminal
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 0,
+                    bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 1.5,
+                    topTrailingRadius: 1.5
                 )
+                .fill(Color.primary.opacity(0.4))
+                .frame(width: Layout.terminalWidth, height: Layout.terminalHeight)
             }
         }
         .foregroundStyle(.primary)
     }
 }
 
-struct BatteryTerminal: View {
-    let width: CGFloat
-    let height: CGFloat
-    let cornerRadius: CGFloat
-
-    var body: some View {
-        UnevenRoundedRectangle(
-            topLeadingRadius: 0,
-            bottomLeadingRadius: 0,
-            bottomTrailingRadius: cornerRadius,
-            topTrailingRadius: cornerRadius
-        )
-        .fill(.primary)
-        .frame(width: width, height: height)
-        .opacity(0.4)
-        .offset(x: 1)
-    }
-}
-
 #Preview {
     VStack(alignment: .leading, spacing: 16) {
-        // Simulate menu bar appearance
         ForEach([100, 80, 50, 20, 10, 5], id: \.self) { level in
             HStack(spacing: 20) {
                 BatteryIndicatorView(
                     batteryLevel: level,
-                    chargingMode: .discharging
+                    chargingMode: .discharging,
+                    batteryPercentageVisibility: .insideIcon
                 )
                 BatteryIndicatorView(
                     batteryLevel: level,
-                    chargingMode: .charging
+                    chargingMode: .charging,
+                    batteryPercentageVisibility: .insideIcon
                 )
                 BatteryIndicatorView(
                     batteryLevel: level,
-                    chargingMode: .pluggedIn
+                    chargingMode: .discharging,
+                    isLowPowerModeEnabled: true,
+                    batteryPercentageVisibility: .insideIcon
                 )
             }
         }
