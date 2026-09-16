@@ -5,6 +5,21 @@
         <description>Most recent changes for Stasis.</description>
         <language>en</language>
         <item>
+            <title>0.22.2</title>
+            <pubDate>Wed, 16 Sep 2026 10:11:58 +0000</pubDate>
+            <sparkle:version>76</sparkle:version>
+            <sparkle:shortVersionString>0.22.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
+            <description><![CDATA[<ul>
+<li><strong>Right-Click Context Menu:</strong> Added a native context menu via right-click on the battery menu bar icon, featuring a toggle for Low Power Mode and a shortcut to System Battery Settings.</li>
+<li><strong>MagSafe LED Behavior:</strong> Fixed MagSafe LED on macOS 27 native mode to accurately transition to &quot;paused&quot; (green) as soon as the native charge limit is reached.</li>
+<li><strong>Optimized UI Updates:</strong> Settings toggles now apply instantly by removing artificial interaction delays using optimistic updates and zero-delay polling.</li>
+</ul>
+
+]]></description>
+            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.22.2/Stasis.dmg" length="4579861" type="application/octet-stream" sparkle:edSignature="CE04+bmGXTuvgaVhS0W+EaKPNNc088EPOu9CbbrJ6rpXR8QRCO9S/f9GeKjlWfUppRZMfnP2HHKZDIcc9nPDAw=="/>
+        </item>
+        <item>
             <title>0.22.0</title>
             <pubDate>Tue, 15 Sep 2026 18:48:50 +0000</pubDate>
             <sparkle:version>74</sparkle:version>
@@ -43,21 +58,6 @@
 
 ]]></description>
             <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.21.3/Stasis.dmg" length="4545583" type="application/octet-stream" sparkle:edSignature="J4nDnByUqr+hY45r+7D/6b5wTboKSNOj1ALBBJ502sWiFDndNeVZP4fVtJaRDvLkdB30fVCR1WMMEidRgd2VCg=="/>
-        </item>
-        <item>
-            <title>0.21.2</title>
-            <pubDate>Fri, 28 Aug 2026 15:24:00 +0000</pubDate>
-            <sparkle:version>72</sparkle:version>
-            <sparkle:shortVersionString>0.21.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
-            <description><![CDATA[<p>Fixed an issue where toggling off &#39;Manage charging&#39; during a forced discharge failed to re-enable the power adapter.</p>
-<h3>Bug Fixes &amp; Refinements</h3>
-<ul>
-<li><strong>Charging Controls:</strong> Ensure the power adapter is properly re-enabled when turning off charge management so native macOS charging resumes immediately.</li>
-</ul>
-
-]]></description>
-            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.21.2/Stasis.dmg" length="4547290" type="application/octet-stream" sparkle:edSignature="bd3aQJLYoIo8KT8tBUMakBdx4VdYkl92Yfyh4P7qCfNCGppKh2oLR+u1vbDZBrIZRBOSTle7aAHVW0sOHST0Bg=="/>
         </item>
     </channel>
 </rss>

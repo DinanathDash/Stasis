@@ -6,6 +6,12 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+---
+
+## 0.22.2 - 2026-09-16
+
 - **Right-Click Context Menu:** Added a native context menu via right-click on the battery menu bar icon, featuring a toggle for Low Power Mode and a shortcut to System Battery Settings.
 - **MagSafe LED Behavior:** Fixed MagSafe LED on macOS 27 native mode to accurately transition to "paused" (green) as soon as the native charge limit is reached.
 - **Optimized UI Updates:** Settings toggles now apply instantly by removing artificial interaction delays using optimistic updates and zero-delay polling.
