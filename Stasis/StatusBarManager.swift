@@ -91,7 +91,7 @@ class StatusBarManager {
     }
 }
 
-class StatusBarHostingView<Content: View>: NSHostingView<Content> {
+class StatusBarHostingView: NSHostingView<StatusBarContentView> {
     var onRightClick: ((NSEvent) -> Void)?
 
     override func rightMouseDown(with event: NSEvent) {
