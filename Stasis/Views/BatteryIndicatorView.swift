@@ -8,6 +8,8 @@ struct BatteryIndicatorView: View {
     var batteryPercentageVisibility: BatteryPercentageVisibility = .insideIcon
     var showState: Bool = true
 
+    @Environment(\.colorScheme) var colorScheme
+
     private var isPowered: Bool {
         chargingMode != .discharging
     }
@@ -68,79 +70,109 @@ struct BatteryIndicatorView: View {
                     let clipPath = Path(roundedRect: rect, cornerRadius: Layout.cornerRadius)
                     context.clip(to: clipPath)
                     
-                    // We must use a transparency layer so .destinationOut punches through the drawn shapes, not ignored.
-                    context.drawLayer { layerContext in
-                        // Empty background - slightly more whitish tone (opacity 0.50)
-                        layerContext.fill(clipPath, with: .color(Color.primary.opacity(0.50)))
+                    let drawElements: (inout GraphicsContext, String, Bool, Bool) -> Void = { ctx, tagSuffix, drawText, drawIcon in
+                        let textWidth: CGFloat
+                        let gap: CGFloat = 0.5
                         
-                        // Filled part
-                        let fillWidth = max(0, size.width * CGFloat(batteryLevel) / 100)
-                        let fillRect = CGRect(x: 0, y: 0, width: fillWidth, height: size.height)
-                        layerContext.fill(Path(fillRect), with: .color(fillColor))
+                        if shouldShowInsidePercentage, let textSymbol = ctx.resolveSymbol(id: "text_" + tagSuffix) {
+                            textWidth = textSymbol.size.width
+                        } else {
+                            textWidth = 0
+                        }
                         
-                        // Punch-out text/icon using Canvas blending
-                        if shouldShowInsidePercentage || (showState && isPowered) {
-                            layerContext.blendMode = .destinationOut
-                            
-                            let textWidth: CGFloat
-                            let gap: CGFloat = 0.5
-                            
-                            if shouldShowInsidePercentage, let textSymbol = layerContext.resolveSymbol(id: "text") {
-                                textWidth = textSymbol.size.width
-                            } else {
-                                textWidth = 0
-                            }
-                            
-                            let iconSize: CGSize
-                            let isPlug = (showState && chargingMode == .pluggedIn)
-                            
-                            if isPowered, let iconSymbol = layerContext.resolveSymbol(id: isPlug ? "plug" : "bolt") {
-                                // Plug is rotated -90 degrees, so its visual width is its layout height
-                                iconSize = isPlug ? CGSize(width: iconSymbol.size.height, height: iconSymbol.size.width) : iconSymbol.size
-                            } else {
-                                iconSize = .zero
-                            }
-                            
-                            let totalWidth = (textWidth > 0 ? textWidth : 0) + (textWidth > 0 && iconSize.width > 0 ? gap : 0) + iconSize.width
-                            let startX = (size.width - totalWidth) / 2
-                            
-                            if shouldShowInsidePercentage, let textSymbol = layerContext.resolveSymbol(id: "text") {
-                                let textX = startX + textWidth / 2
-                                layerContext.draw(textSymbol, at: CGPoint(x: textX, y: size.height / 2), anchor: .center)
-                            }
-                            
-                            if isPowered {
-                                let iconX = startX + (textWidth > 0 ? textWidth + gap : 0) + iconSize.width / 2
-                                if isPlug, let plugSymbol = layerContext.resolveSymbol(id: "plug") {
-                                    var plugContext = layerContext
-                                    plugContext.translateBy(x: iconX, y: size.height / 2)
-                                    plugContext.rotate(by: .degrees(-90))
-                                    plugContext.draw(plugSymbol, at: .zero, anchor: .center)
-                                } else if let boltSymbol = layerContext.resolveSymbol(id: "bolt") {
-                                    layerContext.draw(boltSymbol, at: CGPoint(x: iconX, y: size.height / 2), anchor: .center)
-                                }
+                        let iconSize: CGSize
+                        let isPlug = (showState && chargingMode == .pluggedIn)
+                        
+                        if isPowered, let iconSymbol = ctx.resolveSymbol(id: (isPlug ? "plug_" : "bolt_") + tagSuffix) {
+                            iconSize = isPlug ? CGSize(width: iconSymbol.size.height, height: iconSymbol.size.width) : iconSymbol.size
+                        } else {
+                            iconSize = .zero
+                        }
+                        
+                        let totalWidth = (textWidth > 0 ? textWidth : 0) + (textWidth > 0 && iconSize.width > 0 ? gap : 0) + iconSize.width
+                        let startX = (size.width - totalWidth) / 2
+                        
+                        if drawText && shouldShowInsidePercentage, let textSymbol = ctx.resolveSymbol(id: "text_" + tagSuffix) {
+                            let textX = startX + textWidth / 2
+                            ctx.draw(textSymbol, at: CGPoint(x: textX, y: size.height / 2), anchor: .center)
+                        }
+                        
+                        if drawIcon && isPowered {
+                            let iconX = startX + (textWidth > 0 ? textWidth + gap : 0) + iconSize.width / 2
+                            if isPlug, let plugSymbol = ctx.resolveSymbol(id: "plug_" + tagSuffix) {
+                                var plugContext = ctx
+                                plugContext.translateBy(x: iconX, y: size.height / 2)
+                                plugContext.rotate(by: .degrees(-90))
+                                plugContext.draw(plugSymbol, at: .zero, anchor: .center)
+                            } else if let boltSymbol = ctx.resolveSymbol(id: "bolt_" + tagSuffix) {
+                                ctx.draw(boltSymbol, at: CGPoint(x: iconX, y: size.height / 2), anchor: .center)
                             }
                         }
                     }
-                } symbols: {
-                    if shouldShowInsidePercentage {
-                        Text("\(batteryLevel)")
-                            .font(.system(size: 10, weight: .semibold))
-                            .fixedSize()
-                            .tag("text")
-                            .foregroundStyle(.black)
-                    }
                     
-                    if showState && chargingMode == .charging {
-                        Image(systemName: "bolt.fill")
-                            .font(.system(size: shouldShowInsidePercentage ? 7.5 : 10.5, weight: .semibold))
-                            .tag("bolt")
-                            .foregroundStyle(.black)
-                    } else if showState && chargingMode == .pluggedIn {
-                        Image(systemName: "powerplug.fill")
-                            .font(.system(size: shouldShowInsidePercentage ? 7.0 : 10.0, weight: .semibold))
-                            .tag("plug")
-                            .foregroundStyle(.black)
+                    context.drawLayer { layerContext in
+                        // Empty background - light outline tone (opacity 0.25)
+                        layerContext.fill(clipPath, with: .color(Color.primary.opacity(0.25)))
+                        
+                        let fillWidth = max(0, size.width * CGFloat(batteryLevel) / 100)
+                        let fillRect = CGRect(x: 0, y: 0, width: fillWidth, height: size.height)
+                        
+                        let isNormalFill = !(showState && batteryLevel <= 10 && chargingMode == .discharging) && !isLowPowerModeEnabled
+                        
+                        if isNormalFill {
+                            // Text over empty part (primary color)
+                            var emptyContext = layerContext
+                            drawElements(&emptyContext, "primary", true, false)
+                            
+                            // Filled part
+                            layerContext.fill(Path(fillRect), with: .color(fillColor))
+                            
+                            // Text over filled part (destinationOut hole)
+                            var fillMaskContext = layerContext
+                            fillMaskContext.clip(to: Path(fillRect))
+                            fillMaskContext.blendMode = .destinationOut
+                            drawElements(&fillMaskContext, "inverse", true, false)
+                            
+                            // Icon over everything (destinationOut hole)
+                            var iconContext = layerContext
+                            iconContext.blendMode = .destinationOut
+                            drawElements(&iconContext, "inverse", false, true)
+                        } else {
+                            // Filled part
+                            layerContext.fill(Path(fillRect), with: .color(fillColor))
+                            
+                            // Text and Icon over everything (black)
+                            var allContext = layerContext
+                            drawElements(&allContext, "black", true, true)
+                        }
+                    }
+                } symbols: {
+                    ForEach(["primary", "inverse", "black"], id: \.self) { suffix in
+                        let color: Color = {
+                            if suffix == "primary" { return .primary }
+                            if suffix == "inverse" { return colorScheme == .dark ? .black : .white }
+                            return .black
+                        }()
+                        
+                        if shouldShowInsidePercentage {
+                            Text("\(batteryLevel)")
+                                .font(.system(size: 10, weight: .semibold))
+                                .fixedSize()
+                                .tag("text_\(suffix)")
+                                .foregroundStyle(color)
+                        }
+                        
+                        if showState && chargingMode == .charging {
+                            Image(systemName: "bolt.fill")
+                                .font(.system(size: shouldShowInsidePercentage ? 7.5 : 10.5, weight: .semibold))
+                                .tag("bolt_\(suffix)")
+                                .foregroundStyle(color)
+                        } else if showState && chargingMode == .pluggedIn {
+                            Image(systemName: "powerplug.fill")
+                                .font(.system(size: shouldShowInsidePercentage ? 7.0 : 10.0, weight: .semibold))
+                                .tag("plug_\(suffix)")
+                                .foregroundStyle(color)
+                        }
                     }
                 }
                 .frame(width: Layout.batteryWidth, height: Layout.batteryHeight)

@@ -13,4 +13,5 @@ import Foundation
     func manageMagsafeLED(target: UInt8, reply: @escaping @Sendable (Bool, String?) -> Void)
     func cancelOverride(reply: @escaping @Sendable (Bool, String?) -> Void)
     func resetToDefaults(reply: @escaping @Sendable (Bool, String?) -> Void)
+    func setLowPowerMode(enabled: Bool, reply: @escaping @Sendable (Bool, String?) -> Void)
 }
