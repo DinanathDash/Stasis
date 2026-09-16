@@ -30,7 +30,33 @@ class StatusBarManager {
         guard let button = statusItem.button else { return }
 
         let rootView = StatusBarContentView(viewModel: viewModel)
-        let hosting = NSHostingView(rootView: rootView)
+        let hosting = StatusBarHostingView(rootView: rootView)
+        hosting.onRightClick = { [weak self, weak hosting] event in
+            guard let self = self, let view = hosting else { return }
+            
+            let menu = NSMenu()
+            
+            let lpmItem = NSMenuItem(
+                title: "Low Power Mode",
+                action: #selector(self.toggleLowPowerModeAction),
+                keyEquivalent: ""
+            )
+            lpmItem.target = self
+            lpmItem.state = self.viewModel.isLowPowerModeEnabled ? .on : .off
+            menu.addItem(lpmItem)
+            
+            menu.addItem(NSMenuItem.separator())
+            
+            let settingsItem = NSMenuItem(
+                title: "Battery Settings...",
+                action: #selector(self.openSystemBatterySettings),
+                keyEquivalent: ""
+            )
+            settingsItem.target = self
+            menu.addItem(settingsItem)
+            
+            NSMenu.popUpContextMenu(menu, with: event, for: view)
+        }
 
         button.subviews.forEach { $0.removeFromSuperview() }
         button.title = ""
@@ -44,6 +70,36 @@ class StatusBarManager {
             hosting.leadingAnchor.constraint(equalTo: button.leadingAnchor, constant: 7),
             hosting.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -7),
         ])
+    }
+
+    @objc private func toggleLowPowerModeAction() {
+        let newState = !self.viewModel.isLowPowerModeEnabled
+        self.viewModel.isLowPowerModeEnabled = newState // Optimistic UI update
+        Task {
+            do {
+                try await self.viewModel.toggleLowPowerMode()
+            } catch {
+                self.viewModel.isLowPowerModeEnabled = !newState // Revert on failure
+            }
+        }
+    }
+
+    @objc private func openSystemBatterySettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.Battery-Settings.extension") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+}
+
+class StatusBarHostingView<Content: View>: NSHostingView<Content> {
+    var onRightClick: ((NSEvent) -> Void)?
+
+    override func rightMouseDown(with event: NSEvent) {
+        if let onRightClick = onRightClick {
+            onRightClick(event)
+        } else {
+            super.rightMouseDown(with: event)
+        }
     }
 }
 

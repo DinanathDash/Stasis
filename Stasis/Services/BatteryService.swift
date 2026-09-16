@@ -148,6 +148,14 @@ class BatteryService {
         }
     }
 
+    func toggleLowPowerMode() async throws {
+        let currentState = ProcessInfo.processInfo.isLowPowerModeEnabled
+        let newState = !currentState
+        logger.info("Toggling Low Power Mode to \(newState)")
+        try await ChargingHelperManager.shared.setLowPowerMode(newState)
+        scheduleSinglePoll(delay: .zero)
+    }
+
     func scheduleSinglePoll(delay: Duration = .seconds(3)) {
         delayedPollTask?.cancel()
         delayedPollTask = Task {

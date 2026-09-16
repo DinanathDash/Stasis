@@ -172,6 +172,10 @@ class MenuViewModel {
         chargeManager.toggleChargeToLimit()
     }
 
+    func toggleLowPowerMode() async throws {
+        try await batteryService.toggleLowPowerMode()
+    }
+
     var isCalibrating: Bool = false
 
     func toggleCalibration() {

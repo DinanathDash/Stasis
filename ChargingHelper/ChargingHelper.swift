@@ -116,4 +116,21 @@ final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendabl
             reply(true, nil)
         }
     }
+
+    func setLowPowerMode(enabled: Bool, reply: @escaping @Sendable (Bool, String?) -> Void) {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
+        process.arguments = ["-a", "lowpowermode", enabled ? "1" : "0"]
+        do {
+            try process.run()
+            process.waitUntilExit()
+            if process.terminationStatus == 0 {
+                reply(true, nil)
+            } else {
+                reply(false, "pmset failed with status \(process.terminationStatus)")
+            }
+        } catch {
+            reply(false, error.localizedDescription)
+        }
+    }
 }

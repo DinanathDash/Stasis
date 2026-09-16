@@ -278,7 +278,7 @@ enum ChargingPowerState {
             manageMagsafeLED(target: ChargingSettings.dischargingMagSafeLEDState)
         } else if heatProtectionActive {
             manageMagsafeLED(target: ChargingSettings.heatProtectionMagSafeLEDState)
-        } else if chargingDisabled || percent == 100 {
+        } else if chargingDisabled || percent == 100 || (nativeMode && percent >= ChargingSettings.chargeLimit) {
             manageMagsafeLED(target: ChargingSettings.pausedMagSafeLEDState)
         } else {
             manageMagsafeLED(target: ChargingSettings.chargingMagSafeLEDState)

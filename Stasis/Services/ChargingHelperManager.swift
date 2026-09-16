@@ -183,4 +183,23 @@ class ChargingHelperManager {
         connection?.invalidate()
         connection = nil
     }
+
+    func setLowPowerMode(_ enabled: Bool) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            guard let helper = getHelper(errorHandler: { error in
+                continuation.resume(throwing: error)
+            }) else {
+                continuation.resume(throwing: NSError(domain: "ChargingHelperManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Helper not available"]))
+                return
+            }
+
+            helper.setLowPowerMode(enabled: enabled) { success, errorMessage in
+                if success {
+                    continuation.resume()
+                } else {
+                    continuation.resume(throwing: NSError(domain: "ChargingHelperManager", code: 2, userInfo: [NSLocalizedDescriptionKey: errorMessage ?? "Unknown error"]))
+                }
+            }
+        }
+    }
 }
