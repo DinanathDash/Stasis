@@ -173,8 +173,12 @@ enum ChargingPowerEvents {
         if ChargingPowerState.nativeMode {
             return evaluateStateNative(percent: percent, limit: limit, force: force)
         }
+        
+        if ChargingPowerState.dischargeOnlyFallback {
+            return evaluateStateDischargeOnly(percent: percent, limit: limit, force: force)
+        }
 
-        // Legacy macOS 26 (inhibit-based — UNTOUCHED)
+        // Legacy macOS 26 (inhibit-based — UNTOUCHED except deadband)
         let sailingActive = ChargingSettings.sailingMode && chargingMode == .standard
         let sailingThreshold: UInt8 = sailingActive
             ? (limit >= ChargingSettings.sailingModeLimit ? limit - ChargingSettings.sailingModeLimit : 0)
@@ -185,8 +189,22 @@ enum ChargingPowerEvents {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.enableCharging(force: force)
             } else {
-                if ChargingSettings.automaticDischarge, percent > limit {
-                    _ = ChargingPowerState.disablePowerAdapter(force: force)
+                if ChargingSettings.automaticDischarge {
+                    let triggerLimit = min(100, Int(limit) + 2)
+                    if Int(percent) > triggerLimit {
+                        _ = ChargingPowerState.disablePowerAdapter(force: force)
+                    } else if percent <= limit {
+                        _ = ChargingPowerState.enablePowerAdapter(force: force)
+                    } else {
+                        // Deadband: maintain current state
+                        if force {
+                            if ChargingPowerState.isPowerAdapterDisabled() {
+                                _ = ChargingPowerState.disablePowerAdapter(force: true)
+                            } else {
+                                _ = ChargingPowerState.enablePowerAdapter(force: true)
+                            }
+                        }
+                    }
                 } else {
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
                 }
@@ -230,8 +248,22 @@ enum ChargingPowerEvents {
                 return ChargingPowerState.enableCharging(force: force)
             } else {
                 ChargingPowerState.applyNativeLimit(Int(limit))
-                if ChargingSettings.automaticDischarge, percent > limit {
-                    _ = ChargingPowerState.disablePowerAdapter(force: force)
+                if ChargingSettings.automaticDischarge {
+                    let triggerLimit = min(100, Int(limit) + 2)
+                    if Int(percent) > triggerLimit {
+                        _ = ChargingPowerState.disablePowerAdapter(force: force)
+                    } else if percent <= limit {
+                        _ = ChargingPowerState.enablePowerAdapter(force: force)
+                    } else {
+                        // Deadband: maintain current state
+                        if force {
+                            if ChargingPowerState.isPowerAdapterDisabled() {
+                                _ = ChargingPowerState.disablePowerAdapter(force: true)
+                            } else {
+                                _ = ChargingPowerState.enablePowerAdapter(force: true)
+                            }
+                        }
+                    }
                 } else {
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
                 }
@@ -251,6 +283,37 @@ enum ChargingPowerEvents {
             ChargingPowerState.applyNativeLimit(Int(limit))
             _ = ChargingPowerState.enablePowerAdapter(force: force)
             return ChargingPowerState.enableCharging(force: force)
+        }
+    }
+    
+    // MARK: - macOS 15.8 Fallback
+    
+    @discardableResult
+    private static func evaluateStateDischargeOnly(percent: UInt8, limit: UInt8, force: Bool) -> (Bool, String?) {
+        if chargingMode == .toFull && percent < 100 {
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
+            return (true, nil)
+        }
+        
+        let buffer: UInt8 = 2
+        let triggerLimit = min(100, Int(limit) + Int(buffer))
+        
+        if Int(percent) > triggerLimit {
+            _ = ChargingPowerState.disablePowerAdapter(force: force)
+            return (true, nil)
+        } else if percent <= limit {
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
+            return (true, nil)
+        } else {
+            // Inside deadband: maintain current state
+            if force {
+                if ChargingPowerState.isPowerAdapterDisabled() {
+                    _ = ChargingPowerState.disablePowerAdapter(force: true)
+                } else {
+                    _ = ChargingPowerState.enablePowerAdapter(force: true)
+                }
+            }
+            return (true, nil)
         }
     }
 }

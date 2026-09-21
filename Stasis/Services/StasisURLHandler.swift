@@ -19,6 +19,14 @@ final class StasisURLHandler: NSObject, UNUserNotificationCenterDelegate {
     ) {
         completionHandler([.banner, .sound])
     }
+    
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        completionHandler()
+    }
 
     @discardableResult
     func handleURL(_ url: URL) -> Bool {

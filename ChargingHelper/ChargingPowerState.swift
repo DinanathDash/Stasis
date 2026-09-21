@@ -19,6 +19,12 @@ enum ChargingPowerState {
 
     /// True when PowerUI backend is active (macOS 27). All legacy SMC paths are skipped.
     static var nativeMode: Bool { nativeSession != nil }
+    
+    /// True when the Mac has no inhibit control but has force discharge control (macOS 15.8 workaround)
+    static var dischargeOnlyFallback: Bool {
+        guard let capabilities = battery?.capabilities else { return false }
+        return !nativeMode && !capabilities.inhibitChargeControl && capabilities.forceDischargeControl
+    }
 
     private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingPowerState")
 
@@ -28,7 +34,8 @@ enum ChargingPowerState {
 
         // ── macOS 27: Try PowerUI backend first ──────────────────────────────────
         if battery.capabilities.nativeChargeLimitControl {
-            if let backend = try? PowerUIChargeBackend() {
+            do {
+                let backend = try PowerUIChargeBackend()
                 let session = NativeChargeSession(backend: backend)
                 nativeSession = session
                 logger.info("PowerUI backend ready — using native charge control (macOS 27+)")
@@ -44,10 +51,10 @@ enum ChargingPowerState {
                         logger.info("PowerUI synced charge limit to \(limit)% on startup")
                     } catch {
                         logger.error("PowerUI startup sync failed: \(error.localizedDescription)")
-                    }
                 }
-            } else {
-                logger.warning("CHLT key present but PowerUI unavailable — falling back to SMC inhibit path")
+                }
+            } catch {
+                logger.warning("CHLT key present but PowerUI unavailable (\(error.localizedDescription)) — falling back to SMC inhibit path")
             }
         }
 
@@ -188,7 +195,27 @@ enum ChargingPowerState {
         guard force || !powerDisabled else { return (true, nil) }
         guard let battery = battery else { return (false, "Battery is nil") }
 
-        // ── macOS 27 (PowerUI) ───────────────────────────────────────────────────
+        // ALWAYS use real SMC force discharge if available (even in macOS 27 nativeMode)
+        if battery.capabilities.forceDischargeControl {
+            do {
+                try battery.setForceDischarging(true)
+                powerDisabled = true
+                logger.debug("[Hybrid] SMC force discharging actively engaged")
+                syncSleepState()
+                
+                // If nativeMode, also sync the PowerUI limit for UI consistency
+                if nativeMode {
+                    let (percent, _) = IOKitHelper.getPercentRemaining()
+                    let _ = applyNativeLimit(Int(percent))
+                }
+                
+                return (true, nil)
+            } catch {
+                logger.error("Failed to disable power adapter (Hybrid): \(error.localizedDescription)")
+            }
+        }
+
+        // ── macOS 27 (PowerUI) Fallback if CHIE is missing ──────────────────────
         // Force discharge approximation: set PowerUI limit to current battery level.
         // Firmware stops accepting AC charge; system draws from battery naturally.
         if nativeMode {
@@ -200,25 +227,40 @@ enum ChargingPowerState {
             return (true, nil)
         }
 
-        // ── Legacy macOS 26: CHIE / CH0I ─────────────────────────────────────────
-        guard battery.capabilities.forceDischargeControl else { return (false, "forceDischargeControl is false") }
-        do {
-            try battery.setForceDischarging(true)
-            powerDisabled = true
-            logger.debug("[Legacy] SMC force discharging = true")
-            syncSleepState()
-            return (true, nil)
-        } catch {
-            logger.error("Failed to disable power adapter: \(error.localizedDescription)")
-            return (false, "Failed to disable power adapter: \(error.localizedDescription)")
-        }
+        return (false, "forceDischargeControl is false")
     }
 
     static func enablePowerAdapter(force: Bool = false) -> (Bool, String?) {
         guard force || powerDisabled else { return (true, nil) }
         guard let battery = battery else { return (false, "Battery is nil") }
 
-        // ── macOS 27 (PowerUI) ───────────────────────────────────────────────────
+        // ALWAYS disable real SMC force discharge if it was available
+        if battery.capabilities.forceDischargeControl {
+            do {
+                try battery.setForceDischarging(false)
+                powerDisabled = false
+                logger.debug("[Hybrid] SMC force discharging ended")
+                
+                if !nativeMode && chargingDisabled {
+                    try? battery.setChargingInhibited(true)
+                    logger.debug("[Legacy] Re-asserted charging inhibited after adapter re-enable")
+                }
+                
+                syncSleepState()
+                
+                if nativeMode {
+                    let limit = Int(ChargingSettings.chargeLimit)
+                    let _ = applyNativeLimit(limit)
+                    logger.info("[macOS 27] Force discharge ended — PowerUI limit restored to \(limit)%")
+                }
+                
+                return (true, nil)
+            } catch {
+                logger.error("Failed to enable power adapter (Hybrid): \(error.localizedDescription)")
+            }
+        }
+
+        // ── macOS 27 (PowerUI) Fallback if CHIE is missing ──────────────────────
         // Restore PowerUI limit to configured charge limit.
         if nativeMode {
             let limit = Int(ChargingSettings.chargeLimit)
@@ -229,22 +271,7 @@ enum ChargingPowerState {
             return (true, nil)
         }
 
-        // ── Legacy macOS 26: CHIE / CH0I ─────────────────────────────────────────
-        guard battery.capabilities.forceDischargeControl else { return (false, "forceDischargeControl is false") }
-        do {
-            try battery.setForceDischarging(false)
-            powerDisabled = false
-            logger.debug("[Legacy] SMC force discharging = false")
-            if chargingDisabled {
-                try? battery.setChargingInhibited(true)
-                logger.debug("[Legacy] Re-asserted charging inhibited after adapter re-enable")
-            }
-            syncSleepState()
-            return (true, nil)
-        } catch {
-            logger.error("Failed to enable power adapter: \(error.localizedDescription)")
-            return (false, "Failed to enable power adapter: \(error.localizedDescription)")
-        }
+        return (false, "forceDischargeControl is false")
     }
 
     @discardableResult

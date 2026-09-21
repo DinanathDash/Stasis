@@ -132,8 +132,23 @@ public final class PowerUIChargeBackend: NativeChargeBackend {
         var error: NSError?
         let enabledSel = NSSelectorFromString("isMCLCurrentlyEnabled:")
         typealias Enabled = @convention(c) (AnyObject, Selector, ErrorPointer) -> UInt
-        _ = unsafeBitCast(client.method(for: enabledSel), to: Enabled.self)(client, enabledSel, &error)
+        let isEnabled = unsafeBitCast(client.method(for: enabledSel), to: Enabled.self)(client, enabledSel, &error)
         guard error == nil else { throw NativeChargeError.unavailable }
+        
+        if isEnabled == 0 {
+            let enableSel = NSSelectorFromString("enableMCL:")
+            typealias Enable = @convention(c) (AnyObject, Selector, ErrorPointer) -> Bool
+            if client.responds(to: enableSel) {
+                let success = unsafeBitCast(client.method(for: enableSel), to: Enable.self)(client, enableSel, &error)
+                if !success || error != nil {
+                    Logger(subsystem: "com.dinanathdash.stasis", category: "PowerUIChargeBackend")
+                        .error("Failed to enable MCL. OS native limit might not be respected.")
+                } else {
+                    Logger(subsystem: "com.dinanathdash.stasis", category: "PowerUIChargeBackend")
+                        .info("MCL was disabled in system settings; successfully enabled it.")
+                }
+            }
+        }
 
         let availSel = NSSelectorFromString("availableChargeLimitsWithError:")
         typealias Available = @convention(c) (AnyObject, Selector, ErrorPointer) -> Unmanaged<AnyObject>?
