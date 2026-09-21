@@ -178,7 +178,7 @@ enum ChargingPowerEvents {
             return evaluateStateDischargeOnly(percent: percent, limit: limit, force: force)
         }
 
-        // Legacy macOS 26 (inhibit-based — UNTOUCHED except deadband)
+        // Legacy macOS 26 (inhibit-based — strictly restored)
         let sailingActive = ChargingSettings.sailingMode && chargingMode == .standard
         let sailingThreshold: UInt8 = sailingActive
             ? (limit >= ChargingSettings.sailingModeLimit ? limit - ChargingSettings.sailingModeLimit : 0)
@@ -189,22 +189,8 @@ enum ChargingPowerEvents {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.enableCharging(force: force)
             } else {
-                if ChargingSettings.automaticDischarge {
-                    let triggerLimit = min(100, Int(limit) + 2)
-                    if Int(percent) > triggerLimit {
-                        _ = ChargingPowerState.disablePowerAdapter(force: force)
-                    } else if percent <= limit {
-                        _ = ChargingPowerState.enablePowerAdapter(force: force)
-                    } else {
-                        // Deadband: maintain current state
-                        if force {
-                            if ChargingPowerState.isPowerAdapterDisabled() {
-                                _ = ChargingPowerState.disablePowerAdapter(force: true)
-                            } else {
-                                _ = ChargingPowerState.enablePowerAdapter(force: true)
-                            }
-                        }
-                    }
+                if ChargingSettings.automaticDischarge, percent > limit {
+                    _ = ChargingPowerState.disablePowerAdapter(force: force)
                 } else {
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
                 }
@@ -233,12 +219,14 @@ enum ChargingPowerEvents {
         return threshold
     }
 
+    // MARK: - macOS 27 (PowerUI)
     @discardableResult
     private static func evaluateStateNative(percent: UInt8, limit: UInt8, force: Bool) -> (Bool, String?) {
         guard let session = ChargingPowerState.nativeSession else {
             return (false, "nativeSession unexpectedly nil")
         }
 
+        let sailingActive = ChargingSettings.sailingMode && chargingMode == .standard
         let sailingThreshold = powerUISailingThreshold(limit: limit, session: session)
 
         if percent >= limit {
@@ -247,30 +235,25 @@ enum ChargingPowerEvents {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.enableCharging(force: force)
             } else {
-                ChargingPowerState.applyNativeLimit(Int(limit))
-                if ChargingSettings.automaticDischarge {
-                    let triggerLimit = min(100, Int(limit) + 2)
-                    if Int(percent) > triggerLimit {
-                        _ = ChargingPowerState.disablePowerAdapter(force: force)
-                    } else if percent <= limit {
-                        _ = ChargingPowerState.enablePowerAdapter(force: force)
-                    } else {
-                        // Deadband: maintain current state
-                        if force {
-                            if ChargingPowerState.isPowerAdapterDisabled() {
-                                _ = ChargingPowerState.disablePowerAdapter(force: true)
-                            } else {
-                                _ = ChargingPowerState.enablePowerAdapter(force: true)
-                            }
-                        }
-                    }
+                // Drop PowerUI limit to threshold (or 80) to naturally pause charging without overshoot
+                if let threshold = sailingThreshold {
+                    ChargingPowerState.applyNativeLimit(threshold)
+                } else if let fallback = session.nearestLimit(atOrBelow: Int(limit) - 5) {
+                    ChargingPowerState.applyNativeLimit(fallback)
+                } else {
+                    ChargingPowerState.applyNativeLimit(Int(limit))
+                }
+                
+                // If they specifically ask for forced discharge, use it. Otherwise, native pause works.
+                if ChargingSettings.automaticDischarge, percent > limit {
+                    _ = ChargingPowerState.disablePowerAdapter(force: force)
                 } else {
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
                 }
                 return ChargingPowerState.disableCharging(force: force)
             }
         } else if let threshold = sailingThreshold, Int(percent) >= threshold {
-            // Sailing zone: lower PowerUI limit to threshold — firmware stops here
+            // Sailing zone
             ChargingPowerState.applyNativeLimit(threshold)
             _ = ChargingPowerState.enablePowerAdapter(force: force)
             if ChargingPowerState.isChargingDisabled() {
@@ -295,23 +278,25 @@ enum ChargingPowerEvents {
             return (true, nil)
         }
         
-        let buffer: UInt8 = 2
-        let triggerLimit = min(100, Int(limit) + Int(buffer))
+        let sailingActive = ChargingSettings.sailingMode && chargingMode == .standard
+        let sailingThreshold: UInt8 = sailingActive
+            ? (limit >= ChargingSettings.sailingModeLimit ? limit - ChargingSettings.sailingModeLimit : 0)
+            : 0
         
-        if Int(percent) > triggerLimit {
-            _ = ChargingPowerState.disablePowerAdapter(force: force)
-            return (true, nil)
-        } else if percent <= limit {
-            _ = ChargingPowerState.enablePowerAdapter(force: force)
+        if percent >= limit {
+            if ChargingSettings.automaticDischarge, percent > limit {
+                _ = ChargingPowerState.disablePowerAdapter(force: force)
+            } else {
+                _ = ChargingPowerState.enablePowerAdapter(force: force)
+            }
             return (true, nil)
         } else {
-            // Inside deadband: maintain current state
-            if force {
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
+            if sailingActive, percent >= sailingThreshold {
                 if ChargingPowerState.isPowerAdapterDisabled() {
-                    _ = ChargingPowerState.disablePowerAdapter(force: true)
-                } else {
-                    _ = ChargingPowerState.enablePowerAdapter(force: true)
+                    return (true, nil)
                 }
+                _ = ChargingPowerState.disablePowerAdapter(force: force)
             }
             return (true, nil)
         }
