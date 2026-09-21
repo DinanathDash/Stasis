@@ -235,14 +235,10 @@ enum ChargingPowerEvents {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.enableCharging(force: force)
             } else {
-                // Drop PowerUI limit to threshold (or 80) to naturally pause charging without overshoot
-                if let threshold = sailingThreshold {
-                    ChargingPowerState.applyNativeLimit(threshold)
-                } else if let fallback = session.nearestLimit(atOrBelow: Int(limit) - 5) {
-                    ChargingPowerState.applyNativeLimit(fallback)
-                } else {
-                    ChargingPowerState.applyNativeLimit(Int(limit))
-                }
+                // To prevent active discharge on battery, we must never set the PowerUI limit
+                // BELOW the current percentage. We clamp it to `percent` to force AC power pause.
+                let targetNativeLimit = max(Int(limit), Int(percent))
+                ChargingPowerState.applyNativeLimit(targetNativeLimit)
                 
                 // If they specifically ask for forced discharge, use it. Otherwise, native pause works.
                 if ChargingSettings.automaticDischarge, percent > limit {
@@ -254,7 +250,8 @@ enum ChargingPowerEvents {
             }
         } else if let threshold = sailingThreshold, Int(percent) >= threshold {
             // Sailing zone
-            ChargingPowerState.applyNativeLimit(threshold)
+            // Set native limit to current percentage to pause charging on AC adapter without active draining
+            ChargingPowerState.applyNativeLimit(Int(percent))
             _ = ChargingPowerState.enablePowerAdapter(force: force)
             if ChargingPowerState.isChargingDisabled() {
                 ChargingPowerState.syncMagSafeState(percent: percent)
@@ -278,26 +275,32 @@ enum ChargingPowerEvents {
             return (true, nil)
         }
         
-        let sailingActive = ChargingSettings.sailingMode && chargingMode == .standard
-        let sailingThreshold: UInt8 = sailingActive
-            ? (limit >= ChargingSettings.sailingModeLimit ? limit - ChargingSettings.sailingModeLimit : 0)
-            : 0
-        
+        // On macOS 27 without PowerUI, pausing is physically impossible. 
+        // We must bounce between the limit and an upper trigger threshold.
+        // We do not discharge down to sailing threshold because it forces a deep physical battery drain.
         if percent >= limit {
-            if ChargingSettings.automaticDischarge, percent > limit {
-                _ = ChargingPowerState.disablePowerAdapter(force: force)
+            if ChargingSettings.automaticDischarge {
+                let triggerLimit = min(100, Int(limit) + 1)
+                if Int(percent) > triggerLimit {
+                    _ = ChargingPowerState.disablePowerAdapter(force: force)
+                } else if percent < limit {
+                    _ = ChargingPowerState.enablePowerAdapter(force: force)
+                } else {
+                    // Inside deadband (e.g. 85-86): maintain current state
+                    if force {
+                        if ChargingPowerState.isPowerAdapterDisabled() {
+                            _ = ChargingPowerState.disablePowerAdapter(force: true)
+                        } else {
+                            _ = ChargingPowerState.enablePowerAdapter(force: true)
+                        }
+                    }
+                }
             } else {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
             }
             return (true, nil)
         } else {
             _ = ChargingPowerState.enablePowerAdapter(force: force)
-            if sailingActive, percent >= sailingThreshold {
-                if ChargingPowerState.isPowerAdapterDisabled() {
-                    return (true, nil)
-                }
-                _ = ChargingPowerState.disablePowerAdapter(force: force)
-            }
             return (true, nil)
         }
     }
