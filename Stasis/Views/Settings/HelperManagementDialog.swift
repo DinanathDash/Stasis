@@ -46,7 +46,9 @@ struct HelperManagementDialog: View {
                                 ? String(localized: "Uninstall")
                                 : String(localized: "Install")
                         ) {
-                            handleHelperAction()
+                            Task { @MainActor in
+                                await handleHelperAction()
+                            }
                         }
                         .buttonStyle(.bordered)
                         .foregroundColor(helperManager.isInstalled ? .red : .accentColor)
@@ -71,7 +73,7 @@ struct HelperManagementDialog: View {
         .frame(width: 440)
     }
 
-    private func handleHelperAction() {
+    private func handleHelperAction() async {
         let installing = !helperManager.isInstalled
         do {
             if installing {
@@ -89,7 +91,7 @@ struct HelperManagementDialog: View {
                     }
                 }
             } else {
-                try helperManager.uninstall()
+                try await helperManager.uninstall()
                 NSAlert.show(
                     title: String(localized: "Helper Status"),
                     message: String(localized: "Helper daemon successfully uninstalled. The app will now restart.")

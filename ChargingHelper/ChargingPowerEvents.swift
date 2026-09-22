@@ -20,6 +20,10 @@ enum ChargingPowerEvents {
     private static var percentToken: Int32 = 0
     private static var isRunning = false
 
+    /// Width of the bounce band above `limit` before the macOS 15.8 discharge-only fallback
+    /// actively force-discharges. Wider = fewer AC adapter on/off cycles, wider swing around the limit.
+    private static let dischargeOnlyDeadbandPercent = 5
+
     private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingPowerEvents")
 
     static func start() {
@@ -133,8 +137,9 @@ enum ChargingPowerEvents {
             logger.info("Heat protection engaged (Temp: \(temp)°C)")
 
             if ChargingPowerState.nativeMode {
-                // macOS 27: clamp PowerUI limit to current percent so firmware stops now
-                ChargingPowerState.applyNativeLimit(Int(percent))
+                // macOS 27: raise the PowerUI ceiling to (at least) current percent so the
+                // firmware stops accepting charge now, without snapping below it into discharge.
+                ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.disableCharging(force: force)
             } else {
@@ -173,8 +178,12 @@ enum ChargingPowerEvents {
         if ChargingPowerState.nativeMode {
             return evaluateStateNative(percent: percent, limit: limit, force: force)
         }
+        
+        if ChargingPowerState.dischargeOnlyFallback {
+            return evaluateStateDischargeOnly(percent: percent, limit: limit, force: force)
+        }
 
-        // Legacy macOS 26 (inhibit-based — UNTOUCHED)
+        // Legacy macOS 26 (inhibit-based — strictly restored)
         let sailingActive = ChargingSettings.sailingMode && chargingMode == .standard
         let sailingThreshold: UInt8 = sailingActive
             ? (limit >= ChargingSettings.sailingModeLimit ? limit - ChargingSettings.sailingModeLimit : 0)
@@ -215,12 +224,14 @@ enum ChargingPowerEvents {
         return threshold
     }
 
+    // MARK: - macOS 27 (PowerUI)
     @discardableResult
     private static func evaluateStateNative(percent: UInt8, limit: UInt8, force: Bool) -> (Bool, String?) {
         guard let session = ChargingPowerState.nativeSession else {
             return (false, "nativeSession unexpectedly nil")
         }
 
+        let sailingActive = ChargingSettings.sailingMode && chargingMode == .standard
         let sailingThreshold = powerUISailingThreshold(limit: limit, session: session)
 
         if percent >= limit {
@@ -229,17 +240,22 @@ enum ChargingPowerEvents {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.enableCharging(force: force)
             } else {
-                ChargingPowerState.applyNativeLimit(Int(limit))
+                // If they specifically ask for forced discharge, use it — disablePowerAdapter
+                // sets its own ceiling (the configured limit itself, the real discharge target).
+                // Otherwise, just raise the ceiling to avoid discharge, without ever setting it
+                // BELOW the current percentage (which would make the firmware actively discharge).
                 if ChargingSettings.automaticDischarge, percent > limit {
                     _ = ChargingPowerState.disablePowerAdapter(force: force)
                 } else {
+                    ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
                 }
                 return ChargingPowerState.disableCharging(force: force)
             }
         } else if let threshold = sailingThreshold, Int(percent) >= threshold {
-            // Sailing zone: lower PowerUI limit to threshold — firmware stops here
-            ChargingPowerState.applyNativeLimit(threshold)
+            // Sailing zone
+            // Raise the ceiling to (at least) current percent to pause charging without draining
+            ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
             _ = ChargingPowerState.enablePowerAdapter(force: force)
             if ChargingPowerState.isChargingDisabled() {
                 ChargingPowerState.syncMagSafeState(percent: percent)
@@ -251,6 +267,45 @@ enum ChargingPowerEvents {
             ChargingPowerState.applyNativeLimit(Int(limit))
             _ = ChargingPowerState.enablePowerAdapter(force: force)
             return ChargingPowerState.enableCharging(force: force)
+        }
+    }
+    
+    // MARK: - macOS 15.8 Fallback
+    
+    @discardableResult
+    private static func evaluateStateDischargeOnly(percent: UInt8, limit: UInt8, force: Bool) -> (Bool, String?) {
+        if chargingMode == .toFull && percent < 100 {
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
+            return (true, nil)
+        }
+        
+        // On macOS 27 without PowerUI, pausing is physically impossible. 
+        // We must bounce between the limit and an upper trigger threshold.
+        // We do not discharge down to sailing threshold because it forces a deep physical battery drain.
+        if percent >= limit {
+            if ChargingSettings.automaticDischarge {
+                let triggerLimit = min(100, Int(limit) + dischargeOnlyDeadbandPercent)
+                if Int(percent) > triggerLimit {
+                    _ = ChargingPowerState.disablePowerAdapter(force: force)
+                } else if percent < limit {
+                    _ = ChargingPowerState.enablePowerAdapter(force: force)
+                } else {
+                    // Inside deadband (e.g. 85-86): maintain current state
+                    if force {
+                        if ChargingPowerState.isPowerAdapterDisabled() {
+                            _ = ChargingPowerState.disablePowerAdapter(force: true)
+                        } else {
+                            _ = ChargingPowerState.enablePowerAdapter(force: true)
+                        }
+                    }
+                }
+            } else {
+                _ = ChargingPowerState.enablePowerAdapter(force: force)
+            }
+            return (true, nil)
+        } else {
+            _ = ChargingPowerState.enablePowerAdapter(force: force)
+            return (true, nil)
         }
     }
 }

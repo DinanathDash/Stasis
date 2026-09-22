@@ -4,17 +4,17 @@ import SwiftUI
 
 enum AppResetHelper {
     @MainActor
-    static func resetAllPreferences() {
+    static func resetAllPreferences() async {
         // Uninstall the helper daemon (this handles SMC reset internally)
         do {
-            try ChargingHelperManager.shared.uninstall()
+            try await ChargingHelperManager.shared.uninstall()
         } catch {
             print("Failed to uninstall charging helper: \(error)")
         }
 
         // Disable launch at login and actively unregister to clear OS cache
         LaunchAtLoginService.shared.setLaunchAtLogin(false)
-        try? SMAppService.mainApp.unregister()
+        try? await SMAppService.mainApp.unregister()
 
         // Remove all persisted defaults for this app bundle
         let bundleID = Bundle.main.bundleIdentifier ?? "com.dinanathdash.stasis"
@@ -111,12 +111,14 @@ struct SidebarBottomButtonsView: View {
         NSSound.beep()
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
-            AppResetHelper.resetAllPreferences()
-            NSAlert.show(
-                title: String(localized: "Preferences Reset"),
-                message: String(localized: "All preferences have been successfully restored to their defaults. The app will now restart.")
-            )
-            AppRestartHelper.restartApp()
+            Task { @MainActor in
+                await AppResetHelper.resetAllPreferences()
+                NSAlert.show(
+                    title: String(localized: "Preferences Reset"),
+                    message: String(localized: "All preferences have been successfully restored to their defaults. The app will now restart.")
+                )
+                AppRestartHelper.restartApp()
+            }
         }
     }
 }

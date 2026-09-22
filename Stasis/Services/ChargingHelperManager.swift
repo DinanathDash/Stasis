@@ -8,6 +8,26 @@ enum ChargingHelperStatus {
     case installed
 }
 
+/// Resumes a `CheckedContinuation` at most once, guarding against the XPC reply and a
+/// fallback timeout both firing (a double-resume is a runtime crash).
+private nonisolated final class ResumeOnce: @unchecked Sendable {
+    private let lock = NSLock()
+    private var isResumed = false
+    private let continuation: CheckedContinuation<Void, Never>
+
+    init(_ continuation: CheckedContinuation<Void, Never>) {
+        self.continuation = continuation
+    }
+
+    func resume() {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !isResumed else { return }
+        isResumed = true
+        continuation.resume()
+    }
+}
+
 @MainActor
 @Observable
 class ChargingHelperManager {
@@ -89,20 +109,23 @@ class ChargingHelperManager {
         }
     }
 
-    func uninstall() throws {
+    func uninstall() async throws {
         logger.info("Unregistering charging helper daemon")
         // Reset the SMC to its default state before uninstalling so the Mac isn't stuck at 80%
         if let helper = getHelper(errorHandler: { _ in }) {
-            let semaphore = DispatchSemaphore(value: 0)
-            helper.resetToDefaults { _, _ in
-                semaphore.signal()
+            // Wait briefly for the reset to complete before we destroy the daemon, without
+            // blocking the main thread the way a DispatchSemaphore wait would.
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                let once = ResumeOnce(continuation)
+                helper.resetToDefaults { _, _ in once.resume() }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    once.resume()
+                }
             }
-            // Wait briefly for the reset to complete before we destroy the daemon
-            _ = semaphore.wait(timeout: .now() + 2.0)
         }
 
         disconnect()
-        try service.unregister()
+        try await service.unregister()
         helperStatus = .notInstalled
 
         // Force the UI toggle off since the helper is gone

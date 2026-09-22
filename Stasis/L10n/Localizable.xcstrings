@@ -46505,6 +46505,112 @@
         }
       }
     },
+    "Your Mac's firmware can't pause charging directly on this macOS version. Turn on Automatic Discharge, or your charge limit won't be enforced.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Firmware deines Mac kann das Laden auf dieser macOS-Version nicht direkt pausieren. Aktiviere die automatische Entladung, sonst wird dein Ladelimit nicht durchgesetzt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El firmware de tu Mac no puede pausar la carga directamente en esta versión de macOS. Activa la descarga automática, o tu límite de carga no se aplicará."
+          }
+        },
+        "es-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El firmware de tu Mac no puede pausar la carga directamente en esta versión de macOS. Activa la descarga automática, o tu límite de carga no se aplicará."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このmacOSバージョンでは、Macのファームウェアが直接充電を一時停止できません。自動放電をオンにしないと、充電制限が適用されません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此 macOS 版本上，Mac 的固件无法直接暂停充电。请开启自动放电，否则充电限制将不会生效。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此 macOS 版本上，Mac 的韌體無法直接暫停充電。請開啟自動放電，否則充電限制將不會生效。"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прошивка вашего Mac не может напрямую приостановить зарядку в этой версии macOS. Включите автоматическую разрядку, иначе лимит заряда не будет соблюдаться."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De firmware van je Mac kan het opladen op deze macOS-versie niet direct onderbreken. Zet automatisch ontladen aan, anders wordt je oplaadlimiet niet gehandhaafd."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'inizin ürün yazılımı bu macOS sürümünde şarjı doğrudan duraklatamıyor. Otomatik Deşarj'ı açın, aksi takdirde şarj sınırınız uygulanmaz."
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strojna programska oprema vašega Maca na tej različici macOS ne more neposredno začasno ustaviti polnjenja. Vklopite samodejno praznjenje, sicer omejitev polnjenja ne bo uveljavljena."
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmvér vášho Macu nedokáže na tejto verzii macOS priamo pozastaviť nabíjanie. Zapnite automatické vybíjanie, inak sa limit nabíjania nebude uplatňovať."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmware trên Mac của bạn không thể tạm dừng sạc trực tiếp trên phiên bản macOS này. Hãy bật tính năng Tự động xả pin, nếu không giới hạn sạc sẽ không được áp dụng."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 macOS 버전에서는 Mac의 펌웨어가 충전을 직접 일시 중지할 수 없습니다. 자동 방전을 켜지 않으면 충전 제한이 적용되지 않습니다."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le micrologiciel de votre Mac ne peut pas mettre la charge en pause directement sur cette version de macOS. Activez la décharge automatique, sinon votre limite de charge ne sera pas appliquée."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il firmware del tuo Mac non può mettere in pausa la ricarica direttamente su questa versione di macOS. Attiva la scarica automatica, altrimenti il limite di carica non verrà applicato."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O firmware do seu Mac não consegue pausar diretamente o carregamento nesta versão do macOS. Ative a descarga automática, caso contrário o limite de carga não será aplicado."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O firmware do seu Mac não consegue pausar diretamente o carregamento nesta versão do macOS. Ative a descarga automática, ou o limite de carga não será aplicado."
+          }
+        }
+      }
+    },
     "日本語": {
       "localizations": {
         "de": {

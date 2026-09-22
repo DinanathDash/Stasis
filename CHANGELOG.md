@@ -6,7 +6,15 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
-- No unreleased changes yet.
+### Features & Core Capabilities
+
+- **Discharge Fallback:** Added support for discharge-only fallback capabilities and migrated helper uninstallation to async/await.
+- **macOS 27 Analysis:** Added macOS 27 beta issue analysis tools, baselines, and reproduction scripts.
+
+### Bug Fixes & Refinements
+
+- **Charging Stability:** Added write retry logic for PowerUI limits, prevented startup race conditions, and refined discharge ceiling handling.
+- **Charging Optimization:** Optimized charging limit calculations and native power state logic to prevent battery discharge, and streamlined charging state evaluations by removing deadband logic.
 
 ---
 

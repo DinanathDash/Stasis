@@ -38,19 +38,26 @@ public struct DeviceCapabilities: Sendable {
     public let hasMagSafe: Bool
     public let magsafeLEDControl: Bool
     public let nativeMode: Bool
+    /// True when this Mac has no charge-inhibit key and no working native (PowerUI) limit —
+    /// only force-discharge is available (macOS 15.8 with the new firmware). The charge limit
+    /// can only be held by bouncing the AC adapter; it is not enforced unless automatic
+    /// discharge is also enabled.
+    public let dischargeOnlyFallback: Bool
 
     public init(
         chargingControl: Bool,
         adapterControl: Bool,
         hasMagSafe: Bool,
         magsafeLEDControl: Bool,
-        nativeMode: Bool = false
+        nativeMode: Bool = false,
+        dischargeOnlyFallback: Bool = false
     ) {
         self.chargingControl = chargingControl
         self.adapterControl = adapterControl
         self.hasMagSafe = hasMagSafe
         self.magsafeLEDControl = magsafeLEDControl
         self.nativeMode = nativeMode
+        self.dischargeOnlyFallback = dischargeOnlyFallback
     }
 
     public static func from(

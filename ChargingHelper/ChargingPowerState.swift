@@ -19,6 +19,12 @@ enum ChargingPowerState {
 
     /// True when PowerUI backend is active (macOS 27). All legacy SMC paths are skipped.
     static var nativeMode: Bool { nativeSession != nil }
+    
+    /// True when the Mac has no inhibit control but has force discharge control (macOS 15.8 workaround)
+    static var dischargeOnlyFallback: Bool {
+        guard let capabilities = battery?.capabilities else { return false }
+        return !nativeMode && !capabilities.inhibitChargeControl && capabilities.forceDischargeControl
+    }
 
     private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingPowerState")
 
@@ -28,7 +34,8 @@ enum ChargingPowerState {
 
         // ── macOS 27: Try PowerUI backend first ──────────────────────────────────
         if battery.capabilities.nativeChargeLimitControl {
-            if let backend = try? PowerUIChargeBackend() {
+            do {
+                let backend = try PowerUIChargeBackend()
                 let session = NativeChargeSession(backend: backend)
                 nativeSession = session
                 logger.info("PowerUI backend ready — using native charge control (macOS 27+)")
@@ -44,10 +51,10 @@ enum ChargingPowerState {
                         logger.info("PowerUI synced charge limit to \(limit)% on startup")
                     } catch {
                         logger.error("PowerUI startup sync failed: \(error.localizedDescription)")
-                    }
                 }
-            } else {
-                logger.warning("CHLT key present but PowerUI unavailable — falling back to SMC inhibit path")
+                }
+            } catch {
+                logger.warning("CHLT key present but PowerUI unavailable (\(error.localizedDescription)) — falling back to SMC inhibit path")
             }
         }
 
@@ -115,6 +122,17 @@ enum ChargingPowerState {
             logger.error("PowerUI apply failed: \(error.localizedDescription)")
             return (false, error.localizedDescription)
         }
+    }
+
+    /// Apply a PowerUI ceiling that pauses charging at or just above `percent`, snapping UP to
+    /// the next supported step instead of down. Snapping down here (as `applyNativeLimit` does
+    /// for a user-configured limit) would place the firmware ceiling below the battery's current
+    /// level, which makes the firmware actively discharge instead of merely pausing.
+    @discardableResult
+    static func applyNativePauseCeiling(atLeast percent: Int) -> (Bool, String?) {
+        guard let session = nativeSession else { return (false, "No native session") }
+        let ceiling = session.nearestLimit(atOrAbove: percent) ?? session.supportedLimits.max() ?? 100
+        return applyNativeLimit(ceiling)
     }
 
     static func disableCharging(force: Bool = false) -> (Bool, String?) {
@@ -188,63 +206,93 @@ enum ChargingPowerState {
         guard force || !powerDisabled else { return (true, nil) }
         guard let battery = battery else { return (false, "Battery is nil") }
 
-        // ── macOS 27 (PowerUI) ───────────────────────────────────────────────────
-        // Force discharge approximation: set PowerUI limit to current battery level.
-        // Firmware stops accepting AC charge; system draws from battery naturally.
+        // ALWAYS use real SMC force discharge if available (even in macOS 27 nativeMode)
+        if battery.capabilities.forceDischargeControl {
+            do {
+                try battery.setForceDischarging(true)
+                powerDisabled = true
+                logger.debug("[Hybrid] SMC force discharging actively engaged")
+                syncSleepState()
+
+                // If nativeMode, also sync the PowerUI ceiling to the configured limit — the
+                // actual target of this discharge — not the current (drifting) percent, which
+                // would otherwise visibly march the ceiling through intermediate steps as the
+                // battery falls (e.g. 90% then 85%) instead of showing the real target directly.
+                if nativeMode {
+                    let _ = applyNativeLimit(Int(ChargingSettings.chargeLimit))
+                }
+
+                return (true, nil)
+            } catch {
+                logger.error("Failed to disable power adapter (Hybrid): \(error.localizedDescription)")
+            }
+        }
+
+        // ── macOS 27 (PowerUI) Fallback if CHIE is missing ──────────────────────
+        // Force discharge approximation: set the PowerUI ceiling to the configured limit —
+        // the firmware itself then drains toward it (this IS the enforcement mechanism here,
+        // not just a display sync, since there's no real CHIE to do the discharging).
         if nativeMode {
-            let (percent, _) = IOKitHelper.getPercentRemaining()
-            let _ = applyNativeLimit(Int(percent))
+            let limit = Int(ChargingSettings.chargeLimit)
+            let _ = applyNativeLimit(limit)
             powerDisabled = true
-            logger.info("[macOS 27] Force discharge approximated — PowerUI limit set to current \(percent)%")
+            logger.info("[macOS 27] Force discharge approximated — PowerUI limit set to \(limit)%")
             syncSleepState()
             return (true, nil)
         }
 
-        // ── Legacy macOS 26: CHIE / CH0I ─────────────────────────────────────────
-        guard battery.capabilities.forceDischargeControl else { return (false, "forceDischargeControl is false") }
-        do {
-            try battery.setForceDischarging(true)
-            powerDisabled = true
-            logger.debug("[Legacy] SMC force discharging = true")
-            syncSleepState()
-            return (true, nil)
-        } catch {
-            logger.error("Failed to disable power adapter: \(error.localizedDescription)")
-            return (false, "Failed to disable power adapter: \(error.localizedDescription)")
-        }
+        return (false, "forceDischargeControl is false")
     }
 
     static func enablePowerAdapter(force: Bool = false) -> (Bool, String?) {
         guard force || powerDisabled else { return (true, nil) }
         guard let battery = battery else { return (false, "Battery is nil") }
 
-        // ── macOS 27 (PowerUI) ───────────────────────────────────────────────────
-        // Restore PowerUI limit to configured charge limit.
+        // ALWAYS disable real SMC force discharge if it was available
+        if battery.capabilities.forceDischargeControl {
+            do {
+                try battery.setForceDischarging(false)
+                powerDisabled = false
+                logger.debug("[Hybrid] SMC force discharging ended")
+                
+                if !nativeMode && chargingDisabled {
+                    try? battery.setChargingInhibited(true)
+                    logger.debug("[Legacy] Re-asserted charging inhibited after adapter re-enable")
+                }
+                
+                syncSleepState()
+
+                if nativeMode {
+                    // Never blindly reapply the raw configured limit here — if the battery is
+                    // still even 1% above it when discharge ends (timing lag is normal), that
+                    // would set the ceiling below the current percent and immediately trigger
+                    // another round of active discharge. Only drop to the exact limit once the
+                    // battery has actually reached (or is below) it.
+                    let limit = Int(ChargingSettings.chargeLimit)
+                    let (percent, _) = IOKitHelper.getPercentRemaining()
+                    ChargingPowerState.applyNativePauseCeiling(atLeast: max(limit, Int(percent)))
+                    logger.info("[macOS 27] Force discharge ended — PowerUI ceiling restored (limit \(limit)%, percent \(percent)%)")
+                }
+
+                return (true, nil)
+            } catch {
+                logger.error("Failed to enable power adapter (Hybrid): \(error.localizedDescription)")
+            }
+        }
+
+        // ── macOS 27 (PowerUI) Fallback if CHIE is missing ──────────────────────
+        // Restore PowerUI ceiling — same rule: never drop it below the current percent.
         if nativeMode {
             let limit = Int(ChargingSettings.chargeLimit)
-            let _ = applyNativeLimit(limit)
+            let (percent, _) = IOKitHelper.getPercentRemaining()
+            let _ = applyNativePauseCeiling(atLeast: max(limit, Int(percent)))
             powerDisabled = false
-            logger.info("[macOS 27] Force discharge ended — PowerUI limit restored to \(limit)%")
+            logger.info("[macOS 27] Force discharge ended — PowerUI ceiling restored (limit \(limit)%, percent \(percent)%)")
             syncSleepState()
             return (true, nil)
         }
 
-        // ── Legacy macOS 26: CHIE / CH0I ─────────────────────────────────────────
-        guard battery.capabilities.forceDischargeControl else { return (false, "forceDischargeControl is false") }
-        do {
-            try battery.setForceDischarging(false)
-            powerDisabled = false
-            logger.debug("[Legacy] SMC force discharging = false")
-            if chargingDisabled {
-                try? battery.setChargingInhibited(true)
-                logger.debug("[Legacy] Re-asserted charging inhibited after adapter re-enable")
-            }
-            syncSleepState()
-            return (true, nil)
-        } catch {
-            logger.error("Failed to enable power adapter: \(error.localizedDescription)")
-            return (false, "Failed to enable power adapter: \(error.localizedDescription)")
-        }
+        return (false, "forceDischargeControl is false")
     }
 
     @discardableResult
