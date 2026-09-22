@@ -213,13 +213,15 @@ enum ChargingPowerState {
                 powerDisabled = true
                 logger.debug("[Hybrid] SMC force discharging actively engaged")
                 syncSleepState()
-                
-                // If nativeMode, also sync the PowerUI limit for UI consistency
+
+                // If nativeMode, also sync the PowerUI ceiling to the configured limit — the
+                // actual target of this discharge — not the current (drifting) percent, which
+                // would otherwise visibly march the ceiling through intermediate steps as the
+                // battery falls (e.g. 90% then 85%) instead of showing the real target directly.
                 if nativeMode {
-                    let (percent, _) = IOKitHelper.getPercentRemaining()
-                    let _ = applyNativeLimit(Int(percent))
+                    let _ = applyNativeLimit(Int(ChargingSettings.chargeLimit))
                 }
-                
+
                 return (true, nil)
             } catch {
                 logger.error("Failed to disable power adapter (Hybrid): \(error.localizedDescription)")
@@ -227,13 +229,14 @@ enum ChargingPowerState {
         }
 
         // ── macOS 27 (PowerUI) Fallback if CHIE is missing ──────────────────────
-        // Force discharge approximation: set PowerUI limit to current battery level.
-        // Firmware stops accepting AC charge; system draws from battery naturally.
+        // Force discharge approximation: set the PowerUI ceiling to the configured limit —
+        // the firmware itself then drains toward it (this IS the enforcement mechanism here,
+        // not just a display sync, since there's no real CHIE to do the discharging).
         if nativeMode {
-            let (percent, _) = IOKitHelper.getPercentRemaining()
-            let _ = applyNativeLimit(Int(percent))
+            let limit = Int(ChargingSettings.chargeLimit)
+            let _ = applyNativeLimit(limit)
             powerDisabled = true
-            logger.info("[macOS 27] Force discharge approximated — PowerUI limit set to current \(percent)%")
+            logger.info("[macOS 27] Force discharge approximated — PowerUI limit set to \(limit)%")
             syncSleepState()
             return (true, nil)
         }
@@ -258,13 +261,19 @@ enum ChargingPowerState {
                 }
                 
                 syncSleepState()
-                
+
                 if nativeMode {
+                    // Never blindly reapply the raw configured limit here — if the battery is
+                    // still even 1% above it when discharge ends (timing lag is normal), that
+                    // would set the ceiling below the current percent and immediately trigger
+                    // another round of active discharge. Only drop to the exact limit once the
+                    // battery has actually reached (or is below) it.
                     let limit = Int(ChargingSettings.chargeLimit)
-                    let _ = applyNativeLimit(limit)
-                    logger.info("[macOS 27] Force discharge ended — PowerUI limit restored to \(limit)%")
+                    let (percent, _) = IOKitHelper.getPercentRemaining()
+                    ChargingPowerState.applyNativePauseCeiling(atLeast: max(limit, Int(percent)))
+                    logger.info("[macOS 27] Force discharge ended — PowerUI ceiling restored (limit \(limit)%, percent \(percent)%)")
                 }
-                
+
                 return (true, nil)
             } catch {
                 logger.error("Failed to enable power adapter (Hybrid): \(error.localizedDescription)")
@@ -272,12 +281,13 @@ enum ChargingPowerState {
         }
 
         // ── macOS 27 (PowerUI) Fallback if CHIE is missing ──────────────────────
-        // Restore PowerUI limit to configured charge limit.
+        // Restore PowerUI ceiling — same rule: never drop it below the current percent.
         if nativeMode {
             let limit = Int(ChargingSettings.chargeLimit)
-            let _ = applyNativeLimit(limit)
+            let (percent, _) = IOKitHelper.getPercentRemaining()
+            let _ = applyNativePauseCeiling(atLeast: max(limit, Int(percent)))
             powerDisabled = false
-            logger.info("[macOS 27] Force discharge ended — PowerUI limit restored to \(limit)%")
+            logger.info("[macOS 27] Force discharge ended — PowerUI ceiling restored (limit \(limit)%, percent \(percent)%)")
             syncSleepState()
             return (true, nil)
         }

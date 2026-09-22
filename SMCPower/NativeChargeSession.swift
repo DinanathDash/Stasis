@@ -56,6 +56,34 @@ public final class NativeChargeSession {
         backend.limits.filter { $0 >= value }.min()
     }
 
+    /// Writes `value` and verifies the readback, retrying the whole write+readback round trip
+    /// a few times before giving up. Right after the PowerUI client first connects (e.g. the
+    /// daemon just launched), its very first WRITE can fail outright — not just a stale
+    /// readback — because the private client needs a brief moment after construction before
+    /// it's ready to accept writes, even though reads during init already succeeded fine.
+    private func writeAndVerify(_ value: Int, attempts: Int = 4) throws -> Int {
+        var lastError: Error?
+        for attempt in 1 ... attempts {
+            do {
+                try backend.writeLimit(value)
+                let readback = try backend.readLimit()
+                guard readback == value else {
+                    throw NativeChargeError.failed(
+                        "macOS did not retain the requested limit (read back \(readback)%, expected \(value)%)."
+                    )
+                }
+                return readback
+            } catch {
+                lastError = error
+                if attempt < attempts {
+                    logger.warning("PowerUI write attempt \(attempt) failed, retrying: \(error.localizedDescription)")
+                    Thread.sleep(forTimeInterval: 0.15)
+                }
+            }
+        }
+        throw lastError ?? NativeChargeError.failed("Unknown failure applying limit \(value)%.")
+    }
+
     public func apply(_ limit: Int) throws {
 
         guard backend.limits.contains(limit) else { throw NativeChargeError.unsupportedLimit }
@@ -65,29 +93,16 @@ public final class NativeChargeSession {
             defaults.synchronize()
             logger.info("Journaled original native charge limit: \(current)%")
         }
-        if current != limit {
-            logger.info("Setting native charge limit: \(current)% → \(limit)%")
-            try backend.writeLimit(limit)
-        }
-        let readback = try backend.readLimit()
-        guard readback == limit else {
-            throw NativeChargeError.failed(
-                "macOS did not retain the requested limit (read back \(readback)%, expected \(limit)%)."
-            )
-        }
+        guard current != limit else { return }
+        logger.info("Setting native charge limit: \(current)% → \(limit)%")
+        _ = try writeAndVerify(limit)
     }
 
     public func restore() throws {
         guard defaults.object(forKey: recoveryKey) != nil else { return }
         let original = defaults.integer(forKey: recoveryKey)
         logger.info("Restoring native charge limit to \(original)%")
-        try backend.writeLimit(original)
-        let readback = try backend.readLimit()
-        guard readback == original else {
-            throw NativeChargeError.failed(
-                "Could not restore charge limit (read \(readback)%, expected \(original)%). Check System Settings → Battery."
-            )
-        }
+        _ = try writeAndVerify(original)
         defaults.removeObject(forKey: recoveryKey)
         defaults.synchronize()
         logger.info("Native charge limit restored and journal cleared.")

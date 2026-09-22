@@ -240,14 +240,14 @@ enum ChargingPowerEvents {
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.enableCharging(force: force)
             } else {
-                // To prevent active discharge on battery, we must never set the PowerUI limit
-                // BELOW the current percentage — snap UP to the next supported step instead.
-                ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
-
-                // If they specifically ask for forced discharge, use it. Otherwise, native pause works.
+                // If they specifically ask for forced discharge, use it — disablePowerAdapter
+                // sets its own ceiling (the configured limit itself, the real discharge target).
+                // Otherwise, just raise the ceiling to avoid discharge, without ever setting it
+                // BELOW the current percentage (which would make the firmware actively discharge).
                 if ChargingSettings.automaticDischarge, percent > limit {
                     _ = ChargingPowerState.disablePowerAdapter(force: force)
                 } else {
+                    ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
                 }
                 return ChargingPowerState.disableCharging(force: force)

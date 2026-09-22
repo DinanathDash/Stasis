@@ -94,6 +94,9 @@ class ServiceDelegate: NSObject, NSXPCListenerDelegate {
     }
 }
 
+// ChargingHelper's own init already schedules ChargingPowerState.initialize() and
+// ChargingPowerEvents.start() on the main actor — do not call them again here, or the PowerUI
+// backend gets constructed twice and two near-simultaneous native-limit writes race each other.
 let helper = ChargingHelper(battery: battery, adapter: adapter)
 let delegate = ServiceDelegate(helper: helper)
 let listener = NSXPCListener(
@@ -101,12 +104,6 @@ let listener = NSXPCListener(
 )
 listener.delegate = delegate
 listener.resume()
-
-// Initialize the SMC Power state controller
-ChargingPowerState.initialize(battery: battery, adapter: adapter)
-
-// Start monitoring power events in the background
-ChargingPowerEvents.start()
 
 /// Setup graceful teardown
 let termSource = DispatchSource.makeSignalSource(
