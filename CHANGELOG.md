@@ -6,6 +6,12 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+---
+
+## 0.23.0 - 2026-09-22
+
 ### Features & Core Capabilities
 
 - **Discharge Fallback:** Added support for discharge-only fallback capabilities and migrated helper uninstallation to async/await.

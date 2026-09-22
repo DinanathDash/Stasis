@@ -5,6 +5,26 @@
         <description>Most recent changes for Stasis.</description>
         <language>en</language>
         <item>
+            <title>0.23.0</title>
+            <pubDate>Tue, 22 Sep 2026 08:51:50 +0000</pubDate>
+            <sparkle:version>77</sparkle:version>
+            <sparkle:shortVersionString>0.23.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>Features &amp; Core Capabilities</h3>
+<ul>
+<li><strong>Discharge Fallback:</strong> Added support for discharge-only fallback capabilities and migrated helper uninstallation to async/await.</li>
+<li><strong>macOS 27 Analysis:</strong> Added macOS 27 beta issue analysis tools, baselines, and reproduction scripts.</li>
+</ul>
+<h3>Bug Fixes &amp; Refinements</h3>
+<ul>
+<li><strong>Charging Stability:</strong> Added write retry logic for PowerUI limits, prevented startup race conditions, and refined discharge ceiling handling.</li>
+<li><strong>Charging Optimization:</strong> Optimized charging limit calculations and native power state logic to prevent battery discharge, and streamlined charging state evaluations by removing deadband logic.</li>
+</ul>
+
+]]></description>
+            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.23.0/Stasis.dmg" length="4588205" type="application/octet-stream" sparkle:edSignature="8jgx2U573fC8qfeVNp3L8jly9hKX+k4xQ4eGtnaqJOF7yKIRVL+3EwzlAa22pYxCgIBQvJZU8j7zLgdOTI/bBA=="/>
+        </item>
+        <item>
             <title>0.22.2</title>
             <pubDate>Wed, 16 Sep 2026 10:11:58 +0000</pubDate>
             <sparkle:version>76</sparkle:version>
@@ -38,26 +58,6 @@
 
 ]]></description>
             <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.22.0/Stasis.dmg" length="4570689" type="application/octet-stream" sparkle:edSignature="xuuKiMWrNc41BkjxAjBk/39WXKC/u4Bgpz75/sB7+VvrJH6lq9uy1hp7/QVpQpAjnBqVLfD+6Wd50DtyG0w8Cw=="/>
-        </item>
-        <item>
-            <title>0.21.3</title>
-            <pubDate>Sun, 30 Aug 2026 17:10:48 +0000</pubDate>
-            <sparkle:version>73</sparkle:version>
-            <sparkle:shortVersionString>0.21.3</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
-            <description><![CDATA[<p>Major stability update addressing privileged daemon crashes and XPC reliability in ad-hoc builds.</p>
-<h3>Bug Fixes &amp; Refinements</h3>
-<ul>
-<li><strong>XPC Security &amp; Build Support:</strong> Refactored XPC validation to use <code>SecCodeCopyDesignatedRequirement</code> combined with <code>processIdentifier</code>, resolving a critical <code>EX_CONFIG</code> launch crash on ad-hoc release builds while maintaining robust security against spoofing.</li>
-<li><strong>Daemon Liveness &amp; Sync:</strong> Replaced the unreliable <code>SMAppService.status</code> check with an active XPC <code>ping</code> for true daemon liveness verification. Silent sync failures are now caught and immediately surfaced to the user.</li>
-<li><strong>Daemon Re-installation:</strong> Fixed a 32-second UI thread blocking issue during daemon installation and ensured <code>manageCharging</code> preferences are cleanly wiped upon uninstallation to prevent unintended charging pauses on restart.</li>
-<li><strong>Heat Protection:</strong> Fixed a logic bug where heat protection failed to re-enable the power adapter, inadvertently draining the battery while trying to cool it down.</li>
-<li><strong>SMC Read Reliability:</strong> SMC read failures (e.g. from the unprivileged helper) are now properly surfaced to the UI instead of silently masking as zero values (0.00W).</li>
-<li><strong>Launchd Compatibility:</strong> Added required <code>CFBundleIdentifier</code> and bundle keys to the <code>ChargingHelper</code> Info.plist to satisfy strict <code>launchd</code> constraint requirements.</li>
-</ul>
-
-]]></description>
-            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.21.3/Stasis.dmg" length="4545583" type="application/octet-stream" sparkle:edSignature="J4nDnByUqr+hY45r+7D/6b5wTboKSNOj1ALBBJ502sWiFDndNeVZP4fVtJaRDvLkdB30fVCR1WMMEidRgd2VCg=="/>
         </item>
     </channel>
 </rss>
