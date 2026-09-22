@@ -50,7 +50,7 @@ final class Helper: NSObject, HelperProtocol {
         }
     }
 
-    func getCapabilities(reply: @escaping @Sendable (Bool, Bool, Bool, Bool, Bool) -> Void) {
+    func getCapabilities(reply: @escaping @Sendable (Bool, Bool, Bool, Bool, Bool, Bool) -> Void) {
         do {
             let battery = try SMCBattery.probe()
             let adapter = try SMCAdapter.probe()
@@ -67,19 +67,26 @@ final class Helper: NSObject, HelperProtocol {
 
             let adapterControl = battery.capabilities.forceDischargeControl
 
+            // macOS 15.8: firmware dropped the inhibit keys but PowerUI isn't available pre-26,
+            // so only bouncing the AC adapter via force-discharge can hold the limit.
+            let dischargeOnlyFallback = !battery.capabilities.inhibitChargeControl
+                && !powerUIAvailable
+                && battery.capabilities.forceDischargeControl
+
             logger.info(
-                "Probed capabilities: chargingControl=\(chargingControl) [inhibit=\(battery.capabilities.inhibitChargeControl), chlt=\(battery.capabilities.nativeChargeLimitControl), powerUI=\(powerUIAvailable)] adapterControl=\(adapterControl) magSafe=\(adapter.capabilities.magSafeControl)"
+                "Probed capabilities: chargingControl=\(chargingControl) [inhibit=\(battery.capabilities.inhibitChargeControl), chlt=\(battery.capabilities.nativeChargeLimitControl), powerUI=\(powerUIAvailable)] adapterControl=\(adapterControl) magSafe=\(adapter.capabilities.magSafeControl) dischargeOnlyFallback=\(dischargeOnlyFallback)"
             )
             reply(
                 chargingControl,
                 adapterControl,
                 adapter.capabilities.magSafeControl,
                 adapter.capabilities.magSafeControl,
-                powerUIAvailable
+                powerUIAvailable,
+                dischargeOnlyFallback
             )
         } catch {
             logger.error("Failed to probe capabilities: \(error.localizedDescription)")
-            reply(false, false, false, false, false)
+            reply(false, false, false, false, false, false)
         }
     }
 }

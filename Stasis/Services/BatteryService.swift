@@ -89,14 +89,15 @@ class BatteryService {
                 return
             }
 
-            helper.getCapabilities { chargingControl, adapterControl, hasMagSafe, magsafeLEDControl, nativeMode in
+            helper.getCapabilities { chargingControl, adapterControl, hasMagSafe, magsafeLEDControl, nativeMode, dischargeOnlyFallback in
                 continuation.resume(
                     returning: DeviceCapabilities(
                         chargingControl: chargingControl,
                         adapterControl: adapterControl,
                         hasMagSafe: hasMagSafe,
                         magsafeLEDControl: magsafeLEDControl,
-                        nativeMode: nativeMode
+                        nativeMode: nativeMode,
+                        dischargeOnlyFallback: dischargeOnlyFallback
                     )
                 )
             }

@@ -51,6 +51,11 @@ public final class NativeChargeSession {
         backend.limits.filter { $0 <= value }.max()
     }
 
+    /// Nearest supported PowerUI limit step at or above `value`. Nil if value > maximum (100).
+    public func nearestLimit(atOrAbove value: Int) -> Int? {
+        backend.limits.filter { $0 >= value }.min()
+    }
+
     public func apply(_ limit: Int) throws {
 
         guard backend.limits.contains(limit) else { throw NativeChargeError.unsupportedLimit }

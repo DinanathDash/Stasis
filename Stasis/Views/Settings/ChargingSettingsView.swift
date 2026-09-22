@@ -58,10 +58,31 @@ struct ChargingSettingsView: View {
     }
 
     private var sailingResumePercentage: Int {
-        if capabilities.nativeMode && chargeLimit <= 85 {
-            return chargeLimit - 5
+        chargeLimit - sailingModeLimit
+    }
+
+    /// PowerUI (macOS 26/27) only supports discrete charge-limit steps (80, 85, 90, 95, 100),
+    /// so the sailing threshold must land on one of those steps below `limit` — i.e. a multiple
+    /// of 5, between 5 and `limit - 80`. Clamps (and snaps to 5s) whatever value is currently set.
+    private func clampedSailingModeLimit(for limit: Int) -> Int {
+        guard capabilities.nativeMode else {
+            return min(max(sailingModeLimit, 1), 20)
         }
-        return chargeLimit - sailingModeLimit
+        let lower = 5
+        let upper = max(lower, limit - 80)
+        let snapped = (sailingModeLimit / 5) * 5
+        return min(max(snapped, lower), upper)
+    }
+
+    /// Re-persists `sailingModeLimit` if it's no longer valid for the current charge limit —
+    /// e.g. it was set at a higher limit and the limit was since lowered, or the device is in
+    /// PowerUI native mode where only 5%-step thresholds are valid.
+    private func reclampSailingModeLimitIfNeeded() {
+        guard sailingMode else { return }
+        let clamped = clampedSailingModeLimit(for: chargeLimit)
+        if clamped != sailingModeLimit {
+            sailingModeLimit = clamped
+        }
     }
 
     var body: some View {
@@ -152,6 +173,8 @@ struct ChargingSettingsView: View {
                 } footer: {
                     if !hasAdapterControl {
                         Text("Adapter control is not supported on this device.")
+                    } else if capabilities.dischargeOnlyFallback && !automaticDischarge {
+                        Text("Your Mac's firmware can't pause charging directly on this macOS version. Turn on Automatic Discharge, or your charge limit won't be enforced.")
                     }
                 }
 
@@ -203,11 +226,7 @@ struct ChargingSettingsView: View {
                                     } else {
                                         Slider(
                                             value: Binding(
-                                                get: {
-                                                    let lower = capabilities.nativeMode ? 5.0 : 1.0
-                                                    let upper = capabilities.nativeMode ? Double(chargeLimit - 80) : 20.0
-                                                    return min(max(Double(sailingModeLimit), lower), upper)
-                                                },
+                                                get: { Double(clampedSailingModeLimit(for: chargeLimit)) },
                                                 set: { sailingModeLimit = Int($0) }
                                             ),
                                             in: (capabilities.nativeMode ? 5.0 : 1.0) ... (capabilities.nativeMode ? Double(chargeLimit - 80) : 20.0),
@@ -442,6 +461,9 @@ struct ChargingSettingsView: View {
         .animation(.default, value: enableHeatProtectionMode)
         .animation(.default, value: manageMagSafeLED)
         .animation(.default, value: helperManager.helperStatus)
+        .onChange(of: chargeLimit) { _, _ in reclampSailingModeLimitIfNeeded() }
+        .onChange(of: sailingMode) { _, _ in reclampSailingModeLimitIfNeeded() }
+        .onAppear { reclampSailingModeLimitIfNeeded() }
     }
 
     private func toggleManageCharging(_ enabled: Bool) {

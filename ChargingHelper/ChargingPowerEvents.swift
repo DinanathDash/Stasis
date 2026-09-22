@@ -20,6 +20,10 @@ enum ChargingPowerEvents {
     private static var percentToken: Int32 = 0
     private static var isRunning = false
 
+    /// Width of the bounce band above `limit` before the macOS 15.8 discharge-only fallback
+    /// actively force-discharges. Wider = fewer AC adapter on/off cycles, wider swing around the limit.
+    private static let dischargeOnlyDeadbandPercent = 5
+
     private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingPowerEvents")
 
     static func start() {
@@ -133,8 +137,9 @@ enum ChargingPowerEvents {
             logger.info("Heat protection engaged (Temp: \(temp)°C)")
 
             if ChargingPowerState.nativeMode {
-                // macOS 27: clamp PowerUI limit to current percent so firmware stops now
-                ChargingPowerState.applyNativeLimit(Int(percent))
+                // macOS 27: raise the PowerUI ceiling to (at least) current percent so the
+                // firmware stops accepting charge now, without snapping below it into discharge.
+                ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
                 _ = ChargingPowerState.enablePowerAdapter(force: force)
                 return ChargingPowerState.disableCharging(force: force)
             } else {
@@ -236,10 +241,9 @@ enum ChargingPowerEvents {
                 return ChargingPowerState.enableCharging(force: force)
             } else {
                 // To prevent active discharge on battery, we must never set the PowerUI limit
-                // BELOW the current percentage. We clamp it to `percent` to force AC power pause.
-                let targetNativeLimit = max(Int(limit), Int(percent))
-                ChargingPowerState.applyNativeLimit(targetNativeLimit)
-                
+                // BELOW the current percentage — snap UP to the next supported step instead.
+                ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
+
                 // If they specifically ask for forced discharge, use it. Otherwise, native pause works.
                 if ChargingSettings.automaticDischarge, percent > limit {
                     _ = ChargingPowerState.disablePowerAdapter(force: force)
@@ -250,8 +254,8 @@ enum ChargingPowerEvents {
             }
         } else if let threshold = sailingThreshold, Int(percent) >= threshold {
             // Sailing zone
-            // Set native limit to current percentage to pause charging on AC adapter without active draining
-            ChargingPowerState.applyNativeLimit(Int(percent))
+            // Raise the ceiling to (at least) current percent to pause charging without draining
+            ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
             _ = ChargingPowerState.enablePowerAdapter(force: force)
             if ChargingPowerState.isChargingDisabled() {
                 ChargingPowerState.syncMagSafeState(percent: percent)
@@ -280,7 +284,7 @@ enum ChargingPowerEvents {
         // We do not discharge down to sailing threshold because it forces a deep physical battery drain.
         if percent >= limit {
             if ChargingSettings.automaticDischarge {
-                let triggerLimit = min(100, Int(limit) + 1)
+                let triggerLimit = min(100, Int(limit) + dischargeOnlyDeadbandPercent)
                 if Int(percent) > triggerLimit {
                     _ = ChargingPowerState.disablePowerAdapter(force: force)
                 } else if percent < limit {

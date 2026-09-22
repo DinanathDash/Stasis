@@ -124,6 +124,17 @@ enum ChargingPowerState {
         }
     }
 
+    /// Apply a PowerUI ceiling that pauses charging at or just above `percent`, snapping UP to
+    /// the next supported step instead of down. Snapping down here (as `applyNativeLimit` does
+    /// for a user-configured limit) would place the firmware ceiling below the battery's current
+    /// level, which makes the firmware actively discharge instead of merely pausing.
+    @discardableResult
+    static func applyNativePauseCeiling(atLeast percent: Int) -> (Bool, String?) {
+        guard let session = nativeSession else { return (false, "No native session") }
+        let ceiling = session.nearestLimit(atOrAbove: percent) ?? session.supportedLimits.max() ?? 100
+        return applyNativeLimit(ceiling)
+    }
+
     static func disableCharging(force: Bool = false) -> (Bool, String?) {
         guard force || !chargingDisabled else { return (true, nil) }
         guard let battery = battery else { return (false, "Battery is nil") }
