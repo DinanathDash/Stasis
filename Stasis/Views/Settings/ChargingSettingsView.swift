@@ -266,49 +266,47 @@ struct ChargingSettingsView: View {
                     }
                 }
 
-                if !capabilities.nativeMode {
-                    Section {
-                        Toggle(
-                            "Enable heat protection",
-                            isOn: $enableHeatProtectionMode
-                        )
-                        .disabled(!hasChargingControl)
+                Section {
+                    Toggle(
+                        "Enable heat protection",
+                        isOn: $enableHeatProtectionMode
+                    )
+                    .disabled(!hasChargingControl)
 
-                        if enableHeatProtectionMode {
-                            LabeledContent {
-                                HStack(spacing: 8) {
-                                    Slider(
-                                        value: Binding(
-                                            get: { Double(heatProtectionLimit) },
-                                            set: { heatProtectionLimit = Int($0) }
-                                        ),
-                                        in: 30 ... 50,
-                                        step: 1
-                                    )
-                                    Text("\(heatProtectionLimit)°C")
-                                        .monospacedDigit()
-                                        .foregroundStyle(.secondary)
-                                        .frame(width: 40, alignment: .trailing)
-                                }
-                            } label: {
-                                Text("Temperature limit")
+                    if enableHeatProtectionMode {
+                        LabeledContent {
+                            HStack(spacing: 8) {
+                                Slider(
+                                    value: Binding(
+                                        get: { Double(heatProtectionLimit) },
+                                        set: { heatProtectionLimit = Int($0) }
+                                    ),
+                                    in: 30 ... 50,
+                                    step: 1
+                                )
+                                Text("\(heatProtectionLimit)°C")
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                                    .frame(width: 40, alignment: .trailing)
                             }
+                        } label: {
+                            Text("Temperature limit")
                         }
-                    } header: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Heat Protection")
-                            Text(
-                                "Pause charging when the battery temperature exceeds the threshold."
-                            )
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        }
-                    } footer: {
-                        if !hasChargingControl {
-                            Text(
-                                "Charging control is not supported on this device."
-                            )
-                        }
+                    }
+                } header: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Heat Protection")
+                        Text(
+                            "Pause charging when the battery temperature exceeds the threshold."
+                        )
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    }
+                } footer: {
+                    if !hasChargingControl {
+                        Text(
+                            "Charging control is not supported on this device."
+                        )
                     }
                 }
 

@@ -4,6 +4,7 @@ import IOKit
 import IOKit.ps
 import IOKit.pwr_mgt
 import os.log
+import smc_power
 
 @MainActor
 class IOKitService {
@@ -330,17 +331,21 @@ class IOKitService {
             return decikelvinToCelsius(temp)
         }
 
-        guard
-            let temp: Int = getPropertyValue(
+        if let temp: Int = getPropertyValue(
                 batteryService,
                 key: "Temperature"
             ),
             temp > 0, temp <= 5000
-        else {
+        {
+            return decikelvinToCelsius(temp)
+        }
+        
+        do {
+            return try smc_power.SMCBattery.getTemperature()
+        } catch {
+            logger.debug("Failed to get battery temperature via SMC: \(error.localizedDescription)")
             return nil
         }
-
-        return decikelvinToCelsius(temp)
     }
 
     private nonisolated func decikelvinToCelsius(_ decikelvin: Int) -> Double? {
