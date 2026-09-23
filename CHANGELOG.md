@@ -6,7 +6,11 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
-- No unreleased changes yet.
+### Features & Core Capabilities
+- **Heat Protection:** Re-enabled Heat Protection for macOS 27 natively via `PowerUI` charge limits now that temperature data is correctly retrieved.
+
+### Bug Fixes & Refinements
+- **Battery Temperature:** Resolved an issue where battery temperature displayed as 0°C on Apple Silicon and macOS 27 by retrieving sensor data through SMC fallback instead of the deprecated IOKit property.
 
 ---
 

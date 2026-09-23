@@ -80,6 +80,26 @@ public struct SMCBattery: Sendable {
     public static func getCurrent() throws -> Double {
         try Double(SMCKit.shared.read("B0AC") as Int16) / 1000.0
     }
+    
+    public static func getTemperature() throws -> Double {
+        do {
+            let temp: Float = try SMCKit.shared.read("TB0T")
+            if temp > 0 && temp < 150 { return Double(temp) }
+        } catch {}
+        do {
+            let temp: Float = try SMCKit.shared.read("TB1T")
+            if temp > 0 && temp < 150 { return Double(temp) }
+        } catch {}
+        do {
+            let temp: Float = try SMCKit.shared.read("TB2T")
+            if temp > 0 && temp < 150 { return Double(temp) }
+        } catch {}
+        do {
+            let temp: Float = try SMCKit.shared.read("TB3T")
+            if temp > 0 && temp < 150 { return Double(temp) }
+        } catch {}
+        throw SMCBatteryError.unsupportedCapability
+    }
 
 
     // MARK: - Legacy inhibit-charge control (macOS 26 and earlier)
