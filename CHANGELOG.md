@@ -6,6 +6,12 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+---
+
+## 0.23.1 - 2026-09-23
+
 ### Features & Core Capabilities
 - **Heat Protection:** Re-enabled Heat Protection for macOS 27 natively via `PowerUI` charge limits now that temperature data is correctly retrieved.
 

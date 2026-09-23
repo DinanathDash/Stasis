@@ -5,6 +5,24 @@
         <description>Most recent changes for Stasis.</description>
         <language>en</language>
         <item>
+            <title>0.23.1</title>
+            <pubDate>Wed, 23 Sep 2026 07:04:35 +0000</pubDate>
+            <sparkle:version>78</sparkle:version>
+            <sparkle:shortVersionString>0.23.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>Features &amp; Core Capabilities</h3>
+<ul>
+<li><strong>Heat Protection:</strong> Re-enabled Heat Protection for macOS 27 natively via <code>PowerUI</code> charge limits now that temperature data is correctly retrieved.</li>
+</ul>
+<h3>Bug Fixes &amp; Refinements</h3>
+<ul>
+<li><strong>Battery Temperature:</strong> Resolved an issue where battery temperature displayed as 0°C on Apple Silicon and macOS 27 by retrieving sensor data through SMC fallback instead of the deprecated IOKit property.</li>
+</ul>
+
+]]></description>
+            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.23.1/Stasis.dmg" length="4589618" type="application/octet-stream" sparkle:edSignature="5nqloGy7i5VALtHi4yrZOl7CCt4xdEgM/EyfiD3U6/QW/PyCM0GcAwcOpTbnfS1DTCK5CxK17HnNx3jv/3SkAg=="/>
+        </item>
+        <item>
             <title>0.23.0</title>
             <pubDate>Tue, 22 Sep 2026 08:51:50 +0000</pubDate>
             <sparkle:version>77</sparkle:version>
@@ -38,26 +56,6 @@
 
 ]]></description>
             <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.22.2/Stasis.dmg" length="4579861" type="application/octet-stream" sparkle:edSignature="CE04+bmGXTuvgaVhS0W+EaKPNNc088EPOu9CbbrJ6rpXR8QRCO9S/f9GeKjlWfUppRZMfnP2HHKZDIcc9nPDAw=="/>
-        </item>
-        <item>
-            <title>0.22.0</title>
-            <pubDate>Tue, 15 Sep 2026 18:48:50 +0000</pubDate>
-            <sparkle:version>74</sparkle:version>
-            <sparkle:shortVersionString>0.22.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
-            <description><![CDATA[<p>macOS 27 compatibility updates and strict concurrency improvements.</p>
-<h3>Features &amp; Core Capabilities</h3>
-<ul>
-<li><strong>macOS 27 Compatibility:</strong> Added explicit detection for macOS 27. Due to OS-level restrictions where Apple has locked down SMC keys that prevent forcing battery discharge below 80%, manual charging controls (Top Up, Charge Override, Force Discharge, and Sailing Mode) are now gracefully disabled and hidden on macOS 27 to prevent erratic charging behavior. The core charge limits remain fully functional.</li>
-</ul>
-<h3>Bug Fixes &amp; Refinements</h3>
-<ul>
-<li><strong>Swift 6 Concurrency:</strong> Resolved <code>#ConformanceIsolation</code> build errors affecting SwiftUI Shapes (e.g., <code>NotchShape</code>) on Xcode 16 by correctly isolating the struct to <code>@MainActor</code> and marking protocol requirements as <code>nonisolated</code>.</li>
-<li><strong>Localization Formatting:</strong> Standardized localization formats across 17 languages to correctly parse <code>%@</code> strings provided by <code>PercentageFormatter</code>, fixing compiler warnings and runtime string mismatch errors.</li>
-</ul>
-
-]]></description>
-            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.22.0/Stasis.dmg" length="4570689" type="application/octet-stream" sparkle:edSignature="xuuKiMWrNc41BkjxAjBk/39WXKC/u4Bgpz75/sB7+VvrJH6lq9uy1hp7/QVpQpAjnBqVLfD+6Wd50DtyG0w8Cw=="/>
         </item>
     </channel>
 </rss>
