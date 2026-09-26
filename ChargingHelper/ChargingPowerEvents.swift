@@ -24,6 +24,9 @@ enum ChargingPowerEvents {
     /// actively force-discharges. Wider = fewer AC adapter on/off cycles, wider swing around the limit.
     private static let dischargeOnlyDeadbandPercent = 5
 
+    /// Deadband to prevent micro-charging cycles (e.g. bouncing between 85% and 86%) when automatic discharge is enabled.
+    private static let microChargeDeadbandPercent: UInt8 = 1
+
     private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingPowerEvents")
 
     static func start() {
@@ -195,7 +198,11 @@ enum ChargingPowerEvents {
                 return ChargingPowerState.enableCharging(force: force)
             } else {
                 if ChargingSettings.automaticDischarge, percent > limit {
-                    _ = ChargingPowerState.disablePowerAdapter(force: force)
+                    if ChargingPowerState.isPowerAdapterDisabled() || percent > limit + microChargeDeadbandPercent {
+                        _ = ChargingPowerState.disablePowerAdapter(force: force)
+                    } else {
+                        _ = ChargingPowerState.enablePowerAdapter(force: force)
+                    }
                 } else {
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
                 }
@@ -245,7 +252,14 @@ enum ChargingPowerEvents {
                 // Otherwise, just raise the ceiling to avoid discharge, without ever setting it
                 // BELOW the current percentage (which would make the firmware actively discharge).
                 if ChargingSettings.automaticDischarge, percent > limit {
-                    _ = ChargingPowerState.disablePowerAdapter(force: force)
+                    if ChargingPowerState.isPowerAdapterDisabled() || percent > limit + microChargeDeadbandPercent {
+                        _ = ChargingPowerState.disablePowerAdapter(force: force)
+                    } else {
+                        // Inside deadband (e.g. 86). Quietly set native limit to the target limit
+                        // so firmware handles the 1% overshoot. We do not call enablePowerAdapter()
+                        // to avoid snapping the ceiling up to 90%, since powerDisabled is already false.
+                        ChargingPowerState.applyNativeLimit(Int(limit))
+                    }
                 } else {
                     ChargingPowerState.applyNativePauseCeiling(atLeast: Int(percent))
                     _ = ChargingPowerState.enablePowerAdapter(force: force)
