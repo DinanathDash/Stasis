@@ -20,6 +20,7 @@ class NotchHUDManager {
     private var previousCalibrationStatus: CalibrationStatus?
     private var previousChargeLimitOverride: Bool?
     private var previousChargeToLimit: Bool?
+    private var previousManageCharging: Bool?
 
     init(viewModel: MenuViewModel) {
         self.viewModel = viewModel
@@ -39,6 +40,7 @@ class NotchHUDManager {
             previousCalibrationStatus = Defaults[.calibrationStatus]
             previousChargeLimitOverride = viewModel.chargeLimitOverrideActive
             previousChargeToLimit = viewModel.chargeToLimitActive
+            previousManageCharging = Defaults[.manageCharging]
 
             for await _ in NotificationCenter.default.notifications(named: .NSProcessInfoPowerStateDidChange) {
                 // To allow Low Power Mode observation without polling
@@ -72,7 +74,10 @@ class NotchHUDManager {
 
         Task {
             // Observe defaults for calibration
-            for await _ in Defaults.updates([.calibrationStatus], initial: false) {
+            for await _ in Defaults.updates(
+                [.calibrationStatus, .manageCharging],
+                initial: false
+            ) {
                 Task { @MainActor in
                     self.checkStateAndShowHUD()
                 }
@@ -99,6 +104,7 @@ class NotchHUDManager {
         let currentCalibrationStatus = Defaults[.calibrationStatus]
         let currentChargeLimitOverride = viewModel.chargeLimitOverrideActive
         let currentChargeToLimit = viewModel.chargeToLimitActive
+        let currentManageCharging = Defaults[.manageCharging]
 
         // Determine what changed
         let modeChanged = currentChargingMode != previousChargingMode
@@ -108,9 +114,10 @@ class NotchHUDManager {
         let calChanged = currentCalibrationStatus != previousCalibrationStatus
         let overrideChanged = currentChargeLimitOverride != previousChargeLimitOverride
         let topupChanged = currentChargeToLimit != previousChargeToLimit
+        let manageChargingChanged = currentManageCharging != previousManageCharging
 
         // If something relevant changed, show HUD
-        if modeChanged || lpmChanged || fdChanged || adapterChanged || calChanged || overrideChanged || topupChanged {
+        if modeChanged || lpmChanged || fdChanged || adapterChanged || calChanged || overrideChanged || topupChanged || manageChargingChanged {
             let text = determineStatusText(
                 chargingMode: currentChargingMode,
                 lowPowerMode: currentLowPowerMode,
@@ -121,7 +128,9 @@ class NotchHUDManager {
                 chargeLimitOverride: currentChargeLimitOverride,
                 overrideChanged: overrideChanged,
                 chargeToLimit: currentChargeToLimit,
-                topupChanged: topupChanged
+                topupChanged: topupChanged,
+                manageCharging: currentManageCharging,
+                manageChargingChanged: manageChargingChanged
             )
             showHUD(with: text)
         }
@@ -134,6 +143,7 @@ class NotchHUDManager {
         previousCalibrationStatus = currentCalibrationStatus
         previousChargeLimitOverride = currentChargeLimitOverride
         previousChargeToLimit = currentChargeToLimit
+        previousManageCharging = currentManageCharging
     }
 
     private func determineStatusText(
@@ -146,8 +156,14 @@ class NotchHUDManager {
         chargeLimitOverride: Bool,
         overrideChanged: Bool,
         chargeToLimit: Bool,
-        topupChanged: Bool
+        topupChanged: Bool,
+        manageCharging: Bool,
+        manageChargingChanged: Bool
     ) -> String {
+        if manageChargingChanged {
+            return Self.manageChargingStatusText(isEnabled: manageCharging)
+        }
+
         if calibrationStatus != .idle {
             if !adapterConnected && calibrationStatus != .discharging {
                 return String(localized: "Calibrating (Paused - Plug in)")
@@ -204,6 +220,10 @@ class NotchHUDManager {
             return String(localized: "Plugged In")
         }
         return String(localized: "Unknown")
+    }
+
+    static func manageChargingStatusText(isEnabled: Bool) -> String {
+        String(localized: isEnabled ? "Managed Charging Enabled" : "Charge Limit Disabled")
     }
 
     private func showHUD(with text: String) {

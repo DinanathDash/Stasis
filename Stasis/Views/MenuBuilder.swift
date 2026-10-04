@@ -1,5 +1,6 @@
 import AppKit
 import Defaults
+import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -42,6 +43,17 @@ class MenuBuilder {
             for item in section {
                 menu.addItem(item)
             }
+        }
+
+        if Self.shouldShowManageChargingToggle {
+            menu.addItem(NSMenuItem.separator())
+            menu.addItem(
+                createMenuItem(
+                    view: ManageChargingToggleView { [weak self] enabled in
+                        self?.setManageCharging(enabled)
+                    }
+                )
+            )
         }
 
         if viewModel.manageChargingEnabled, viewModel.adapterConnected {
@@ -270,12 +282,79 @@ class MenuBuilder {
         return menuItem
     }
 
+    static var shouldShowManageChargingToggle: Bool {
+        true
+    }
+
+    static func setManageCharging(_ enabled: Bool) {
+        Defaults[.manageCharging] = enabled
+    }
+
+    private func setManageCharging(_ enabled: Bool) {
+        guard enabled else {
+            Self.setManageCharging(false)
+            return
+        }
+
+        do {
+            try ChargingHelperManager.shared.install()
+            let helperStatus = ChargingHelperManager.shared.helperStatus
+            guard helperStatus == .installed || helperStatus == .requiresApproval else {
+                return
+            }
+
+            Self.setManageCharging(true)
+            Defaults[.launchAtLogin] = true
+            LaunchAtLoginService.shared.setLaunchAtLogin(true)
+
+            if helperStatus == .requiresApproval {
+                SMAppService.openSystemSettingsLoginItems()
+            }
+        } catch {
+            let tip = String(localized: "Tip: Check System Settings -> General -> Login Items. Ensure Stasis is allowed to run in the background. If it is already on, try toggling it off and on again.")
+            NSAlert.show(
+                title: String(localized: "Failed to enable charging helper"),
+                message: "\(error.localizedDescription)\n\n\(tip)",
+                style: .warning
+            )
+        }
+    }
+
     @objc private func handleSettings() {
         settingsWindowController.showSettings()
     }
 
     @objc private func handleQuit() {
         viewModel.quit()
+    }
+}
+
+@MainActor
+struct ManageChargingToggleView: View {
+    @Default(.manageCharging) private var manageCharging
+    let onChange: @MainActor (Bool) -> Void
+
+    var body: some View {
+        HStack {
+            Text("Manage charging")
+            Spacer(minLength: 20)
+            Toggle(
+                "Manage charging",
+                isOn: Binding(
+                    get: { manageCharging },
+                    set: { newValue in
+                        onChange(newValue)
+                    }
+                )
+            )
+            .labelsHidden()
+            .toggleStyle(.switch)
+            .controlSize(.mini)
+        }
+        .foregroundColor(.secondary)
+        .font(.callout)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 4)
     }
 }
 

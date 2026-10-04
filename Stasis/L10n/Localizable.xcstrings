@@ -12774,6 +12774,27 @@
         }
       }
     },
+    "Disable Charge Limit": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Ladelimit deaktivieren" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Desactivar el límite de carga" } },
+        "es-US": { "stringUnit": { "state": "translated", "value": "Desactivar el límite de carga" } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Désactiver la limite de charge" } },
+        "it": { "stringUnit": { "state": "translated", "value": "Disabilita limite di carica" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "充電制限を無効化" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "충전 제한 비활성화" } },
+        "nl": { "stringUnit": { "state": "translated", "value": "Laadlimiet uitschakelen" } },
+        "pt-BR": { "stringUnit": { "state": "translated", "value": "Desativar limite de carga" } },
+        "pt-PT": { "stringUnit": { "state": "translated", "value": "Desativar limite de carregamento" } },
+        "ru": { "stringUnit": { "state": "translated", "value": "Отключить ограничение заряда" } },
+        "sk": { "stringUnit": { "state": "translated", "value": "Zakázať limit nabíjania" } },
+        "sl": { "stringUnit": { "state": "translated", "value": "Onemogoči omejitev polnjenja" } },
+        "tr": { "stringUnit": { "state": "translated", "value": "Şarj sınırını devre dışı bırak" } },
+        "vi": { "stringUnit": { "state": "translated", "value": "Tắt giới hạn sạc" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "禁用充电上限" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "停用充電上限" } }
+      }
+    },
     "Disable sleep until charge limit": {
       "localizations": {
         "de": {
@@ -23437,6 +23458,48 @@
             "value": "Gerir LED MagSafe"
           }
         }
+      }
+    },
+    "Managed Charging Enabled": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Verwaltetes Laden aktiviert" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Carga gestionada activada" } },
+        "es-US": { "stringUnit": { "state": "translated", "value": "Carga gestionada activada" } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Recharge gérée activée" } },
+        "it": { "stringUnit": { "state": "translated", "value": "Ricarica gestita attivata" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "充電管理を有効化" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "충전 관리 활성화됨" } },
+        "nl": { "stringUnit": { "state": "translated", "value": "Beheerd opladen ingeschakeld" } },
+        "pt-BR": { "stringUnit": { "state": "translated", "value": "Carregamento gerenciado ativado" } },
+        "pt-PT": { "stringUnit": { "state": "translated", "value": "Carregamento gerido ativado" } },
+        "ru": { "stringUnit": { "state": "translated", "value": "Управляемая зарядка включена" } },
+        "sk": { "stringUnit": { "state": "translated", "value": "Spravované nabíjanie zapnuté" } },
+        "sl": { "stringUnit": { "state": "translated", "value": "Upravljano polnjenje omogočeno" } },
+        "tr": { "stringUnit": { "state": "translated", "value": "Yönetilen şarj etkin" } },
+        "vi": { "stringUnit": { "state": "translated", "value": "Đã bật sạc được quản lý" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "已启用充电管理" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "已啟用充電管理" } }
+      }
+    },
+    "Charge Limit Disabled": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Ladelimit deaktiviert" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Límite de carga desactivado" } },
+        "es-US": { "stringUnit": { "state": "translated", "value": "Límite de carga desactivado" } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Limite de charge désactivée" } },
+        "it": { "stringUnit": { "state": "translated", "value": "Limite di carica disabilitato" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "充電制限を無効化" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "충전 제한 비활성화됨" } },
+        "nl": { "stringUnit": { "state": "translated", "value": "Laadlimiet uitgeschakeld" } },
+        "pt-BR": { "stringUnit": { "state": "translated", "value": "Limite de carga desativado" } },
+        "pt-PT": { "stringUnit": { "state": "translated", "value": "Limite de carregamento desativado" } },
+        "ru": { "stringUnit": { "state": "translated", "value": "Ограничение заряда отключено" } },
+        "sk": { "stringUnit": { "state": "translated", "value": "Limit nabíjania vypnutý" } },
+        "sl": { "stringUnit": { "state": "translated", "value": "Omejitev polnjenja onemogočena" } },
+        "tr": { "stringUnit": { "state": "translated", "value": "Şarj sınırı devre dışı" } },
+        "vi": { "stringUnit": { "state": "translated", "value": "Đã tắt giới hạn sạc" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "已禁用充电上限" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "已停用充電上限" } }
       }
     },
     "Manage charging": {
@@ -35285,6 +35348,48 @@
             "value": "顯示包含電量百分比、充電模式、功率、電池健康和溫度的橫幅通知。"
           }
         }
+      }
+    },
+    "Show battery icon": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Batteriesymbol anzeigen" } },
+        "es": { "stringUnit": { "state": "translated", "value": "Mostrar icono de batería" } },
+        "es-US": { "stringUnit": { "state": "translated", "value": "Mostrar icono de batería" } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Afficher l’icône de batterie" } },
+        "it": { "stringUnit": { "state": "translated", "value": "Mostra icona batteria" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "バッテリーアイコンを表示" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "배터리 아이콘 표시" } },
+        "nl": { "stringUnit": { "state": "translated", "value": "Batterijpictogram tonen" } },
+        "pt-BR": { "stringUnit": { "state": "translated", "value": "Mostrar ícone da bateria" } },
+        "pt-PT": { "stringUnit": { "state": "translated", "value": "Mostrar ícone da bateria" } },
+        "ru": { "stringUnit": { "state": "translated", "value": "Показывать значок батареи" } },
+        "sk": { "stringUnit": { "state": "translated", "value": "Zobraziť ikonu batérie" } },
+        "sl": { "stringUnit": { "state": "translated", "value": "Prikaži ikono baterije" } },
+        "tr": { "stringUnit": { "state": "translated", "value": "Pil simgesini göster" } },
+        "vi": { "stringUnit": { "state": "translated", "value": "Hiển thị biểu tượng pin" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "显示电池图标" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "顯示電池圖示" } }
+      }
+    },
+    "Show the battery icon and configure the information displayed in the menu bar.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Batteriesymbol anzeigen und die in der Menüleiste dargestellten Informationen konfigurieren." } },
+        "es": { "stringUnit": { "state": "translated", "value": "Muestra el icono de batería y configura la información que aparece en la barra de menú." } },
+        "es-US": { "stringUnit": { "state": "translated", "value": "Muestra el icono de batería y configura la información que aparece en la barra de menú." } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Afficher l’icône de batterie et configurer les informations affichées dans la barre des menus." } },
+        "it": { "stringUnit": { "state": "translated", "value": "Mostra l’icona della batteria e configura le informazioni visualizzate nella barra dei menu." } },
+        "ja": { "stringUnit": { "state": "translated", "value": "バッテリーアイコンを表示し、メニューバーに表示する情報を設定します。" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "배터리 아이콘을 표시하고 메뉴 막대에 표시할 정보를 설정합니다." } },
+        "nl": { "stringUnit": { "state": "translated", "value": "Toon het batterijpictogram en configureer de informatie die in de menubalk wordt weergegeven." } },
+        "pt-BR": { "stringUnit": { "state": "translated", "value": "Mostre o ícone da bateria e configure as informações exibidas na barra de menus." } },
+        "pt-PT": { "stringUnit": { "state": "translated", "value": "Mostre o ícone da bateria e configure as informações apresentadas na barra de menus." } },
+        "ru": { "stringUnit": { "state": "translated", "value": "Показывайте значок батареи и настраивайте информацию в строке меню." } },
+        "sk": { "stringUnit": { "state": "translated", "value": "Zobrazte ikonu batérie a nastavte informácie zobrazené na paneli s ponukami." } },
+        "sl": { "stringUnit": { "state": "translated", "value": "Prikažite ikono baterije in nastavite podatke, prikazane v menijski vrstici." } },
+        "tr": { "stringUnit": { "state": "translated", "value": "Pil simgesini gösterin ve menü çubuğunda görüntülenen bilgileri yapılandırın." } },
+        "vi": { "stringUnit": { "state": "translated", "value": "Hiển thị biểu tượng pin và định cấu hình thông tin được hiển thị trên thanh menu." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "显示电池图标并配置菜单栏中显示的信息。" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "顯示電池圖示並設定選單列中顯示的資訊。" } }
       }
     },
     "Show battery state": {

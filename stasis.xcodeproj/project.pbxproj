@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D9000000000000000000000D /* Defaults in StasisTests */ = {isa = PBXBuildFile; productRef = A6638F802F1C0FD60047FA8E /* Defaults */; };
 		A6638F812F1C0FD60047FA8E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = A6638F802F1C0FD60047FA8E /* Defaults */; };
 		A66D62D92F44069300B996E7 /* smc_power.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A66D62CE2F44067C00B996E7 /* smc_power.framework */; };
 		A66D62DD2F44069900B996E7 /* smc_power.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A66D62CE2F44067C00B996E7 /* smc_power.framework */; };
@@ -54,6 +55,13 @@
 			remoteGlobalIDString = A6E6D71D2F39DD350069CF9F;
 			remoteInfo = "charging-helper";
 		};
+		D90000000000000000000002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A68B3E042F19AB4B00F115E4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A68B3E0B2F19AB4B00F115E4;
+			remoteInfo = stasis;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -98,6 +106,7 @@
 		A68B3E0C2F19AB4B00F115E4 /* Stasis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stasis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A68B3E1E2F19ABCB00F115E4 /* helper.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = helper.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "com.dinanathdash.stasis.charging-helper"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9000000000000000000000C /* StasisTests.xctest */ = {isa = PBXFileReference; explicitFileType = "wrapper.cfbundle"; includeInIndex = 0; path = StasisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -154,6 +163,11 @@
 			path = ChargingHelper;
 			sourceTree = "<group>";
 		};
+		D90000000000000000000007 /* Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Tests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +205,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D90000000000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D9000000000000000000000D /* Defaults in StasisTests */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -202,6 +224,7 @@
 				A68B3E1F2F19ABCB00F115E4 /* Helper */,
 				A6E6D71F2F39DD350069CF9F /* ChargingHelper */,
 				A66D62CF2F44067C00B996E7 /* SMCPower */,
+				D90000000000000000000007 /* Tests */,
 				A68B3E532F1A942600F115E4 /* Frameworks */,
 				A68B3E0D2F19AB4B00F115E4 /* Products */,
 			);
@@ -214,6 +237,7 @@
 				A68B3E1E2F19ABCB00F115E4 /* helper.xpc */,
 				A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */,
 				A66D62CE2F44067C00B996E7 /* smc_power.framework */,
+				D9000000000000000000000C /* StasisTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -334,6 +358,30 @@
 			productReference = A6E6D71E2F39DD350069CF9F /* com.dinanathdash.stasis.charging-helper */;
 			productType = "com.apple.product-type.tool";
 		};
+		D90000000000000000000008 /* StasisTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D90000000000000000000009 /* Build configuration list for PBXNativeTarget "StasisTests" */;
+			buildPhases = (
+				D90000000000000000000004 /* Sources */,
+				D90000000000000000000006 /* Frameworks */,
+				D90000000000000000000005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D90000000000000000000003 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D90000000000000000000007 /* Tests */,
+			);
+			name = StasisTests;
+			packageProductDependencies = (
+				A6638F802F1C0FD60047FA8E /* Defaults */,
+			);
+			productName = StasisTests;
+			productReference = D9000000000000000000000C /* StasisTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -355,6 +403,9 @@
 					};
 					A6E6D71D2F39DD350069CF9F = {
 						CreatedOnToolsVersion = 26.2;
+					};
+					D90000000000000000000008 = {
+						CreatedOnToolsVersion = 26.5;
 					};
 				};
 			};
@@ -398,6 +449,7 @@
 				A68B3E1D2F19ABCB00F115E4 /* helper */,
 				A6E6D71D2F39DD350069CF9F /* charging-helper */,
 				A66D62CD2F44067C00B996E7 /* smc-power */,
+				D90000000000000000000008 /* StasisTests */,
 			);
 		};
 /* End PBXProject section */
@@ -418,6 +470,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A68B3E1C2F19ABCB00F115E4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D90000000000000000000005 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -474,6 +533,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D90000000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -501,6 +567,11 @@
 			isa = PBXTargetDependency;
 			target = A6E6D71D2F39DD350069CF9F /* charging-helper */;
 			targetProxy = A6E6D7302F3A00000069CF9F /* PBXContainerItemProxy */;
+		};
+		D90000000000000000000003 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A68B3E0B2F19AB4B00F115E4 /* stasis */;
+			targetProxy = D90000000000000000000002 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -951,6 +1022,34 @@
 			};
 			name = Release;
 		};
+		D9000000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dinanathdash.stasis.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stasis.app/Contents/MacOS/Stasis";
+			};
+			name = Debug;
+		};
+		D9000000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dinanathdash.stasis.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Stasis.app/Contents/MacOS/Stasis";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -995,6 +1094,15 @@
 			buildConfigurations = (
 				A6E6D7232F39DD350069CF9F /* Debug */,
 				A6E6D7242F39DD350069CF9F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D90000000000000000000009 /* Build configuration list for PBXNativeTarget "StasisTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9000000000000000000000A /* Debug */,
+				D9000000000000000000000B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

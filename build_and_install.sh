@@ -1,8 +1,25 @@
 #!/bin/bash
 set -e
 
+APP_PATH="build/Build/Products/Debug/Stasis.app"
+CHARGING_HELPER_PATH="$APP_PATH/Contents/Library/LaunchServices/com.dinanathdash.stasis.charging-helper"
+
 echo "Building Stasis..."
-xcodebuild -scheme stasis -configuration Debug -derivedDataPath ./build
+xcodebuild \
+    -scheme stasis \
+    -configuration Debug \
+    -derivedDataPath ./build \
+    CODE_SIGN_STYLE="Manual" \
+    DEVELOPMENT_TEAM="" \
+    CODE_SIGN_IDENTITY="-" \
+    CODE_SIGNING_REQUIRED=YES \
+    CODE_SIGNING_ALLOWED=YES
+
+echo "Signing Stasis for local Service Management registration..."
+codesign --force --sign - "$CHARGING_HELPER_PATH"
+codesign --force --deep --sign - "$APP_PATH"
+codesign --force --sign - -r req.txt "$APP_PATH"
+codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 
 echo "Killing existing Stasis processes..."
 pkill -f "stasis.app/Contents/MacOS/stasis" || true
