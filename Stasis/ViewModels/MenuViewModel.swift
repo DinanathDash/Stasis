@@ -238,7 +238,9 @@ class MenuViewModel {
             adapterCapacityWatts: adapter.adapterCapacityWatts
         )
 
-        if Defaults[.manageCharging] {
+        // Target time estimator is designed for plugged-in charging to a target limit.
+        // When on battery power, always display the battery discharge time remaining.
+        if Defaults[.manageCharging] && safeMetrics.externalConnected {
             let target = chargeManager.chargeLimitOverrideActive ? 100 : Defaults[.chargeLimit]
             timeRemainingText = targetTimeEstimator.update(
                 safeMetrics, target: target, now: ProcessInfo.processInfo.systemUptime
@@ -563,7 +565,7 @@ class MenuViewModel {
         adapterConnected: Bool,
         batteryPercentage: Int
     ) -> String {
-        if adapterConnected {
+        if adapterConnected && !isCharging {
             return String(localized: "N/A")
         }
 

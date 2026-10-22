@@ -5,10 +5,10 @@ enum TargetTimeEstimate: Equatable {
 
     var text: String {
         switch self {
-        case .estimating: "Estimating…"
-        case .notApproaching: "Not approaching target"
-        case .holding(let target): "∞ · Holding at \(target)%"
-        case .minutes(let minutes, let target): "≈ \(minutes) min to \(target)%"
+        case .estimating: String(localized: "Estimating…")
+        case .notApproaching: String(localized: "Not approaching target")
+        case .holding(let target): String(localized: "∞ · Holding at \(target)%")
+        case .minutes(let minutes, let target): String(localized: "≈ \(minutes) min to \(target)%")
         }
     }
 }
@@ -35,11 +35,12 @@ struct TargetTimeEstimator {
     }
 
     mutating func update(_ battery: BatteryMetrics, target: Int, now: Double) -> TargetTimeEstimate {
-        guard battery.hasPowerSourceData, (0...100).contains(battery.batteryPercentage),
-              (1...100).contains(target), now.isFinite,
-              let sample = battery.powerSampleTime, sample.isFinite,
+        let currentAmps = battery.osBatteryCurrent ?? (battery.batteryCurrent != 0 ? battery.batteryCurrent : nil)
+        let sample = battery.powerSampleTime ?? now
+        guard battery.hasPowerSourceData || currentAmps != nil, (0...100).contains(battery.batteryPercentage),
+              (1...100).contains(target), now.isFinite, sample.isFinite,
               now >= sample, now - sample <= 120,
-              let amps = battery.osBatteryCurrent, amps.isFinite else {
+              let amps = currentAmps, amps.isFinite else {
             reset()
             return .estimating
         }
@@ -61,7 +62,8 @@ struct TargetTimeEstimator {
            (1...2880).contains(battery.timeRemaining) {
             return .minutes(battery.timeRemaining, target: target)
         }
-        guard let capacity = battery.fullChargeCapacityMAh, capacity.isFinite,
+        let capacityValue = battery.fullChargeCapacityMAh ?? (battery.maxCapacity > 100 ? Double(battery.maxCapacity) : nil)
+        guard let capacity = capacityValue, capacity.isFinite,
               capacity > 100, capacity < 100_000 else {
             reset()
             return .estimating

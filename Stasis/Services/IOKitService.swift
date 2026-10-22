@@ -153,6 +153,19 @@ class IOKitService {
         // Calibrated health (cached from system_profiler)
         batteryMetrics.calibratedBatteryHealth = calibratedHealthCache
 
+        batteryMetrics.hasPowerSourceData = (powerInfo != nil)
+        batteryMetrics.powerSampleTime = ProcessInfo.processInfo.systemUptime
+
+        if let current = powerInfo?[kIOPSCurrentKey] as? NSNumber {
+            batteryMetrics.osBatteryCurrent = BatteryReading.signedAmperage(current)
+        } else if let amperage: Int = getPropertyValue(batteryService, key: "Amperage") {
+            batteryMetrics.osBatteryCurrent = Double(amperage) / 1000.0
+        } else if let instantAmperage: Int = getPropertyValue(batteryService, key: "InstantAmperage") {
+            batteryMetrics.osBatteryCurrent = Double(instantAmperage) / 1000.0
+        }
+
+        batteryMetrics.fullChargeCapacityMAh = BatteryReading.fullChargeCapacityMAh(from: properties)
+
         batteryMetrics.externalConnected =
             getPropertyValue(batteryService, key: "ExternalConnected") ?? false
         batteryMetrics.systemInputPower = getSystemInputPowerWatts()
@@ -175,9 +188,10 @@ class IOKitService {
         batteryMetrics.cycleCount =
             getPropertyValue(batteryService, key: "CycleCount") ?? 0
 
-        logger.debug(
+        let debugString =
             "IOKit metrics: battery=\(batteryMetrics.batteryPercentage)%, hardwareBattery=\(batteryMetrics.hardwareBatteryPercentage)%, rawHealth=\(batteryMetrics.rawBatteryHealth)%, calibratedHealth=\(batteryMetrics.calibratedBatteryHealth.map(String.init) ?? "nil")%, charging=\(batteryMetrics.isCharging), temp=\(batteryMetrics.batteryTemperature)°C, cycles=\(batteryMetrics.cycleCount), timeRemaining=\(batteryMetrics.timeRemaining), externalConnected=\(batteryMetrics.externalConnected), adapterConnected=\(adapterMetrics.adapterConnected)"
-        )
+        logger.debug("\(debugString)")
+        StasisLogger.debug(debugString)
 
         continuation?.yield((batteryMetrics, adapterMetrics))
     }
@@ -288,25 +302,75 @@ class IOKitService {
     }
 
     private func getTimeRemaining(powerInfo: [String: Any]?) -> Int? {
-        guard let timeToEmpty = powerInfo?[kIOPSTimeToEmptyKey] as? Int,
-              timeToEmpty > 0,
-              timeToEmpty != Int(kIOPSTimeRemainingUnknown)
-        else {
-            return nil
+        if let timeToEmpty = powerInfo?[kIOPSTimeToEmptyKey] as? Int,
+           timeToEmpty > 0,
+           timeToEmpty != Int(kIOPSTimeRemainingUnknown),
+           timeToEmpty != 65535
+        {
+            return timeToEmpty
         }
 
-        return timeToEmpty
+        // Modern macOS / Apple Silicon fallbacks:
+        if let timeRemaining: Int = getPropertyValue(batteryService, key: "TimeRemaining"),
+           timeRemaining > 0,
+           timeRemaining != 65535,
+           timeRemaining != Int(kIOPSTimeRemainingUnknown)
+        {
+            return timeRemaining
+        }
+
+        if let avgTimeToEmpty: Int = getPropertyValue(batteryService, key: "AvgTimeToEmpty"),
+           avgTimeToEmpty > 0,
+           avgTimeToEmpty != 65535,
+           avgTimeToEmpty != Int(kIOPSTimeRemainingUnknown)
+        {
+            return avgTimeToEmpty
+        }
+
+        if let batteryData: [String: Any] = getPropertyValue(batteryService, key: "BatteryData"),
+           let avgTimeToEmpty = batteryData["AvgTimeToEmpty"] as? Int,
+           avgTimeToEmpty > 0,
+           avgTimeToEmpty != 65535,
+           avgTimeToEmpty != Int(kIOPSTimeRemainingUnknown)
+        {
+            return avgTimeToEmpty
+        }
+
+        let estimate = IOPSGetTimeRemainingEstimate()
+        if estimate > 0, estimate != kIOPSTimeRemainingUnknown, estimate != kIOPSTimeRemainingUnlimited {
+            return Int(estimate)
+        }
+
+        return nil
     }
 
     private func getTimeToFull(powerInfo: [String: Any]?) -> Int? {
-        guard let timeToFull = powerInfo?[kIOPSTimeToFullChargeKey] as? Int,
-              timeToFull > 0,
-              timeToFull != Int(kIOPSTimeRemainingUnknown)
-        else {
-            return nil
+        if let timeToFull = powerInfo?[kIOPSTimeToFullChargeKey] as? Int,
+           timeToFull > 0,
+           timeToFull != Int(kIOPSTimeRemainingUnknown),
+           timeToFull != 65535
+        {
+            return timeToFull
         }
 
-        return timeToFull
+        if let avgTimeToFull: Int = getPropertyValue(batteryService, key: "AvgTimeToFull"),
+           avgTimeToFull > 0,
+           avgTimeToFull != 65535,
+           avgTimeToFull != Int(kIOPSTimeRemainingUnknown)
+        {
+            return avgTimeToFull
+        }
+
+        if let batteryData: [String: Any] = getPropertyValue(batteryService, key: "BatteryData"),
+           let avgTimeToFull = batteryData["AvgTimeToFull"] as? Int,
+           avgTimeToFull > 0,
+           avgTimeToFull != 65535,
+           avgTimeToFull != Int(kIOPSTimeRemainingUnknown)
+        {
+            return avgTimeToFull
+        }
+
+        return nil
     }
 
     private func getAdapterRatedWatts() -> Int? {
@@ -339,7 +403,7 @@ class IOKitService {
         {
             return decikelvinToCelsius(temp)
         }
-        
+
         do {
             return try smc_power.SMCBattery.getTemperature()
         } catch {
