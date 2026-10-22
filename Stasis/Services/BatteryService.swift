@@ -50,10 +50,7 @@ class BatteryService {
     private let chargingPowerEpsilonWatts: Double = 0.8
     private let transitionConfirmationSamples: Int = 2
 
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "BatteryService"
-    )
+    private nonisolated let logger = StasisLog(category: "BatteryService")
 
     init() {
         logger.info("BatteryService initialized")
@@ -190,7 +187,7 @@ class BatteryService {
 
             helper.readBatteryMetrics { batteryVoltage, batteryCurrent, batteryPower, errorMsg in
                 if let errorMsg = errorMsg {
-                    self.logger.error("SMC battery read failed in helper: \(errorMsg)")
+                    logger.error("SMC battery read failed in helper: \(errorMsg)")
                     continuation.resume(returning: nil)
                 } else {
                     continuation.resume(
@@ -218,7 +215,7 @@ class BatteryService {
 
             helper.readAdapterMetrics { adapterVoltage, adapterCurrent, adapterPower, errorMsg in
                 if let errorMsg = errorMsg {
-                    self.logger.error("SMC adapter read failed in helper: \(errorMsg)")
+                    logger.error("SMC adapter read failed in helper: \(errorMsg)")
                     continuation.resume(returning: nil)
                 } else {
                     continuation.resume(
@@ -274,7 +271,6 @@ class BatteryService {
     }
 
     private func handleIOKitUpdate(_ newBatteryMetrics: BatteryMetrics, adapterUpdate: AdapterMetrics) {
-        logger.debug("Received IOKit update")
 
         var updatedBattery = newBatteryMetrics
         updatedBattery.batteryVoltage = metrics.batteryVoltage

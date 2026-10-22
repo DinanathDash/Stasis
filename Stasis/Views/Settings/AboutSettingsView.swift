@@ -113,7 +113,7 @@ struct AboutSettingsView: View {
                         .disabled(isExportingLogs)
 
                         Button(String(localized: "Reveal")) {
-                            StasisLogExporter.showLogsInFinder()
+                            StasisLogExporter.revealInFinder()
                         }
                     }
                 }

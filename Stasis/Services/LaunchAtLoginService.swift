@@ -5,10 +5,7 @@ import ServiceManagement
 class LaunchAtLoginService {
     static let shared = LaunchAtLoginService()
 
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "LaunchAtLoginService"
-    )
+    private let logger = StasisLog(category: "LaunchAtLoginService")
 
     private init() {}
 

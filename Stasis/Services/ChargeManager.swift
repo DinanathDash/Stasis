@@ -21,10 +21,7 @@ class ChargeManager {
     private(set) var daemonError: String?
     private var hasShownDaemonErrorAlert = false
 
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "ChargeManager"
-    )
+    private let logger = StasisLog(category: "ChargeManager")
 
     init(batteryService: BatteryService) {
         self.batteryService = batteryService
@@ -60,6 +57,8 @@ class ChargeManager {
             showDaemonErrorAlertIfNeeded()
             return
         }
+
+        logger.info("Syncing settings to helper: manageCharging=\(Defaults[.manageCharging]), chargeLimit=\(Defaults[.chargeLimit])%, sailingMode=\(Defaults[.sailingMode])")
 
         let settings: [String: NSObject & Sendable] = [
             "manageCharging": Defaults[.manageCharging] as NSNumber,
@@ -130,6 +129,7 @@ class ChargeManager {
 
     func toggleChargeLimitOverride() {
         chargeLimitOverrideActive.toggle()
+        logger.info("Toggling charge limit override (now \(chargeLimitOverrideActive))")
         if chargeLimitOverrideActive {
             forceDischargeActive = false
             chargeToLimitActive = false
@@ -157,6 +157,7 @@ class ChargeManager {
 
     func toggleForceDischarge() {
         forceDischargeActive.toggle()
+        logger.info("Toggling force discharge (now \(forceDischargeActive))")
         if forceDischargeActive {
             chargeLimitOverrideActive = false
             chargeToLimitActive = false
@@ -184,6 +185,7 @@ class ChargeManager {
 
     func toggleChargeToLimit() {
         chargeToLimitActive.toggle()
+        logger.info("Toggling charge to limit (now \(chargeToLimitActive))")
         if chargeToLimitActive {
             chargeLimitOverrideActive = false
             forceDischargeActive = false

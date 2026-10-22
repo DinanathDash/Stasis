@@ -16,10 +16,28 @@ class IOKitService {
         AsyncStream<(BatteryMetrics, AdapterMetrics)>.Continuation?
     private var refreshTask: Task<Void, Never>?
 
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "IOKitService"
-    )
+    private let logger = StasisLog(category: "IOKitService")
+    private var lastLoggedMetrics: (percent: Int, isCharging: Bool, timeRemaining: Int, connected: Bool, adapterWatts: Int, temp: Double)?
+    private var lastLoggedMetricsTime: Date = .distantPast
+
+    private func shouldLogMetrics(_ battery: BatteryMetrics, adapter: AdapterMetrics) -> Bool {
+        let now = Date()
+        guard let last = lastLoggedMetrics else {
+            return true
+        }
+        if now.timeIntervalSince(lastLoggedMetricsTime) >= 60 {
+            return true
+        }
+        if last.percent != battery.batteryPercentage ||
+           last.isCharging != battery.isCharging ||
+           last.timeRemaining != battery.timeRemaining ||
+           last.connected != battery.externalConnected ||
+           last.adapterWatts != adapter.adapterCapacityWatts ||
+           abs(last.temp - battery.batteryTemperature) >= 1.0 {
+            return true
+        }
+        return false
+    }
 
     private var calibratedHealthCache: Int?
     private var lastCalibratedFetch: Date = .distantPast
@@ -118,7 +136,6 @@ class IOKitService {
     }
 
     private func emitMetrics() {
-        logger.debug("IOKit notification triggered")
         fetchCalibratedHealthIfNeeded()
 
         let powerInfo = getPowerSourceInfo() as? [String: Any]
@@ -188,10 +205,20 @@ class IOKitService {
         batteryMetrics.cycleCount =
             getPropertyValue(batteryService, key: "CycleCount") ?? 0
 
-        let debugString =
-            "IOKit metrics: battery=\(batteryMetrics.batteryPercentage)%, hardwareBattery=\(batteryMetrics.hardwareBatteryPercentage)%, rawHealth=\(batteryMetrics.rawBatteryHealth)%, calibratedHealth=\(batteryMetrics.calibratedBatteryHealth.map(String.init) ?? "nil")%, charging=\(batteryMetrics.isCharging), temp=\(batteryMetrics.batteryTemperature)°C, cycles=\(batteryMetrics.cycleCount), timeRemaining=\(batteryMetrics.timeRemaining), externalConnected=\(batteryMetrics.externalConnected), adapterConnected=\(adapterMetrics.adapterConnected)"
-        logger.debug("\(debugString)")
-        StasisLogger.debug(debugString)
+        if shouldLogMetrics(batteryMetrics, adapter: adapterMetrics) {
+            lastLoggedMetrics = (
+                percent: batteryMetrics.batteryPercentage,
+                isCharging: batteryMetrics.isCharging,
+                timeRemaining: batteryMetrics.timeRemaining,
+                connected: batteryMetrics.externalConnected,
+                adapterWatts: adapterMetrics.adapterCapacityWatts,
+                temp: batteryMetrics.batteryTemperature
+            )
+            lastLoggedMetricsTime = Date()
+            logger.debug(
+                "IOKit metrics: battery=\(batteryMetrics.batteryPercentage)%, hardwareBattery=\(batteryMetrics.hardwareBatteryPercentage)%, rawHealth=\(batteryMetrics.rawBatteryHealth)%, calibratedHealth=\(batteryMetrics.calibratedBatteryHealth.map(String.init) ?? "nil")%, charging=\(batteryMetrics.isCharging), temp=\(batteryMetrics.batteryTemperature)°C, cycles=\(batteryMetrics.cycleCount), timeRemaining=\(batteryMetrics.timeRemaining), externalConnected=\(batteryMetrics.externalConnected), adapterConnected=\(adapterMetrics.adapterConnected)"
+            )
+        }
 
         continuation?.yield((batteryMetrics, adapterMetrics))
     }

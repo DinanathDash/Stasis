@@ -26,7 +26,7 @@ enum ChargingPowerState {
         return !nativeMode && !capabilities.inhibitChargeControl && capabilities.forceDischargeControl
     }
 
-    private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingPowerState")
+    private static let logger = ChargingHelperLog(category: "ChargingPowerState")
 
     static func initialize(battery: SMCBattery, adapter: SMCAdapter) {
         self.battery = battery

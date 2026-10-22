@@ -3,9 +3,49 @@ import Foundation
 import OSLog
 import UniformTypeIdentifiers
 
+/// Structured logger that routes messages to OSLog as well as rotating Stasis log files.
+public nonisolated struct StasisLog: Sendable {
+    public let category: String
+    private let osLogger: Logger
+
+    public init(category: String, subsystem: String = "com.dinanathdash.stasis") {
+        self.category = category
+        self.osLogger = Logger(subsystem: subsystem, category: category)
+    }
+
+    public func info(_ message: String) {
+        osLogger.info("\(message, privacy: .public)")
+        StasisLogger.info("[\(category)] \(message)")
+    }
+
+    public func error(_ message: String) {
+        osLogger.error("\(message, privacy: .public)")
+        StasisLogger.error("[\(category)] \(message)")
+    }
+
+    public func warn(_ message: String) {
+        osLogger.warning("\(message, privacy: .public)")
+        StasisLogger.warn("[\(category)] \(message)")
+    }
+
+    public func warning(_ message: String) {
+        warn(message)
+    }
+
+    public func debug(_ message: String) {
+        osLogger.debug("\(message, privacy: .public)")
+        StasisLogger.debug("[\(category)] \(message)")
+    }
+
+    public func fault(_ message: String) {
+        osLogger.fault("\(message, privacy: .public)")
+        StasisLogger.error("[\(category)] [FAULT] \(message)")
+    }
+}
+
 /// Thread-safe rotating file logger and diagnostic exporter for Stasis.
 /// Writes entries to ~/Library/Logs/Stasis/stasis.log and /tmp/stasis.log.
-public final class StasisLogger: @unchecked Sendable {
+public nonisolated final class StasisLogger: @unchecked Sendable {
     public static let shared = StasisLogger()
 
     public static var logDirectory: URL {
@@ -269,7 +309,7 @@ public enum StasisLogExporter {
         if let store = try? OSLogStore(scope: .currentProcessIdentifier),
            let position = try? store.position(timeIntervalSinceLatestBoot: 0),
            let entries = try? store.getEntries(at: position) {
-            lines.append("=== Recent System Logs ===")
+            lines.append("=== Recent Main App Unified Logs ===")
             for entry in entries {
                 if let logEntry = entry as? OSLogEntryLog {
                     lines.append("[\(logEntry.date)] [\(logEntry.category)] \(logEntry.composedMessage)")
@@ -293,6 +333,14 @@ public enum StasisLogExporter {
         let fileManager = FileManager.default
         if !fileManager.fileExists(atPath: directory.path) {
             try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+
+        // Include helper daemon logs if available
+        let helperTmpLog = URL(fileURLWithPath: "/tmp/stasis-charging-helper.log")
+        let destHelperLog = directory.appendingPathComponent("stasis-charging-helper.log")
+        if fileManager.fileExists(atPath: helperTmpLog.path) {
+            try? fileManager.removeItem(at: destHelperLog)
+            try? fileManager.copyItem(at: helperTmpLog, to: destHelperLog)
         }
 
         // Generate up-to-date diagnostic dump
@@ -327,11 +375,11 @@ public enum StasisLogExporter {
             process.arguments = ["-q", "-j", archiveURL.path] + logFiles.map(\.path)
             try process.run()
             process.waitUntilExit()
-        }.value
 
-        guard fileManager.fileExists(atPath: archiveURL.path) else {
-            throw StasisLogExporterError.exportFailed("Zip archive was not created.")
-        }
+            guard process.terminationStatus == 0 else {
+                throw StasisLogExporterError.exportFailed("zip process exited with code \(process.terminationStatus)")
+            }
+        }.value
 
         return archiveURL
     }
@@ -343,5 +391,10 @@ public enum StasisLogExporter {
             try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
         }
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: directory.path)
+    }
+
+    /// Alias for showLogsInFinder
+    public static func revealInFinder(directory: URL = StasisLogger.logDirectory) {
+        showLogsInFinder(directory: directory)
     }
 }

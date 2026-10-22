@@ -32,10 +32,7 @@ struct ChargingSettingsView: View {
 
     private let capabilities: DeviceCapabilities
 
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "ChargingSettingsView"
-    )
+    private let logger = StasisLog(category: "ChargingSettingsView")
 
     init(capabilities: DeviceCapabilities) {
         self.capabilities = capabilities
