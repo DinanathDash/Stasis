@@ -10,8 +10,8 @@ We provide security updates and fixes for the latest release of Stasis.
 
 | Version | Supported |
 | :--- | :--- |
-| **0.23.x (Latest)** | :white_check_mark: Yes |
-| < 0.23.0 | :x: No |
+| **0.24.x (Latest)** | :white_check_mark: Yes |
+| < 0.24.0 | :x: No |
 
 ---
 

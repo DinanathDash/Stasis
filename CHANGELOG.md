@@ -6,6 +6,12 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+---
+
+## 0.24.0 - 2026-10-22
+
 ### Features & Core Capabilities
 - **Diagnostic Log Export:** Added diagnostic logs export in Settings > About with options to save a timestamped zip archive containing both application and privileged daemon logs, or reveal the log directory in Finder.
 - **Structured System Logging:** Implemented structured file-based logging (`StasisLogger`) with automatic rotation and privileged helper event tracing, routing logs to both Apple OSLog and persistent log files.

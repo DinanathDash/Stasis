@@ -5,6 +5,27 @@
         <description>Most recent changes for Stasis.</description>
         <language>en</language>
         <item>
+            <title>0.24.0</title>
+            <pubDate>Thu, 22 Oct 2026 17:15:32 +0000</pubDate>
+            <sparkle:version>81</sparkle:version>
+            <sparkle:shortVersionString>0.24.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>Features &amp; Core Capabilities</h3>
+<ul>
+<li><strong>Diagnostic Log Export:</strong> Added diagnostic logs export in Settings &gt; About with options to save a timestamped zip archive containing both application and privileged daemon logs, or reveal the log directory in Finder.</li>
+<li><strong>Structured System Logging:</strong> Implemented structured file-based logging (<code>StasisLogger</code>) with automatic rotation and privileged helper event tracing, routing logs to both Apple OSLog and persistent log files.</li>
+</ul>
+<h3>Bug Fixes &amp; Refinements</h3>
+<ul>
+<li><strong>Time Remaining Calculation:</strong> Fixed an issue where the battery menu displayed &quot;Calculating…&quot; indefinitely on battery mode by falling back to modern IOKit power source APIs (<code>AvgTimeToEmpty</code> and <code>IOPSGetTimeRemainingEstimate</code>) on modern Apple Silicon Macs and macOS 27 (#52).</li>
+<li><strong>Log Noise Reduction:</strong> Throttled high-frequency IOKit polling metrics to state-change triggers and a periodic 60s heartbeat, preventing log flooding.</li>
+<li><strong>Localization:</strong> Organized and sorted string catalog keys alphabetically across all 18 supported languages in <code>Localizable.xcstrings</code>.</li>
+</ul>
+
+]]></description>
+            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.24.0/Stasis.dmg" length="4613555" type="application/octet-stream" sparkle:edSignature="MRYofcctk4XSYPiGYSh6rOUuoh+80VqNQ676ph3uX2x+dGwWIkwBVxPYFAPiZrFxwT7y6r0ktaj8yT0LXWR5Dg=="/>
+        </item>
+        <item>
             <title>0.23.1</title>
             <pubDate>Wed, 23 Sep 2026 07:04:35 +0000</pubDate>
             <sparkle:version>78</sparkle:version>
@@ -41,21 +62,6 @@
 
 ]]></description>
             <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.23.0/Stasis.dmg" length="4588205" type="application/octet-stream" sparkle:edSignature="8jgx2U573fC8qfeVNp3L8jly9hKX+k4xQ4eGtnaqJOF7yKIRVL+3EwzlAa22pYxCgIBQvJZU8j7zLgdOTI/bBA=="/>
-        </item>
-        <item>
-            <title>0.22.2</title>
-            <pubDate>Wed, 16 Sep 2026 10:11:58 +0000</pubDate>
-            <sparkle:version>76</sparkle:version>
-            <sparkle:shortVersionString>0.22.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.8</sparkle:minimumSystemVersion>
-            <description><![CDATA[<ul>
-<li><strong>Right-Click Context Menu:</strong> Added a native context menu via right-click on the battery menu bar icon, featuring a toggle for Low Power Mode and a shortcut to System Battery Settings.</li>
-<li><strong>MagSafe LED Behavior:</strong> Fixed MagSafe LED on macOS 27 native mode to accurately transition to &quot;paused&quot; (green) as soon as the native charge limit is reached.</li>
-<li><strong>Optimized UI Updates:</strong> Settings toggles now apply instantly by removing artificial interaction delays using optimistic updates and zero-delay polling.</li>
-</ul>
-
-]]></description>
-            <enclosure url="https://github.com/DinanathDash/Stasis/releases/download/v0.22.2/Stasis.dmg" length="4579861" type="application/octet-stream" sparkle:edSignature="CE04+bmGXTuvgaVhS0W+EaKPNNc088EPOu9CbbrJ6rpXR8QRCO9S/f9GeKjlWfUppRZMfnP2HHKZDIcc9nPDAw=="/>
         </item>
     </channel>
 </rss>
