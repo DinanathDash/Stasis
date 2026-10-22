@@ -6,7 +6,14 @@ All notable changes to Stasis are documented here.
 
 ## Unreleased
 
-- No unreleased changes yet.
+### Features & Core Capabilities
+- **Diagnostic Log Export:** Added diagnostic logs export in Settings > About with options to save a timestamped zip archive containing both application and privileged daemon logs, or reveal the log directory in Finder.
+- **Structured System Logging:** Implemented structured file-based logging (`StasisLogger`) with automatic rotation and privileged helper event tracing, routing logs to both Apple OSLog and persistent log files.
+
+### Bug Fixes & Refinements
+- **Time Remaining Calculation:** Fixed an issue where the battery menu displayed "Calculating…" indefinitely on battery mode by falling back to modern IOKit power source APIs (`AvgTimeToEmpty` and `IOPSGetTimeRemainingEstimate`) on modern Apple Silicon Macs and macOS 27 (#52).
+- **Log Noise Reduction:** Throttled high-frequency IOKit polling metrics to state-change triggers and a periodic 60s heartbeat, preventing log flooding.
+- **Localization:** Organized and sorted string catalog keys alphabetically across all 18 supported languages in `Localizable.xcstrings`.
 
 ---
 
