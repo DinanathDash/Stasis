@@ -27,7 +27,7 @@ enum ChargingPowerEvents {
     /// Deadband to prevent micro-charging cycles (e.g. bouncing between 85% and 86%) when automatic discharge is enabled.
     private static let microChargeDeadbandPercent: UInt8 = 1
 
-    private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingPowerEvents")
+    private static let logger = ChargingHelperLog(category: "ChargingPowerEvents")
 
     static func start() {
         guard !isRunning else { return }

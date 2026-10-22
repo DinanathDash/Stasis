@@ -11,10 +11,7 @@ class SignificantEnergyService {
 
     private let threshold: Double = 1.0
     private var openMenuTask: Task<Void, Never>?
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "SignificantEnergyService"
-    )
+    private let logger = StasisLog(category: "SignificantEnergyService")
 
     init() {}
 

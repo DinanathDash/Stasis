@@ -38,10 +38,7 @@ class ChargingHelperManager {
 
     private var service: SMAppService
     private var connection: NSXPCConnection?
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "ChargingHelperManager"
-    )
+    private let logger = StasisLog(category: "ChargingHelperManager")
 
     private(set) var helperStatus: ChargingHelperStatus
 

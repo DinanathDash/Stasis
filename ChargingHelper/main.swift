@@ -3,10 +3,7 @@ import os.log
 import Security
 import smc_power
 
-let logger = Logger(
-    subsystem: "com.dinanathdash.stasis.charging-helper",
-    category: "ServiceDelegate"
-)
+let logger = ChargingHelperLog(category: "ServiceDelegate")
 
 let battery: SMCBattery
 let adapter: SMCAdapter

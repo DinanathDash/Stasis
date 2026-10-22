@@ -66,6 +66,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        StasisLogger.info("Stasis launched (version: \(appVersion))")
+
         // Perform first‑run / version‑upgrade reset of user defaults
         let launchState = resetStasisPreferencesIfNeeded()
         // Exit the app immediately if the device doesn't have a battery

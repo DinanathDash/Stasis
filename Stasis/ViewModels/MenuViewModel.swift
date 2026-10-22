@@ -14,6 +14,7 @@ class MenuViewModel {
     let significantEnergyService: SignificantEnergyService
     private let bootTimestamp: Date?
     private var targetTimeEstimator = TargetTimeEstimator()
+    private let logger = StasisLog(category: "MenuViewModel")
 
     var significantApps: [SignificantEnergyApp] {
         significantEnergyService.apps
@@ -161,18 +162,22 @@ class MenuViewModel {
     }
 
     func toggleChargeLimitOverride() {
+        logger.info("User toggled charge limit override (now \(!chargeLimitOverrideActive))")
         chargeManager.toggleChargeLimitOverride()
     }
 
     func toggleForceDischarge() {
+        logger.info("User toggled force discharge (now \(!forceDischargeActive))")
         chargeManager.toggleForceDischarge()
     }
 
     func toggleChargeToLimit() {
+        logger.info("User toggled charge to limit (now \(!chargeToLimitActive))")
         chargeManager.toggleChargeToLimit()
     }
 
     func toggleLowPowerMode() async throws {
+        logger.info("User toggled low power mode")
         try await batteryService.toggleLowPowerMode()
     }
 
@@ -238,7 +243,9 @@ class MenuViewModel {
             adapterCapacityWatts: adapter.adapterCapacityWatts
         )
 
-        if Defaults[.manageCharging] {
+        // Target time estimator is designed for plugged-in charging to a target limit.
+        // When on battery power, always display the battery discharge time remaining.
+        if Defaults[.manageCharging] && safeMetrics.externalConnected {
             let target = chargeManager.chargeLimitOverrideActive ? 100 : Defaults[.chargeLimit]
             timeRemainingText = targetTimeEstimator.update(
                 safeMetrics, target: target, now: ProcessInfo.processInfo.systemUptime
@@ -563,7 +570,7 @@ class MenuViewModel {
         adapterConnected: Bool,
         batteryPercentage: Int
     ) -> String {
-        if adapterConnected {
+        if adapterConnected && !isCharging {
             return String(localized: "N/A")
         }
 

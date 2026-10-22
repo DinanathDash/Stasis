@@ -4,7 +4,7 @@ import os.log
 @MainActor
 enum ChargingSettings {
     private static let defaults = UserDefaults.standard
-    private static let logger = Logger(subsystem: "com.dinanathdash.stasis.charging-helper", category: "ChargingSettings")
+    private static let logger = ChargingHelperLog(category: "ChargingSettings")
 
     static var manageCharging: Bool {
         get { defaults.bool(forKey: "manageCharging") }

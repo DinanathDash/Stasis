@@ -13,10 +13,7 @@ class CalibrationManager {
     private var metricsObservation: Task<Void, Never>?
     private var schedulerTask: Task<Void, Never>?
 
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "CalibrationManager"
-    )
+    private let logger = StasisLog(category: "CalibrationManager")
 
     init(batteryService: BatteryService, chargeManager: ChargeManager) {
         self.batteryService = batteryService

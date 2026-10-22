@@ -5,10 +5,7 @@ import os.log
 class SMCReaderConnection {
     private var connection: NSXPCConnection?
     private let serviceName: String
-    private let logger = Logger(
-        subsystem: "com.dinanathdash.stasis",
-        category: "SMCReaderConnection"
-    )
+    private let logger = StasisLog(category: "SMCReaderConnection")
 
     private var reconnectAttempts = 0
     private var reconnectTask: Task<Void, Never>?

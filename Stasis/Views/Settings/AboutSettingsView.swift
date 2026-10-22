@@ -1,10 +1,12 @@
 import Defaults
 import ServiceManagement
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct AboutSettingsView: View {
     @Environment(\.openURL) private var openURL
     @ObservedObject private var updaterManager = UpdaterManager.shared
+    @State private var isExportingLogs: Bool = false
 
     init() {}
 
@@ -95,6 +97,36 @@ struct AboutSettingsView: View {
             }
 
             Section {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Diagnostic Logs")
+                            .fontWeight(.medium)
+                        Text("Export logs or reveal the log directory in Finder.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    HStack(spacing: 8) {
+                        Button(isExportingLogs ? String(localized: "Exporting…") : String(localized: "Export…")) {
+                            exportLogs()
+                        }
+                        .disabled(isExportingLogs)
+
+                        Button(String(localized: "Reveal")) {
+                            StasisLogExporter.revealInFinder()
+                        }
+                    }
+                }
+            } header: {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Diagnostics")
+                    Text("Helpful for troubleshooting and attaching to bug reports.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Section {
                 Toggle(isOn: Binding(
                     get: { updaterManager.automaticallyChecksForUpdates },
                     set: { updaterManager.automaticallyChecksForUpdates = $0 }
@@ -153,6 +185,40 @@ struct AboutSettingsView: View {
         }
 
         return String(localized: "Version \(shortVersion)")
+    }
+
+    private func exportLogs() {
+        isExportingLogs = true
+        Task {
+            defer { isExportingLogs = false }
+            do {
+                let tempZipURL = try await StasisLogExporter.exportLogs()
+                defer {
+                    try? FileManager.default.removeItem(at: tempZipURL)
+                }
+
+                let panel = NSSavePanel()
+                panel.title = String(localized: "Export Stasis Logs")
+                panel.nameFieldStringValue = tempZipURL.lastPathComponent
+                panel.allowedContentTypes = [.zip]
+                panel.canCreateDirectories = true
+
+                if panel.runModal() == .OK, let destinationURL = panel.url {
+                    let fileManager = FileManager.default
+                    if fileManager.fileExists(atPath: destinationURL.path) {
+                        try fileManager.removeItem(at: destinationURL)
+                    }
+                    try fileManager.copyItem(at: tempZipURL, to: destinationURL)
+                }
+            } catch {
+                StasisLogger.error("Failed to export logs: \(error.localizedDescription)")
+                NSAlert.show(
+                    title: "Export Failed",
+                    message: error.localizedDescription,
+                    style: .warning
+                )
+            }
+        }
     }
 }
 

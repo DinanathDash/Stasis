@@ -7,10 +7,7 @@ private enum Constants {
 }
 
 final class ChargingHelper: NSObject, ChargingHelperProtocol, @unchecked Sendable {
-    private let logger = Logger(
-        subsystem: Constants.subsystem,
-        category: "ChargingHelper"
-    )
+    private let logger = ChargingHelperLog(category: "ChargingHelper")
 
     private let battery: SMCBattery
     private let adapter: SMCAdapter
