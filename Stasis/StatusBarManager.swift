@@ -2,8 +2,18 @@ import AppKit
 import Defaults
 import SwiftUI
 
+enum StatusBarDisplayMode: Equatable {
+    case percentageOnly
+    case batteryGraphic
+
+    init(showBatteryGraphic: Bool) {
+        self = showBatteryGraphic ? .batteryGraphic : .percentageOnly
+    }
+}
+
 @MainActor
 class StatusBarManager {
+    static let statusItemIsAlwaysVisible = true
     private let statusItem: NSStatusItem
     private let viewModel: MenuViewModel
 
@@ -13,6 +23,7 @@ class StatusBarManager {
             withLength: NSStatusItem.variableLength
         )
         statusItem.autosaveName = "StasisBatteryStatusItem"
+        statusItem.isVisible = Self.statusItemIsAlwaysVisible
         setupPersistentHostingView()
     }
 
@@ -105,17 +116,31 @@ class StatusBarHostingView: NSHostingView<StatusBarContentView> {
 
 struct StatusBarContentView: View {
     let viewModel: MenuViewModel
+    @Default(.showBatteryGraphicInStatusIcon) var showBatteryGraphicInStatusIcon
     @Default(.batteryPercentageVisibility) var batteryPercentageVisibility
     @Default(.showBatteryStateInStatusIcon) var showBatteryStateInStatusIcon
 
+    private var displayMode: StatusBarDisplayMode {
+        StatusBarDisplayMode(showBatteryGraphic: showBatteryGraphicInStatusIcon)
+    }
+
     var body: some View {
-        BatteryIndicatorView(
-            batteryLevel: viewModel.displayPercentage,
-            chargingMode: viewModel.chargingMode,
-            isLowPowerModeEnabled: viewModel.isLowPowerModeEnabled,
-            batteryPercentageVisibility: batteryPercentageVisibility,
-            showState: showBatteryStateInStatusIcon
-        )
+        Group {
+            switch displayMode {
+            case .percentageOnly:
+                Text(viewModel.displayPercentage.formattedPercentage)
+                    .font(.system(size: 12, weight: .medium))
+                    .monospacedDigit()
+            case .batteryGraphic:
+                BatteryIndicatorView(
+                    batteryLevel: viewModel.displayPercentage,
+                    chargingMode: viewModel.chargingMode,
+                    isLowPowerModeEnabled: viewModel.isLowPowerModeEnabled,
+                    batteryPercentageVisibility: batteryPercentageVisibility,
+                    showState: showBatteryStateInStatusIcon
+                )
+            }
+        }
         .fixedSize()
     }
 }

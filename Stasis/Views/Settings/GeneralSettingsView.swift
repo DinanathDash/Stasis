@@ -3,6 +3,7 @@ import SwiftUI
 
 struct GeneralSettingsView: View {
     @Default(.launchAtLogin) var launchAtLogin
+    @Default(.showBatteryGraphicInStatusIcon) var showBatteryGraphicInStatusIcon
     @Default(.batteryPercentageVisibility) var batteryPercentageVisibility
     @Default(.showBatteryStateInStatusIcon) var showBatteryStateInStatusIcon
     @Default(.enableNotchHUD) var enableNotchHUD
@@ -18,6 +19,7 @@ struct GeneralSettingsView: View {
             }
 
             Section {
+                Toggle("Show battery icon", isOn: $showBatteryGraphicInStatusIcon)
                 Picker("Battery percentage", selection: $batteryPercentageVisibility) {
                     ForEach(BatteryPercentageVisibility.allCases) { visibility in
                         Text(verbatim: visibility.localizedName).tag(visibility)
@@ -28,7 +30,7 @@ struct GeneralSettingsView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Menu Bar Icon")
                     Text(
-                        "Display battery percentage next to or inside the menu bar icon."
+                        "Show the battery icon and configure the information displayed in the menu bar."
                     )
                     .font(.subheadline)
                     .foregroundStyle(.secondary)

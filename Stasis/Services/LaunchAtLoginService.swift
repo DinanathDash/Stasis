@@ -10,6 +10,13 @@ class LaunchAtLoginService {
     private init() {}
 
     func setLaunchAtLogin(_ enabled: Bool) {
+        let currentStatus = SMAppService.mainApp.status
+        guard (enabled && currentStatus != .enabled)
+            || (!enabled && currentStatus == .enabled)
+        else {
+            return
+        }
+
         do {
             if enabled {
                 try SMAppService.mainApp.register()

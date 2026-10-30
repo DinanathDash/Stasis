@@ -93,8 +93,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 } catch {
                     print("ERROR: forceUpgrade failed with \(error)")
                 }
-            } else {
-                try? ChargingHelperManager.shared.install()
             }
             forceSyncSettings()
         } else if launchState == .firstRun {

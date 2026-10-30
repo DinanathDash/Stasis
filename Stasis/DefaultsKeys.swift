@@ -213,6 +213,10 @@ extension Defaults.Keys {
     static let appLanguage = Key<AppLanguage>("appLanguage", default: .system)
 
     /// Status Icon
+    static let showBatteryGraphicInStatusIcon = Key<Bool>(
+        "showBatteryGraphicInStatusIcon",
+        default: true
+    )
     static let batteryPercentageVisibility = Key<BatteryPercentageVisibility>(
         "batteryPercentageVisibility",
         default: .nextToIcon
